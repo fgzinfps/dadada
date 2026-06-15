@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  DEMONSTRAÇÃO EDUCACIONAL — "CAÇA-NÍQUEL" (SLOT LAB)
+  ============================================================================
+  ATENÇÃO: Este arquivo NÃO é um jogo de azar. É uma peça didática.
+  Os resultados são ROTEIRIZADOS (vitória, vitória, derrota) para expor, passo
+  a passo, como a interface de um cassino manipula o jogador. Não há dinheiro
+  real, não há aleatoriedade real nos 3 primeiros giros, e o objetivo é
+  EXPLICAR o mecanismo — não reproduzi-lo de forma atraente.
+
+  Estrutura do arquivo:
+    1. <head>      -> metadados, fontes e TODO o CSS (comentado por blocos)
+    2. <header>    -> faixa fixa de aviso "DEMONSTRAÇÃO EDUCACIONAL"
+    3. .machine    -> a máquina em si (rolos, créditos fictícios, botão Girar)
+    4. .sidebar    -> histórico de resultados + estatísticas da demonstração
+    5. .reveal     -> painel que aparece APÓS o 3º giro, explicando o truque
+    6. <script>    -> toda a lógica (máquina de estados + animação dos rolos)
+  ============================================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demonstração Educacional — Como funciona um caça-níquel</title>
+
+  <!-- Fontes: Geist (interface) e Geist Mono (dados / leitura de "laboratório").
+       Carregadas via CDN; há fallback caso a rede falhe. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ====================================================================
+       1. TOKENS DE DESIGN (variáveis CSS)
+       Concentro cor e tipografia aqui para manter tudo coerente.
+       - Fundo "laboratório": tons frios de ardósia.
+       - A máquina usa o vermelho/dourado original (a "isca"), de propósito.
+       - O ciano é a "voz analítica" que comenta a máquina.
+       ==================================================================== */
+    :root {
+      --bg:        #0e1318;   /* fundo geral, bem escuro */
+      --panel:     #161e27;   /* cartões e painéis */
+      --panel-2:   #1d2732;   /* superfícies elevadas */
+      --line:      #2a3744;   /* linhas/divisórias finas */
+      --ink:       #e9edf2;   /* texto principal */
+      --muted:     #8a98a8;   /* texto secundário */
+      --bait-red:  #d23a22;   /* vermelho da máquina (isca) */
+      --bait-gold: #e6b13e;   /* dourado da máquina (isca) */
+      --analysis:  #46d7c7;   /* ciano analítico (a "verdade") */
+      --win:       #5fd38a;   /* feedback de vitória */
+      --loss:      #d96868;   /* feedback de derrota */
+      --radius:    14px;
+      --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+      --sans: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* ====================================================================
+       2. RESET BÁSICO E BASE
+       ==================================================================== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background:
+        radial-gradient(1200px 600px at 50% -10%, #14202b 0%, transparent 60%),
+        var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Respeita quem pediu menos animação no sistema operacional. */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    /* ====================================================================
+       LOADSCREEN / SPLASH DE AVISO ("Cuidado com as apostas")
+       Cobre a tela inteira ao carregar; só some quando o usuário confirma.
+       ==================================================================== */
+    .splash {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      background: radial-gradient(1000px 600px at 50% 28%, #1b2433, #090d11 82%);
+      transition: opacity 0.5s ease;
+    }
+    .splash.hide { opacity: 0; pointer-events: none; } /* estado de saída */
+    .splash-card {
+      max-width: 460px; text-align: center;
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 18px; padding: 34px 28px 28px;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.55);
+      animation: splash-in 0.5s ease;
+    }
+    @keyframes splash-in {
+      from { opacity: 0; transform: translateY(16px) scale(0.98); }
+      to   { opacity: 1; transform: none; }
+    }
+    /* Ícone de alerta (SVG) com leve pulsação. */
+    .splash-icon {
+      width: 84px; height: 84px; margin: 0 auto 16px; display: block;
+      color: var(--bait-gold);
+      animation: alert-pulse 1.8s ease-in-out infinite;
+    }
+    .splash-icon .tri  { fill: rgba(230,177,62,0.08); stroke: currentColor; stroke-width: 4; stroke-linejoin: round; }
+    .splash-icon .mark { stroke: currentColor; stroke-width: 5; stroke-linecap: round; fill: none; }
+    @keyframes alert-pulse {
+      0%, 100% { filter: drop-shadow(0 0 0 rgba(230,177,62,0)); }
+      50%      { filter: drop-shadow(0 0 14px rgba(230,177,62,0.55)); }
+    }
+    .splash-card h2 { font-size: 24px; font-weight: 800; color: var(--bait-gold); margin-bottom: 10px; letter-spacing: -0.01em; }
+    .splash-card p  { color: var(--muted); font-size: 14.5px; line-height: 1.6; margin-bottom: 22px; }
+    .splash-btn {
+      padding: 13px 22px; border: none; border-radius: 11px; cursor: pointer;
+      font-family: var(--sans); font-weight: 700; font-size: 15px; color: #06231f;
+      background: linear-gradient(180deg, var(--analysis), #2bb6a8);
+    }
+    .splash-btn:hover { filter: brightness(1.06); }
+    .splash-btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+    /* ====================================================================
+       3. FAIXA FIXA DE AVISO (sempre visível)
+       Deixa explícito, o tempo todo, que isto é uma demonstração.
+       ==================================================================== */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 10px 16px;
+      background: repeating-linear-gradient(45deg, #2a1f14, #2a1f14 12px, #241a10 12px, #241a10 24px);
+      border-bottom: 1px solid #3a2c1a;
+      font-family: var(--mono);
+      font-size: 12.5px; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--bait-gold);
+      text-align: center;
+    }
+    .topbar strong { color: #ffe9b0; }
+
+    /* ====================================================================
+       4. LAYOUT GERAL
+       ==================================================================== */
+    .wrap {
+      max-width: 1080px; margin: 0 auto; padding: 28px 20px 60px;
+    }
+
+    .intro { margin-bottom: 26px; }
+    .eyebrow {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--analysis);
+    }
+    .intro h1 {
+      font-size: clamp(26px, 4.5vw, 40px); font-weight: 800;
+      letter-spacing: -0.02em; margin: 8px 0 10px; line-height: 1.1;
+    }
+    .intro p { color: var(--muted); max-width: 60ch; font-size: 15px; }
+
+    /* Grade: máquina à esquerda, barra lateral (histórico/stats) à direita.
+       Em telas pequenas vira coluna única (ver media query no fim). */
+    .grid {
+      display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px;
+      align-items: start;
+    }
+
+    /* ====================================================================
+       5. A MÁQUINA ("espécime" em vermelho/dourado)
+       ==================================================================== */
+    .machine {
+      position: relative;
+      border-radius: var(--radius);
+      padding: 22px;
+      background:
+        radial-gradient(120% 80% at 50% 0%, #7a1d10 0%, #5a160c 45%, #3c0f08 100%);
+      border: 1px solid #7c2a18;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    /* Etiqueta de "espécime", reforçando que é objeto de estudo. */
+    .machine::before {
+      content: "ESPÉCIME · slot 3×3 simplificado";
+      position: absolute; top: 12px; left: 14px;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+      color: rgba(255,225,180,0.55);
+    }
+
+    .machine-title {
+      text-align: center; margin: 16px 0 18px;
+      font-weight: 800; letter-spacing: 0.02em;
+      color: var(--bait-gold);
+      font-size: 22px;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.4);
+    }
+    .machine-title .emoji { filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
+
+    /* Os rolos: 3 colunas. Cada coluna tem uma "janela" que mostra 1 símbolo,
+       e por baixo uma tira longa de símbolos que desliza durante o giro. */
+    .reels {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      padding: 14px; border-radius: 10px;
+      background: #1a0d07;
+      border: 2px solid var(--bait-gold);
+      box-shadow: inset 0 6px 18px rgba(0,0,0,0.6);
+    }
+    .reel {
+      position: relative; height: 110px; overflow: hidden;
+      border-radius: 8px;
+      background: linear-gradient(#241108, #160a05);
+    }
+    /* Sombra superior/inferior pra dar profundidade de "tambor". */
+    .reel::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(180deg, rgba(0,0,0,0.55), transparent 28%, transparent 72%, rgba(0,0,0,0.55));
+    }
+    .strip {
+      display: flex; flex-direction: column;
+      will-change: transform;
+    }
+    .symbol {
+      height: 110px; display: flex; align-items: center; justify-content: center;
+      font-size: 64px; user-select: none;
+    }
+    /* Pequeno destaque na linha vencedora. */
+    .reel.win { box-shadow: 0 0 0 2px var(--bait-gold), 0 0 22px rgba(230,177,62,0.5); }
+
+    /* Painel de créditos fictícios + aposta. */
+    .meters {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 4px;
+    }
+    .meter {
+      background: rgba(0,0,0,0.28); border: 1px solid rgba(255,225,180,0.18);
+      border-radius: 10px; padding: 10px 12px;
+    }
+    .meter .label {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,225,180,0.7);
+    }
+    .meter .value {
+      font-family: var(--mono); font-size: 24px; font-weight: 600; color: #fff;
+    }
+    .meter .value small { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+    /* Controle de aposta (stepper + input + apostar tudo). */
+    .bet-control {
+      display: flex; align-items: stretch; gap: 6px; margin-top: 4px;
+    }
+    .bet-step {
+      width: 34px; flex: none; border: 1px solid rgba(255,225,180,0.3);
+      background: rgba(0,0,0,0.3); color: #ffe9b0; border-radius: 8px;
+      font-size: 20px; font-weight: 700; cursor: pointer; line-height: 1;
+    }
+    .bet-step:hover { background: rgba(255,225,180,0.12); }
+    .bet-step:focus-visible { outline: 2px solid var(--analysis); outline-offset: 2px; }
+    .bet-step:disabled { opacity: 0.4; cursor: not-allowed; }
+    #betInput {
+      flex: 1; min-width: 0; text-align: center;
+      font-family: var(--mono); font-size: 20px; font-weight: 600; color: #fff;
+      background: rgba(0,0,0,0.3); border: 1px solid rgba(255,225,180,0.18);
+      border-radius: 8px; padding: 4px;
+      -moz-appearance: textfield;
+    }
+    #betInput::-webkit-outer-spin-button,
+    #betInput::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    #betInput:focus-visible { outline: 2px solid var(--analysis); outline-offset: 2px; }
+    .bet-max {
+      width: 100%; margin-top: 6px; padding: 5px;
+      background: transparent; border: 1px dashed rgba(255,225,180,0.4);
+      color: rgba(255,225,180,0.85); border-radius: 8px; cursor: pointer;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .bet-max:hover { background: rgba(255,225,180,0.1); }
+    .bet-max:focus-visible { outline: 2px solid var(--analysis); outline-offset: 2px; }
+    .bet-control button:disabled, .bet-max:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Mensagem de status acima do botão (ex.: "VITÓRIA!", "Quase!"). */
+    .status {
+      text-align: center; min-height: 26px; margin: 12px 0 6px;
+      font-weight: 700; font-size: 16px; letter-spacing: 0.01em;
+    }
+    .status.win  { color: #ffe07a; }
+    .status.loss { color: #ffb4ad; }
+
+    /* Botão Girar. */
+    .spin-btn {
+      width: 100%; padding: 16px; border: none; border-radius: 12px;
+      font-family: var(--sans); font-size: 18px; font-weight: 800;
+      letter-spacing: 0.04em; text-transform: uppercase; color: #2a1000;
+      cursor: pointer;
+      background: linear-gradient(180deg, #ffd86b, #e6a72e);
+      box-shadow: 0 6px 0 #9c6d12, 0 10px 22px rgba(0,0,0,0.4);
+      transition: transform 0.06s ease, box-shadow 0.06s ease, filter 0.2s ease;
+    }
+    .spin-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #9c6d12; }
+    .spin-btn:focus-visible { outline: 3px solid var(--analysis); outline-offset: 3px; }
+    .spin-btn:disabled { filter: grayscale(0.7) brightness(0.7); cursor: not-allowed; }
+
+    .spins-left {
+      text-align: center; margin-top: 10px;
+      font-family: var(--mono); font-size: 11px; color: rgba(255,225,180,0.6);
+      letter-spacing: 0.05em;
+    }
+
+    /* ====================================================================
+       6. BARRA LATERAL: HISTÓRICO + ESTATÍSTICAS
+       ==================================================================== */
+    .card {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 16px 16px 18px; margin-bottom: 18px;
+    }
+    .card h2 {
+      font-size: 13px; font-family: var(--mono); font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--analysis);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Estatísticas em grade. */
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat {
+      background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: 10px; padding: 10px 12px;
+    }
+    .stat .num { font-family: var(--mono); font-size: 22px; font-weight: 600; }
+    .stat .cap {
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-top: 2px;
+    }
+    .stat.win .num  { color: var(--win); }
+    .stat.loss .num { color: var(--loss); }
+
+    /* Histórico (lista de giros). */
+    .history { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .history li {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: 10px; padding: 8px 12px; font-size: 14px;
+      animation: pop 0.25s ease;
+    }
+    @keyframes pop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+    .history .combo { font-size: 20px; letter-spacing: 2px; }
+    .history .tag {
+      font-family: var(--mono); font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 999px;
+    }
+    .history .tag.win  { color: var(--win);  background: rgba(95,211,138,0.12); }
+    .history .tag.loss { color: var(--loss); background: rgba(217,104,104,0.12); }
+    .history .empty { color: var(--muted); font-size: 13px; }
+
+    /* ====================================================================
+       7. PAINEL DE REVELAÇÃO (aparece após o 3º giro)
+       É o coração educativo: explica o truque psicológico e a matemática.
+       ==================================================================== */
+    .reveal {
+      display: none;                 /* mostrado via JS após o 3º giro */
+      margin-top: 24px;
+      background: linear-gradient(180deg, #10201f, #0d1a19);
+      border: 1px solid var(--analysis);
+      border-radius: var(--radius);
+      padding: 22px 22px 26px;
+      box-shadow: 0 0 0 1px rgba(70,215,199,0.15), 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .reveal.show { display: block; animation: reveal-in 0.5s ease; }
+    @keyframes reveal-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .reveal h2 {
+      font-size: 20px; font-weight: 800; color: var(--analysis);
+      margin-bottom: 6px; letter-spacing: -0.01em;
+    }
+    .reveal .lede { color: var(--muted); margin-bottom: 18px; font-size: 15px; }
+
+    .tricks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+    .trick {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--line);
+      border-radius: 10px; padding: 14px;
+    }
+    .trick .n {
+      font-family: var(--mono); font-size: 11px; color: var(--analysis);
+      letter-spacing: 0.1em;
+    }
+    .trick h3 { font-size: 14px; margin: 6px 0 6px; }
+    .trick p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* Mini-simulação: "e se você continuasse jogando?" -> queda do saldo. */
+    .sim { background: rgba(0,0,0,0.25); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+    .sim h3 { font-size: 14px; margin-bottom: 4px; }
+    .sim p { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .sim svg { width: 100%; height: 160px; display: block; }
+    .sim .axis { stroke: var(--line); stroke-width: 1; }
+    .sim .curve { fill: none; stroke: var(--loss); stroke-width: 2.5; }
+    .sim .zero { stroke: rgba(255,255,255,0.25); stroke-dasharray: 4 4; stroke-width: 1; }
+    .sim .note { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+
+    .reset-btn {
+      margin-top: 18px; padding: 11px 18px; border-radius: 10px;
+      background: transparent; border: 1px solid var(--analysis); color: var(--analysis);
+      font-family: var(--mono); font-size: 13px; font-weight: 600; cursor: pointer;
+      letter-spacing: 0.05em;
+    }
+    .reset-btn:hover { background: rgba(70,215,199,0.1); }
+    .reset-btn:focus-visible { outline: 3px solid var(--analysis); outline-offset: 3px; }
+
+    /* ====================================================================
+       8. RODAPÉ
+       ==================================================================== */
+    footer {
+      margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--line);
+      color: var(--muted); font-size: 12.5px; line-height: 1.6;
+    }
+    footer strong { color: var(--ink); }
+    .help { color: var(--analysis); }
+
+    /* ====================================================================
+       9. RESPONSIVO
+       ==================================================================== */
+    @media (max-width: 820px) {
+      .grid { grid-template-columns: 1fr; }
+      .tricks { grid-template-columns: 1fr; }
+      .symbol { font-size: 54px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ====================================================================
+       LOADSCREEN: aviso obrigatório antes de mostrar a máquina.
+       Some apenas quando o usuário clica em "Entendi".
+       ==================================================================== -->
+  <div class="splash" id="splash" role="dialog" aria-modal="true" aria-labelledby="splashTitle">
+    <div class="splash-card">
+      <!-- Ícone de alerta desenhado em SVG (triângulo + exclamação). -->
+      <svg class="splash-icon" viewBox="0 0 64 64" aria-hidden="true">
+        <path class="tri"  d="M32 7 L60 55 H4 Z"/>
+        <line class="mark" x1="32" y1="25" x2="32" y2="41"/>
+        <circle class="mark" cx="32" cy="48" r="0.5"/>
+      </svg>
+      <h2 id="splashTitle">Cuidado com as apostas</h2>
+      <p>
+        Esta é uma <strong>demonstração educacional</strong>, sem dinheiro real. Ela existe para mostrar
+        como um caça-níquel manipula o jogador — não para incentivar apostas. No mundo real, a casa
+        sempre vence no longo prazo, e apostar não é fonte de renda.
+      </p>
+      <button class="splash-btn" id="splashBtn">Entendi — é uma demonstração</button>
+    </div>
+  </div>
+
+  <!-- Faixa de aviso fixa: visível em qualquer ponto da rolagem. -->
+  <div class="topbar" role="note">
+    ⚠️ <strong>Demonstração educacional</strong> — sem dinheiro real · resultados roteirizados · não incentiva apostas
+  </div>
+
+  <main class="wrap">
+    <!-- Introdução: define o propósito antes de mostrar a máquina. -->
+    <section class="intro">
+      <div class="eyebrow">Como uma máquina de cassino te prende</div>
+      <h1>Anatomia de um caça-níquel</h1>
+      <p>
+        Abaixo está uma máquina de caça-níquel comum, mas dissecada. Você tem
+        <strong>3 giros</strong> com resultados <em>já decididos</em>: ganha, ganha e perde — a mesma
+        sequência emocional que os jogos reais usam para criar a ilusão de que você está "no controle".
+        Você escolhe <em>quanto</em> apostar; o resultado, não. Ao final, explicamos o truque.
+      </p>
+    </section>
+
+    <div class="grid">
+      <!-- ============ COLUNA ESQUERDA: A MÁQUINA ============ -->
+      <section class="machine" aria-label="Máquina de demonstração">
+        <div class="machine-title"><span class="emoji">🎰</span> SLOT LAB <span class="emoji">7️⃣</span></div>
+
+        <!-- Os três rolos. As tiras (.strip) são preenchidas via JS. -->
+        <div class="reels" id="reels">
+          <div class="reel"><div class="strip" id="strip-0"></div></div>
+          <div class="reel"><div class="strip" id="strip-1"></div></div>
+          <div class="reel"><div class="strip" id="strip-2"></div></div>
+        </div>
+
+        <!-- Créditos fictícios e aposta. -->
+        <div class="meters">
+          <div class="meter">
+            <div class="label">Créditos fictícios</div>
+            <div class="value" id="credits">1000 <small>pts</small></div>
+          </div>
+          <div class="meter">
+            <div class="label">Aposta neste giro</div>
+            <!-- Controle de aposta: diminuir, digitar, aumentar e "apostar tudo". -->
+            <div class="bet-control">
+              <button type="button" class="bet-step" id="betMinus" aria-label="Diminuir aposta">−</button>
+              <input type="number" id="betInput" value="100" min="50" step="50" aria-label="Valor da aposta">
+              <button type="button" class="bet-step" id="betPlus" aria-label="Aumentar aposta">+</button>
+            </div>
+            <button type="button" class="bet-max" id="betMax">Apostar tudo</button>
+          </div>
+        </div>
+
+        <!-- Mensagem de status do giro. -->
+        <div class="status" id="status">Pressione "Girar" para começar a demonstração.</div>
+
+        <!-- Botão Girar. -->
+        <button class="spin-btn" id="spinBtn">🎰 Girar</button>
+        <div class="spins-left" id="spinsLeft">Giros restantes nesta demonstração: 3</div>
+      </section>
+
+      <!-- ============ COLUNA DIREITA: HISTÓRICO + ESTATÍSTICAS ============ -->
+      <aside>
+        <!-- Estatísticas da demonstração. -->
+        <div class="card">
+          <h2>📊 Estatísticas da demonstração</h2>
+          <div class="stats">
+            <div class="stat"><div class="num" id="stTotal">0</div><div class="cap">Giros</div></div>
+            <div class="stat win"><div class="num" id="stWins">0</div><div class="cap">Vitórias</div></div>
+            <div class="stat loss"><div class="num" id="stLoss">0</div><div class="cap">Derrotas</div></div>
+            <div class="stat"><div class="num" id="stNet">0</div><div class="cap">Saldo (pts)</div></div>
+          </div>
+        </div>
+
+        <!-- Histórico de resultados (preenchido via JS). -->
+        <div class="card">
+          <h2>🧾 Histórico de resultados</h2>
+          <ul class="history" id="history">
+            <li class="empty">Nenhum giro ainda.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ============ PAINEL DE REVELAÇÃO (após o 3º giro) ============ -->
+    <section class="reveal" id="reveal" aria-live="polite">
+      <h2>🔍 O que você acabou de ver foi roteirizado</h2>
+      <p class="lede">
+        Os três resultados foram <strong>programados</strong> (ganha · ganha · perde) só para ilustrar
+        conceitos de probabilidade e o funcionamento das interfaces de cassino. As duas vitórias iniciais
+        servem para te deixar confiante. Em uma máquina real, você escolhe quanto apostar, mas
+        <strong>nunca o resultado</strong> — e a matemática é desenhada para a casa vencer no longo prazo.
+        Detalhe honesto: num giro só você não perde tudo — você perde tudo <strong>apostando de novo e de
+        novo (ou dobrando a aposta) para "recuperar"</strong>.
+      </p>
+
+      <!-- Os três truques psicológicos demonstrados. -->
+      <div class="tricks">
+        <div class="trick">
+          <div class="n">TRUQUE 01</div>
+          <h3>Vitória inicial ("hook")</h3>
+          <p>Começar ganhando ativa a sensação de habilidade e sorte. É o mesmo que dar a primeira dose de graça: barato para a casa, viciante para você.</p>
+        </div>
+        <div class="trick">
+          <div class="n">TRUQUE 02</div>
+          <h3>Reforço intermitente</h3>
+          <p>Vitórias imprevisíveis viciam mais que recompensas constantes — o mesmo princípio que mantém você puxando a alavanca de uma rede social.</p>
+        </div>
+        <div class="trick">
+          <div class="n">TRUQUE 03</div>
+          <h3>Perseguir o prejuízo</h3>
+          <p>Depois de ganhar, "apostar mais pra ganhar mais" parece racional — mas é a ruína. Parou em 7️⃣ 7️⃣ ❌: a quase-vitória sussurra "da próxima vai", e é assim que se perde tudo.</p>
+        </div>
+      </div>
+
+      <!-- Mini-simulação honesta: o saldo cai se você continuar jogando. -->
+      <div class="sim">
+        <h3>E se você continuasse jogando?</h3>
+        <p>
+          Simulação de 500 giros com um RTP de 96% (típico do setor): a cada 100 pts apostados,
+          a casa fica, em média, com 4. Parece pouco — mas, repetido, leva seu saldo a zero.
+        </p>
+        <svg id="simChart" viewBox="0 0 600 160" preserveAspectRatio="none" role="img"
+             aria-label="Gráfico mostrando o saldo caindo até zero ao longo de muitos giros"></svg>
+      </div>
+
+      <button class="reset-btn" id="resetBtn">↺ Reiniciar demonstração</button>
+    </section>
+
+    <!-- Rodapé com avisos e contexto. -->
+    <footer>
+      <p>
+        <strong>Aviso:</strong> isto é material educativo. Não há aposta, dinheiro real ou prêmio.
+        Jogos de azar online no estilo caça-níquel causaram endividamento sério no Brasil, especialmente entre jovens.
+        Apostar não é estratégia de renda — a matemática garante a perda no longo prazo.
+      </p>
+      <p style="margin-top:8px">
+        Se você ou alguém que conhece está perdendo o controle com apostas, procurar ajuda é um sinal de força, não de fraqueza.
+        No Brasil, o <span class="help">CVV (188, ligação gratuita, 24h)</span> oferece apoio emocional, e um profissional de saúde pode orientar sobre dependência.
+      </p>
+    </footer>
+  </main>
+
+  <script>
+    /* ======================================================================
+       LÓGICA DA DEMONSTRAÇÃO
+       Tudo é determinístico: nenhum Math.random() decide os 3 giros principais.
+       ====================================================================== */
+
+    /* --- Símbolos usados nas tiras dos rolos (apenas estética do giro). --- */
+    const SYMBOLS = ['7️⃣', '🍒', '🔔', '💎', '🍋', '⭐'];
+
+    /* --- Roteiro fixo dos resultados (o ponto central da demonstração). ---
+       Cada item é o que cada um dos 3 rolos deve mostrar ao parar.
+       Giro 1 e 2: três setes (vitória). Giro 3: 7️⃣ 7️⃣ 🍒 (quase-vitória / derrota). */
+    const SCRIPT = [
+      { reels: ['7️⃣', '7️⃣', '7️⃣'], win: true  },  // 1º giro: vitória
+      { reels: ['7️⃣', '7️⃣', '7️⃣'], win: true  },  // 2º giro: vitória
+      { reels: ['7️⃣', '7️⃣', '🍒'], win: false }   // 3º giro: derrota (quase-vitória)
+    ];
+
+    const MIN_BET = 50;       // aposta mínima (fictícia)
+    const BET_STEP = 50;      // incremento do stepper
+    const WIN_MULTIPLIER = 5; // pagamento de uma vitória = 5x a aposta
+
+    /* --- Estado da demonstração. --- */
+    let state = {
+      credits: 1000,  // créditos fictícios iniciais
+      spin: 0,        // quantos giros já aconteceram
+      wins: 0,
+      losses: 0,
+      net: 0,         // saldo acumulado (lucro/prejuízo fictício)
+      spinning: false // trava o botão durante a animação
+    };
+
+    /* --- Referências de elementos do DOM. --- */
+    const el = {
+      splash:    document.getElementById('splash'),
+      splashBtn: document.getElementById('splashBtn'),
+      strips:    [0,1,2].map(i => document.getElementById('strip-' + i)),
+      reels:     document.querySelectorAll('.reel'),
+      credits:   document.getElementById('credits'),
+      betInput:  document.getElementById('betInput'),
+      betMinus:  document.getElementById('betMinus'),
+      betPlus:   document.getElementById('betPlus'),
+      betMax:    document.getElementById('betMax'),
+      status:    document.getElementById('status'),
+      spinBtn:   document.getElementById('spinBtn'),
+      spinsLeft: document.getElementById('spinsLeft'),
+      history:   document.getElementById('history'),
+      stTotal:   document.getElementById('stTotal'),
+      stWins:    document.getElementById('stWins'),
+      stLoss:    document.getElementById('stLoss'),
+      stNet:     document.getElementById('stNet'),
+      reveal:    document.getElementById('reveal'),
+      resetBtn:  document.getElementById('resetBtn'),
+      simChart:  document.getElementById('simChart')
+    };
+
+    /* ----------------------------------------------------------------------
+       Monta a tira (.strip) de um rolo: muitos símbolos aleatórios "de fachada"
+       e, no FIM da tira, o símbolo-alvo definido pelo roteiro. Assim, quando a
+       tira desliza para cima e para, o que fica visível é exatamente o alvo.
+       ---------------------------------------------------------------------- */
+    const STRIP_LEN = 30;   // quantidade de símbolos por tira
+    const SYMBOL_H  = 110;  // altura de cada símbolo (precisa bater com o CSS)
+
+    // O usuário pediu "menos animação" no SO? Se sim, encurtamos tudo.
+    const REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Plano de velocidade dos rolos (em segundos).
+       Os rolos param em sequência, e o ÚLTIMO gira mais tempo e mais devagar,
+       criando o suspense de "vai fechar ou não" — exatamente o gancho emocional
+       que os slots reais usam tanto na vitória quanto na quase-derrota. */
+    const REEL_PLAN = REDUCE
+      ? [ { delay: 0,   dur: 0.2 }, { delay: 60,   dur: 0.25 }, { delay: 120,  dur: 0.3 } ]
+      : [ { delay: 0,   dur: 2.4 }, { delay: 600,  dur: 2.9  }, { delay: 1300, dur: 3.6 } ];
+
+    function buildStrip(stripEl, targetSymbol) {
+      stripEl.innerHTML = '';
+      // Símbolos de enchimento (aparência do giro).
+      for (let i = 0; i < STRIP_LEN - 1; i++) {
+        const s = document.createElement('div');
+        s.className = 'symbol';
+        s.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+        stripEl.appendChild(s);
+      }
+      // Último símbolo = alvo (o que ficará visível ao parar).
+      const target = document.createElement('div');
+      target.className = 'symbol';
+      target.textContent = targetSymbol;
+      stripEl.appendChild(target);
+
+      // Reposiciona a tira no topo, sem animação, pronta para descer.
+      stripEl.style.transition = 'none';
+      stripEl.style.transform = 'translateY(0)';
+    }
+
+    /* ----------------------------------------------------------------------
+       Anima um rolo: desliza a tira até o último símbolo (o alvo).
+       Cada rolo para com um pequeno atraso extra (efeito "cascata" de slots).
+       Retorna uma Promise que resolve quando a animação termina.
+       ---------------------------------------------------------------------- */
+    function spinReel(stripEl, delayMs, durSec) {
+      return new Promise(resolve => {
+        const finalY = -(STRIP_LEN - 1) * SYMBOL_H; // desloca até o alvo
+        // força reflow para garantir que o transform inicial foi aplicado
+        void stripEl.offsetHeight;
+        setTimeout(() => {
+          // Curva com forte desaceleração: começa girando e vai "frenando" até parar.
+          stripEl.style.transition = 'transform ' + durSec + 's cubic-bezier(0.12, 0.62, 0.18, 1)';
+          stripEl.style.transform  = 'translateY(' + finalY + 'px)';
+          // resolve um pouco depois do fim da transição
+          setTimeout(resolve, durSec * 1000 + 120);
+        }, delayMs);
+      });
+    }
+
+    /* ----------------------------------------------------------------------
+       Fluxo principal de um giro.
+       ---------------------------------------------------------------------- */
+    async function doSpin() {
+      if (state.spinning || state.spin >= SCRIPT.length) return;
+
+      state.spinning = true;
+      el.spinBtn.disabled = true;
+      setControlsDisabled(true);
+      el.status.className = 'status';
+      el.status.textContent = 'Girando...';
+      el.reels.forEach(r => r.classList.remove('win'));
+
+      const result = SCRIPT[state.spin]; // resultado roteirizado deste giro
+
+      // Lê e valida a aposta digitada pelo usuário (entre o mínimo e o saldo).
+      const currentBet = clampBet(parseInt(el.betInput.value, 10));
+      el.betInput.value = currentBet;
+
+      // Cobra a aposta (créditos fictícios).
+      state.credits -= currentBet;
+      state.net     -= currentBet;
+
+      // Constrói as tiras com os alvos corretos e dispara a animação.
+      result.reels.forEach((sym, i) => buildStrip(el.strips[i], sym));
+      await Promise.all([
+        spinReel(el.strips[0], REEL_PLAN[0].delay, REEL_PLAN[0].dur),
+        spinReel(el.strips[1], REEL_PLAN[1].delay, REEL_PLAN[1].dur),
+        spinReel(el.strips[2], REEL_PLAN[2].delay, REEL_PLAN[2].dur)
+      ]);
+
+      // Aplica o resultado.
+      if (result.win) {
+        const payout = currentBet * WIN_MULTIPLIER;
+        state.credits += payout;
+        state.net     += payout;
+        state.wins++;
+        el.status.className = 'status win';
+        el.status.textContent = '🎉 VITÓRIA! +' + payout + ' pts';
+        el.reels.forEach(r => r.classList.add('win'));
+      } else {
+        state.losses++;
+        el.status.className = 'status loss';
+        // Mensagem mais dura quando a derrota zera (ou quase) o saldo.
+        el.status.textContent = state.credits <= 0
+          ? '💥 Apostou tudo e perdeu. Saldo: 0 pts.'
+          : '😬 Quase! Dois setes... mas não fechou.';
+      }
+
+      state.spin++;
+      updateUI(result);
+
+      // Encerramento: após o 3º giro, revela o truque e trava a máquina.
+      if (state.spin >= SCRIPT.length) {
+        el.spinBtn.disabled = true;
+        el.spinBtn.textContent = 'Demonstração concluída';
+        el.spinsLeft.textContent = 'Demonstração concluída — veja a explicação abaixo.';
+        showReveal();
+      } else {
+        el.spinBtn.disabled = false;
+        setControlsDisabled(false);
+      }
+      state.spinning = false;
+    }
+
+    /* ----------------------------------------------------------------------
+       Atualiza painéis (créditos, estatísticas, histórico).
+       ---------------------------------------------------------------------- */
+    function updateUI(result) {
+      el.credits.innerHTML = state.credits + ' <small>pts</small>';
+      syncBetControls(); // ajusta limites da aposta ao novo saldo
+      el.stTotal.textContent = state.spin;
+      el.stWins.textContent  = state.wins;
+      el.stLoss.textContent  = state.losses;
+      el.stNet.textContent   = (state.net >= 0 ? '+' : '') + state.net;
+
+      // Adiciona o giro ao histórico (no topo da lista).
+      const emptyItem = el.history.querySelector('.empty');
+      if (emptyItem) emptyItem.remove();
+
+      const li = document.createElement('li');
+      li.innerHTML =
+        '<span class="combo">' + result.reels.join(' ') + '</span>' +
+        '<span class="tag ' + (result.win ? 'win' : 'loss') + '">' +
+          (result.win ? 'VITÓRIA' : 'DERROTA') + '</span>';
+      el.history.prepend(li);
+    }
+
+    /* ----------------------------------------------------------------------
+       Mostra o painel de revelação e desenha a simulação de longo prazo.
+       ---------------------------------------------------------------------- */
+    function showReveal() {
+      el.reveal.classList.add('show');
+      el.reveal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      drawSimulation();
+    }
+
+    /* ----------------------------------------------------------------------
+       Desenha um gráfico SVG do saldo caindo ao longo de muitos giros.
+       Modelo simples: começa com 1000, aposta 100 por giro, RTP de 96%.
+       É ILUSTRATIVO — mostra a tendência (a casa vence no longo prazo).
+       ---------------------------------------------------------------------- */
+    function drawSimulation() {
+      const W = 600, H = 160, pad = 8;
+      const spins = 500;
+      const bet = 100;
+      const rtp = 0.96;             // 96% retorna ao jogador (4% fica com a casa)
+      // Curva determinística da expectativa: cada giro perde, em média, bet*(1-rtp).
+      let balance = 1000;
+      const points = [];
+      for (let i = 0; i <= spins; i++) {
+        points.push(Math.max(0, balance));
+        balance -= bet * (1 - rtp); // perda esperada por giro = 4 pts
+      }
+      const maxBal = 1000;
+      const toX = i => pad + (i / spins) * (W - pad * 2);
+      const toY = b => H - pad - (b / maxBal) * (H - pad * 2);
+
+      let path = 'M ' + toX(0) + ' ' + toY(points[0]);
+      points.forEach((b, i) => { path += ' L ' + toX(i) + ' ' + toY(b); });
+
+      el.simChart.innerHTML =
+        '<line class="axis" x1="' + pad + '" y1="' + (H - pad) + '" x2="' + (W - pad) + '" y2="' + (H - pad) + '"/>' +
+        '<line class="zero" x1="' + pad + '" y1="' + toY(0) + '" x2="' + (W - pad) + '" y2="' + toY(0) + '"/>' +
+        '<path class="curve" d="' + path + '"/>' +
+        '<text class="note" x="' + (pad + 4) + '" y="' + (toY(1000) + 14) + '">saldo inicial: 1000</text>' +
+        '<text class="note" x="' + (W - 150) + '" y="' + (toY(0) - 8) + '">saldo final: 0 pts</text>';
+    }
+
+    /* ----------------------------------------------------------------------
+       Reinicia tudo para o estado original.
+       ---------------------------------------------------------------------- */
+    function reset() {
+      state = { credits: 1000, spin: 0, wins: 0, losses: 0, net: 0, spinning: false };
+      el.credits.innerHTML = '1000 <small>pts</small>';
+      el.betInput.value = 100;
+      el.betInput.max = 1000;
+      el.status.className = 'status';
+      el.status.textContent = 'Pressione "Girar" para começar a demonstração.';
+      el.spinBtn.disabled = false;
+      el.spinBtn.textContent = '🎰 Girar';
+      el.spinsLeft.textContent = 'Giros restantes nesta demonstração: 3';
+      el.stTotal.textContent = '0';
+      el.stWins.textContent = '0';
+      el.stLoss.textContent = '0';
+      el.stNet.textContent = '0';
+      el.history.innerHTML = '<li class="empty">Nenhum giro ainda.</li>';
+      el.reveal.classList.remove('show');
+      el.reels.forEach(r => r.classList.remove('win'));
+      setControlsDisabled(false);
+      // Recoloca símbolos neutros nos rolos.
+      el.strips.forEach(s => buildStrip(s, SYMBOLS[0]));
+      el.strips.forEach(s => { s.style.transition = 'none'; s.style.transform = 'translateY(0)'; });
+    }
+
+    /* ----------------------------------------------------------------------
+       Helpers do controle de aposta.
+       ---------------------------------------------------------------------- */
+    // Garante que a aposta seja múltipla do passo e fique entre o mínimo e o saldo.
+    function clampBet(v) {
+      if (isNaN(v)) v = MIN_BET;
+      v = Math.round(v / BET_STEP) * BET_STEP;
+      if (v < MIN_BET) v = MIN_BET;
+      if (v > state.credits) v = state.credits;
+      return v;
+    }
+    // Atualiza o limite máximo do campo conforme o saldo atual.
+    function syncBetControls() {
+      el.betInput.max = state.credits;
+      if (parseInt(el.betInput.value, 10) > state.credits) el.betInput.value = state.credits;
+    }
+    // Liga/desliga os controles de aposta (usado durante a animação do giro).
+    function setControlsDisabled(disabled) {
+      el.betInput.disabled = disabled;
+      el.betMinus.disabled = disabled;
+      el.betPlus.disabled  = disabled;
+      el.betMax.disabled   = disabled;
+    }
+
+    /* --- Liga os eventos e prepara a tela inicial. --- */
+    // Fecha a loadscreen de aviso ao confirmar.
+    el.splashBtn.addEventListener('click', () => {
+      el.splash.classList.add('hide');
+      // Remove do fluxo após a transição, liberando interação com a página.
+      setTimeout(() => { el.splash.style.display = 'none'; }, 600);
+    });
+
+    el.spinBtn.addEventListener('click', doSpin);
+    el.resetBtn.addEventListener('click', reset);
+
+    // Botões de ajuste de aposta.
+    el.betMinus.addEventListener('click', () => { el.betInput.value = clampBet(parseInt(el.betInput.value, 10) - BET_STEP); });
+    el.betPlus .addEventListener('click', () => { el.betInput.value = clampBet(parseInt(el.betInput.value, 10) + BET_STEP); });
+    el.betMax  .addEventListener('click', () => { el.betInput.value = state.credits; }); // "apostar tudo"
+    el.betInput.addEventListener('change', () => { el.betInput.value = clampBet(parseInt(el.betInput.value, 10)); });
+
+    // Estado inicial dos rolos (apenas visual).
+    el.strips.forEach(s => buildStrip(s, '7️⃣'));
+    // Atualiza o contador de giros restantes a cada giro.
+    const origUpdate = updateUI;
+    updateUI = function(r) {
+      origUpdate(r);
+      const left = SCRIPT.length - state.spin;
+      if (left > 0) el.spinsLeft.textContent = 'Giros restantes nesta demonstração: ' + left;
+    };
+  </script>
+</body>
+</html>
