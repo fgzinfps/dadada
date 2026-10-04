@@ -9,6 +9,9 @@ Mascote: **dragão vermelho**. As imagens já foram geradas no seu Canva:
 | `cenas/02-simpay` | 7 cofres no balcão | https://www.canva.com/M/MAHXA-ibPww |
 | `cenas/03-24h` | Madrugada no laptop | https://www.canva.com/M/MAHXA41rNH0 |
 | `cenas/04-orquestra` | Regendo cartão, cofre e boleto | https://www.canva.com/M/MAHXAxmMS6c |
+| `cenas/05-funil` | Funil furado | https://www.canva.com/M/MAHXAw4Uxi0 |
+| `cenas/06-saque` | Dinheiro saindo do celular | https://www.canva.com/M/MAHXAyXMLDQ |
+| `cenas/07-f1` | Pit stop de F1 | https://www.canva.com/M/MAHXAwatcQw |
 
 ## Como deixar em alta resolução
 Os JPGs em `cenas/` hoje são **miniaturas de 200px**, porque esta sessão não consegue baixar do Canva. Por isso a prévia sai borrada.
