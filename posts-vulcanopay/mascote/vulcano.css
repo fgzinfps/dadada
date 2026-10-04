@@ -1,0 +1,25 @@
+/* VulcanoPay: identidade própria (escuro, lava, dragão). Não usar moldura de concorrentes. */
+@import url(../post.css);
+
+.post { background: #050203; color: #fff; }
+.scene { left: 0; top: 0; width: 1080px; height: 1350px; object-fit: cover; }
+.shade-top { left: 0; right: 0; top: 0; height: 620px; background: linear-gradient(#050203 0%, rgba(5,2,3,.85) 45%, rgba(5,2,3,0)); }
+.shade-bot { left: 0; right: 0; bottom: 0; height: 330px; background: linear-gradient(rgba(5,2,3,0), rgba(5,2,3,.92) 55%, #050203); }
+
+/* topo: logo + selo */
+.top { left: 84px; right: 84px; top: 76px; display: flex; align-items: center; justify-content: space-between; }
+.top img { height: 70px; }
+.seal { display: inline-flex; align-items: center; gap: 12px; padding: 12px 22px; border-radius: 999px; border: 1.5px solid rgba(255,90,40,.6); background: rgba(255,60,20,.12); font-size: 21px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.seal i { width: 10px; height: 10px; border-radius: 50%; background: #FF5A1F; box-shadow: 0 0 14px #FF5A1F; }
+
+/* título: branco pesado + palavra em lava */
+.ttl { font-weight: 900; font-size: 128px; line-height: .9; letter-spacing: -.05em; word-spacing: .05em; text-shadow: 0 10px 40px rgba(0,0,0,.6); }
+.lava { background: linear-gradient(180deg, #FFC24A 0%, #FF5A1F 40%, #F5022B 75%, #B8001E 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 28px rgba(255,70,20,.45)); }
+.dek { font-size: 33px; font-weight: 500; line-height: 1.25; letter-spacing: -.01em; color: rgba(255,255,255,.82); margin-top: 26px; }
+
+/* rodapé: linha de lava + CTA + site */
+.lavaline { left: 0; right: 0; bottom: 190px; height: 3px; background: linear-gradient(90deg, rgba(245,2,43,0), #F5022B 20%, #FF5A1F 50%, #F5022B 80%, rgba(245,2,43,0)); box-shadow: 0 0 24px #FF3A1F, 0 0 60px rgba(255,60,20,.6); }
+.bottom { left: 84px; right: 84px; bottom: 64px; display: flex; align-items: center; justify-content: space-between; }
+.fire { display: inline-flex; align-items: center; gap: 16px; padding: 24px 38px; border-radius: 999px; background: linear-gradient(135deg, #FF5A1F, #F5022B 55%, #B8001E); font-size: 30px; font-weight: 800; letter-spacing: -.01em; box-shadow: 0 16px 50px rgba(245,2,43,.5), inset 0 1px 0 rgba(255,255,255,.35); }
+.fire svg { width: 30px; height: 30px; }
+.site { font-size: 26px; font-weight: 600; color: rgba(255,255,255,.7); letter-spacing: .01em; }
