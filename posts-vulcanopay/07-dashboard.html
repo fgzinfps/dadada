@@ -2,53 +2,35 @@
 <html lang="pt-BR"><head><meta charset="utf-8"><title>07 · Dashboard</title>
 <link rel="stylesheet" href="post.css">
 <style>
-  .head { left: 0; right: 0; top: 150px; text-align: center; }
-  .head .k { font-weight: 500; font-size: 56px; letter-spacing: -.03em; color: var(--red); }
-  .head .b { font-weight: 900; font-size: 150px; letter-spacing: -.055em; line-height: .95; color: var(--red); }
-  .tray { background: #E4DEDF; border-radius: 52px; padding: 30px; display: flex; gap: 30px; }
-  .w { border-radius: 34px; padding: 30px 32px; color: #fff; position: relative; overflow: hidden;
-       background: linear-gradient(150deg, #3a0710, #1a0306 60%, #2a050b); box-shadow: inset 0 0 0 2px rgba(245,2,43,.45), inset 0 1px 0 rgba(255,255,255,.12), 0 0 40px rgba(245,2,43,.25); }
-  .w .lbl { font-family: "JetBrains Mono"; font-size: 17px; letter-spacing: .14em; color: #FF5A74; font-weight: 600; }
-  .w .val { font-weight: 800; font-size: 46px; letter-spacing: -.03em; margin-top: 16px; }
-  .w .sub { font-size: 22px; font-weight: 600; margin-top: 4px; }
-  .w .up { font-size: 20px; color: var(--ok); font-weight: 700; margin-top: 6px; }
-  .w .ft { position: absolute; left: 32px; bottom: 22px; font-size: 17px; opacity: .55; }
-  .bars { position: absolute; right: 34px; top: 34px; height: 108px; display: flex; align-items: flex-end; gap: 9px; }
-  .bars i { width: 14px; border-radius: 4px; background: linear-gradient(180deg, #FF4A68, #C40020); }
-  .base { position: absolute; right: 34px; top: 146px; width: 220px; border-top: 2px dashed rgba(255,90,116,.5); }
-  .meta { position: absolute; right: 34px; bottom: 26px; display: flex; gap: 40px; font-size: 16px; opacity: .8; }
-  .meta b { display: block; font-size: 22px; opacity: 1; }
-  .w.black { background: linear-gradient(150deg, #2a2627, #121011); box-shadow: inset 0 0 0 2px rgba(255,255,255,.1), 0 0 30px rgba(0,0,0,.2); }
+  .tray { background: #E6E0E1; border-radius: 52px; padding: 28px; }
+  .w { border-radius: 34px; padding: 32px 36px; color: #fff; position: relative; overflow: hidden; }
+  .w.red { background: linear-gradient(150deg, #3a0710, #1a0306 60%, #2a050b); box-shadow: inset 0 0 0 2px rgba(245,2,43,.45), inset 0 1px 0 rgba(255,255,255,.12), 0 0 40px rgba(245,2,43,.22); }
+  .w.black { background: linear-gradient(150deg, #2a2627, #121011); box-shadow: inset 0 0 0 2px rgba(255,255,255,.08); }
+  .lbl { font-size: 18px; letter-spacing: .12em; color: #FF5A74; font-weight: 700; }
+  .bars { position: absolute; right: 40px; bottom: 40px; height: 150px; display: flex; align-items: flex-end; gap: 10px; }
+  .bars i { width: 16px; border-radius: 5px; background: linear-gradient(180deg, #FF4A68, #C40020); }
 </style></head>
 <body><div class="post light grain">
-  <svg style="left:-220px;top:250px;width:700px;height:1200px" viewBox="0 0 700 1200" fill="none"><path d="M10 0 C 420 300, 420 900, 10 1200" stroke="#F5022B" stroke-opacity=".18" stroke-width="3"/></svg>
+  <div style="left:0;right:0;top:200px;text-align:center">
+    <div style="font-weight:500;font-size:58px;letter-spacing:-.03em;color:var(--red)">Feito pensando em</div>
+    <div style="font-weight:900;font-size:168px;letter-spacing:-.055em;line-height:.95;color:var(--red)">Praticidade</div>
+  </div>
 
-  <div class="head"><div class="k">Toda a sua operação</div><div class="b">num só lugar</div></div>
-
-  <div class="tray" style="left:80px;top:500px">
-    <div class="w" style="width:290px;height:250px">
-      <div class="lbl">VENDAS HOJE</div><div class="val" style="font-size:36px;white-space:nowrap">R$ 12.480,90</div><div class="sub">64 Pix pagos</div><div class="up">+22% vs ontem</div><div class="ft">Sua operação</div>
-    </div>
-    <div class="w" style="width:570px;height:250px">
-      <div class="lbl">VENDAS HOJE</div><div class="val" style="font-size:40px">R$ 12.480,90</div><div class="sub">64 Pix pagos</div><div class="up">+22% vs ontem</div>
-      <div class="bars"><i style="height:16%"></i><i style="height:30%"></i><i style="height:22%"></i><i style="height:48%"></i><i style="height:40%"></i><i style="height:66%"></i><i style="height:58%"></i><i style="height:84%"></i><i style="height:72%"></i><i style="height:100%"></i></div>
-      <div class="base"></div>
-      <div class="meta"><span>Ticket médio<b>R$ 195,01</b></span><span>Conversão<b>69,6%</b></span></div>
+  <div class="tray" style="left:150px;top:560px">
+    <div class="w red" style="width:724px;height:250px">
+      <div class="lbl">VENDAS HOJE</div>
+      <div style="font-weight:800;font-size:56px;letter-spacing:-.03em;margin-top:16px">R$ 12.480,90</div>
+      <div style="font-size:24px;font-weight:600;margin-top:4px">64 Pix pagos <span style="color:var(--ok);margin-left:8px">+22%</span></div>
+      <div class="bars"><i style="height:18%"></i><i style="height:32%"></i><i style="height:24%"></i><i style="height:50%"></i><i style="height:42%"></i><i style="height:68%"></i><i style="height:60%"></i><i style="height:86%"></i><i style="height:74%"></i><i style="height:100%"></i></div>
     </div>
   </div>
 
-  <div class="tray" style="left:140px;top:830px">
-    <div class="w black" style="width:240px;height:240px;display:grid;place-items:center;text-align:center">
-      <div><div style="font-weight:900;font-size:96px;letter-spacing:-.04em;line-height:1">64</div><div style="font-size:30px;font-weight:600;margin-top:6px">Pix pagos</div></div>
-    </div>
-    <div class="w black" style="width:560px;height:240px">
-      <div style="display:flex;align-items:center;gap:16px"><img src="assets/logo-icon.png" style="width:52px;filter:drop-shadow(0 0 12px rgba(245,2,43,.7))"><span style="font-size:30px;font-weight:700">VulcanoPay <span style="opacity:.6;font-weight:500">· hoje</span></span></div>
-      <div style="font-weight:900;font-size:66px;letter-spacing:-.035em;margin-top:18px">R$ 12.480,90</div>
-      <div style="font-size:27px;opacity:.7;margin-top:6px">64 Pix pagos · ticket R$ 195,01</div>
+  <div class="tray" style="left:210px;top:880px">
+    <div class="w black" style="width:604px;height:200px;display:flex;align-items:center;gap:28px">
+      <img src="assets/logo-icon.png" style="width:96px;filter:drop-shadow(0 0 16px rgba(245,2,43,.7))">
+      <div><div style="font-size:26px;font-weight:600;opacity:.7">VulcanoPay · hoje</div><div style="font-weight:900;font-size:62px;letter-spacing:-.035em">R$ 12.480,90</div></div>
     </div>
   </div>
-
-  <div class="fine" style="left:0;right:0;top:1142px;text-align:center">Imagens ilustrativas.</div>
 
   <div style="left:0;right:0;bottom:0;height:170px;background:var(--red)"></div>
   <div class="footer" style="bottom:50px;color:#fff">

@@ -3,55 +3,28 @@
 <link rel="stylesheet" href="post.css">
 <style>
   .circle { border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FF3B5C, #F5022B 45%, #B8001E); }
-  .head { left: 0; right: 0; top: 200px; text-align: center; }
-  .head .kick { font-weight: 700; font-size: 40px; letter-spacing: -.02em; color: var(--ink); }
-  .head .kick b { color: var(--red); font-weight: 900; }
-  .head .big { font-weight: 900; font-size: 150px; line-height: .86; letter-spacing: -.055em; word-spacing: .08em; color: var(--red); margin-top: 18px; }
-  .head .sub { font-weight: 600; font-size: 44px; letter-spacing: -.03em; margin-top: 22px; color: var(--ink); }
-
-  .chart { left: 170px; width: 740px; top: 690px; height: 430px; padding: 40px 44px; }
-  .chart .t { display: flex; justify-content: space-between; font-family: "JetBrains Mono"; font-size: 19px; letter-spacing: .12em; opacity: .6; }
-  .bars { position: absolute; left: 44px; right: 44px; bottom: 44px; height: 290px; display: flex; align-items: flex-end; gap: 26px; }
-  .bar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
-  .bar i { display: block; width: 100%; border-radius: 16px 16px 6px 6px; background: rgba(255,255,255,.12); }
-  .bar span { font-size: 19px; font-weight: 600; opacity: .55; margin-top: 14px; text-align: center; line-height: 1.15; }
-  .bar.win i { background: linear-gradient(180deg, #FF4A68, #F5022B); box-shadow: 0 0 50px rgba(245,2,43,.7); }
-  .bar.win span { opacity: 1; color: #fff; font-weight: 800; }
-  .arrow-down { position: absolute; right: 60px; top: 92px; width: 92px; height: 92px; border-radius: 50%; background: var(--red); display: grid; place-items: center; box-shadow: 0 10px 40px rgba(245,2,43,.6); }
-  .arrow-down svg { width: 50px; height: 50px; }
-
-  .note { left: 610px; top: 610px; width: 400px; padding: 22px 26px; display: flex; gap: 18px; align-items: center; }
-  .note .ic { width: 58px; height: 58px; border-radius: 50%; background: #fff; display: grid; place-items: center; flex: none; }
-  .note .ic svg { width: 32px; height: 32px; }
-  .note b { display: block; font-size: 25px; font-weight: 800; }
-  .note span { font-size: 19px; opacity: .7; }
 </style></head>
 <body><div class="post light grain">
-  <div class="circle" style="width:760px;height:760px;left:-420px;top:560px"></div>
-  <div class="circle" style="width:700px;height:700px;right:-360px;top:900px"></div>
+  <div class="circle" style="width:640px;height:640px;left:-300px;top:560px"></div>
+  <div class="circle" style="width:620px;height:620px;right:-280px;top:930px"></div>
 
-  <img class="logo" src="assets/logo-full-light.png" style="left:50%;transform:translateX(-50%);top:70px">
+  <img class="logo" src="assets/logo-full-light.png" style="left:50%;transform:translateX(-50%);top:80px">
 
-  <div class="head">
-    <div class="kick">Woovi agora na <b>VulcanoPay</b></div>
-    <div class="big">A menor taxa<br>do mercado*</div>
-    <div class="sub">entre os gateways de pagamento.</div>
+  <div style="left:0;right:0;top:220px;text-align:center">
+    <div class="h1 red" style="font-size:132px">A menor taxa<br>do mercado.*</div>
+    <div class="lead" style="margin-top:26px;font-size:40px;font-weight:600">Woovi agora na VulcanoPay.</div>
   </div>
 
-  <div class="card-dark chart">
-    <div class="t"><span>TAXA POR PIX</span></div>
-    <div class="arrow-down"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
-    <div class="bars">
-      <div class="bar"><i style="height:92%"></i><span>Gateway<br>A</span></div>
-      <div class="bar"><i style="height:78%"></i><span>Gateway<br>B</span></div>
-      <div class="bar"><i style="height:66%"></i><span>Gateway<br>C</span></div>
-      <div class="bar win"><i style="height:30%"></i><span>VulcanoPay<br>+ Woovi</span></div>
-    </div>
+  <img class="hero-v" src="assets/logo-icon.png" style="width:520px;left:280px;top:640px">
+
+  <div class="notif solid" style="left:96px;top:760px;width:420px">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <div><b>Pix recebido</b><p>com taxa Woovi</p></div><time>agora</time>
   </div>
 
-  <div class="slash" style="bottom:100px">
+  <div class="slash" style="bottom:118px;left:110px;right:110px;height:104px;font-size:46px">
     <span>Migre para a VulcanoPay</span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
   </div>
-  <div class="fine" style="left:0;right:0;bottom:50px;text-align:center;color:var(--ink);opacity:.7">*Gráfico ilustrativo. Consulte condições.</div>
+  <div class="fine" style="left:0;right:0;bottom:60px;text-align:center;color:var(--ink);opacity:.65">*Consulte condições.</div>
 </div></body></html>

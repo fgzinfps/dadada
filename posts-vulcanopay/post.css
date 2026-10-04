@@ -130,3 +130,20 @@ html, body { width: 1080px; height: 1350px; overflow: hidden; background: var(--
 
 /* letra miúda */
 .fine { font-size: 17px; font-weight: 500; opacity: .5; letter-spacing: .01em; }
+
+/* ---------- v2 minimalista: componentes ---------- */
+.notif { display: flex; align-items: center; gap: 22px; padding: 24px 30px 24px 24px; border-radius: 32px; }
+.notif.solid { background: #141012; color: #fff; box-shadow: 0 30px 70px rgba(30,0,6,.35), inset 0 1px 0 rgba(255,255,255,.08); }
+.notif .ic { width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--ok); box-shadow: 0 0 28px rgba(46,224,122,.45); }
+.notif .ic svg { width: 34px; height: 34px; }
+.notif b { display: block; font-size: 28px; font-weight: 800; letter-spacing: -.015em; }
+.notif p { font-size: 21px; opacity: .68; margin-top: 3px; font-weight: 500; }
+.notif time { margin-left: auto; align-self: flex-start; padding-left: 20px; font-size: 18px; opacity: .5; }
+
+.stat { padding: 26px 32px; }
+.stat .lbl { font-size: 17px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; opacity: .75; }
+.stat .val { font-size: 54px; font-weight: 800; letter-spacing: -.03em; margin-top: 8px; color: #FF5A74; }
+.stat .sm { font-size: 18px; opacity: .65; margin-top: 2px; }
+
+.hero-v { pointer-events: none; filter: drop-shadow(0 0 80px rgba(245,2,43,.55)) drop-shadow(0 50px 70px rgba(0,0,0,.55)); }
+.light .hero-v { filter: drop-shadow(0 50px 60px rgba(120,0,20,.28)); }
