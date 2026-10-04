@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>08 · API</title>
+<link rel="stylesheet" href="post.css">
+<style>
+  .code { left: 72px; right: 72px; top: 560px; padding: 0 0 34px; overflow: hidden; }
+  .code .top { display: flex; align-items: center; gap: 12px; padding: 22px 30px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .code .top i { width: 16px; height: 16px; border-radius: 50%; background: rgba(255,255,255,.2); }
+  .code .top i:first-child { background: var(--red); }
+  .code .top span { margin-left: 14px; font-family: "JetBrains Mono"; font-size: 19px; opacity: .55; }
+  pre { font-family: "JetBrains Mono"; font-size: 25px; line-height: 1.6; padding: 26px 40px 0; color: #F3E9EA; white-space: pre; }
+  .k { color: #FF5A74; } .s { color: #FFC2CB; } .n { color: #fff; font-weight: 600; } .c { color: rgba(255,255,255,.4); }
+  .m { color: #fff; background: var(--red); padding: 2px 10px; border-radius: 8px; font-weight: 600; }
+  .hook { right: 46px; top: 1000px; width: 470px; padding: 24px 28px; display: flex; align-items: center; gap: 20px; transform: rotate(-3deg); }
+  .hook .ic { width: 60px; height: 60px; border-radius: 50%; background: var(--ok); display: grid; place-items: center; flex: none; box-shadow: 0 0 30px rgba(46,224,122,.5); }
+  .hook .ic svg { width: 34px; height: 34px; }
+  .hook b { font-family: "JetBrains Mono"; font-size: 24px; display: block; }
+  .hook span { font-size: 20px; opacity: .7; }
+  .chips { left: 72px; top: 1050px; display: flex; flex-direction: column; gap: 14px; }
+  .chip { display: inline-flex; align-items: center; gap: 12px; padding: 14px 22px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.18); background: rgba(255,255,255,.05); font-size: 23px; font-weight: 600; align-self: flex-start; }
+</style></head>
+<body><div class="post dark grain">
+  <div class="glow" style="width:800px;height:800px;right:-300px;top:-300px;background:rgba(245,2,43,.4)"></div>
+  <div class="glow" style="width:700px;height:700px;left:-260px;top:900px;background:rgba(160,0,25,.4)"></div>
+  <img class="bigv" src="assets/logo-icon.png" style="width:520px;right:-120px;top:40px;opacity:.55;transform:rotate(8deg)">
+
+  <img class="logo" src="assets/logo-full-dark.png" style="left:72px;top:72px">
+
+  <div class="h1" style="left:72px;top:220px;font-size:140px">Integre hoje.<br><span class="red">Venda hoje.</span></div>
+
+  <div class="glass code">
+    <div class="top"><i></i><i></i><i></i><span>exemplo · criar cobrança Pix</span></div>
+<pre><span class="m">POST</span> <span class="n">/pix/cobrancas</span>
+{
+  <span class="k">"valor"</span>: <span class="s">197.00</span>,
+  <span class="k">"cliente"</span>: <span class="s">"João Silva"</span>,
+  <span class="k">"expira_em"</span>: <span class="s">900</span>
+}
+<span class="c">// → QR Code + copia e cola na resposta</span></pre>
+  </div>
+
+  <div class="chips">
+    <div class="chip"><i class="dot"></i>API REST</div>
+    <div class="chip"><i class="dot"></i>Webhooks</div>
+    <div class="chip"><i class="dot"></i>QR Code dinâmico</div>
+  </div>
+
+  <div class="glass hook">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <div><b>webhook · pix.pago</b><span>R$ 197,00 confirmado</span></div>
+  </div>
+
+  <div class="cta" style="right:72px;bottom:64px;font-size:26px;padding:24px 34px">Link na bio para integrar
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+</div></body></html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>05 · Saque</title>
+<link rel="stylesheet" href="post.css">
+<style>
+  .wallet { left: 72px; right: 72px; top: 650px; padding: 44px 48px; }
+  .wallet .t { font-family: "JetBrains Mono"; font-size: 20px; letter-spacing: .14em; opacity: .7; }
+  .wallet .bal { font-weight: 900; font-size: 104px; letter-spacing: -.045em; margin-top: 10px; line-height: 1; }
+  .wallet .bal small { font-size: 54px; opacity: .8; margin-right: 8px; }
+  .wallet .btn { position: absolute; right: 48px; top: 64px; background: #fff; color: var(--ink); font-weight: 800; font-size: 30px; padding: 22px 40px; border-radius: 999px; display: flex; align-items: center; gap: 14px; box-shadow: 0 16px 40px rgba(0,0,0,.35); }
+  .wallet .btn svg { width: 30px; height: 30px; }
+  .steps { left: 72px; right: 72px; top: 960px; padding: 34px 44px; }
+  .step { display: flex; align-items: center; gap: 24px; height: 84px; }
+  .step + .step { border-top: 1px solid rgba(255,255,255,.1); }
+  .step .ic { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; flex: none; background: rgba(46,224,122,.15); border: 2px solid var(--ok); }
+  .step .ic svg { width: 28px; height: 28px; }
+  .step b { font-size: 30px; font-weight: 700; }
+  .step span { margin-left: auto; font-family: "JetBrains Mono"; font-size: 20px; letter-spacing: .08em; color: var(--ok); }
+</style></head>
+<body><div class="post dark grain">
+  <div class="glow" style="width:900px;height:900px;left:-300px;top:500px;background:rgba(245,2,43,.38)"></div>
+  <img class="bigv" src="assets/logo-icon.png" style="width:700px;right:-250px;top:-80px;opacity:.85;transform:rotate(14deg)">
+
+  <img class="logo" src="assets/logo-full-dark.png" style="left:72px;top:72px">
+
+  <div class="h1" style="left:72px;top:230px;font-size:128px">Seu dinheiro<br><span class="red">não fica<br>preso.</span></div>
+
+  <div class="glass-red wallet">
+    <div class="t">SALDO DISPONÍVEL</div>
+    <div class="bal"><small>R$</small>48.730,20</div>
+    <div class="btn">Sacar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+  </div>
+
+  <div class="glass steps">
+    <div class="step"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2EE07A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><b>Saque solicitado</b><span>OK</span></div>
+    <div class="step"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2EE07A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><b>Enviado para sua conta</b><span>CONCLUÍDO</span></div>
+  </div>
+
+  <div class="footer">
+    <span class="fine" style="opacity:.45">Imagem ilustrativa.</span>
+    <div class="line"></div>
+    <div class="tag">Migre para<b>VulcanoPay</b></div>
+  </div>
+</div></body></html>

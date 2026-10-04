@@ -1,0 +1,132 @@
+/* ==========================================================================
+   VulcanoPay — sistema visual dos posts (1080×1350, feed 4:5)
+   Cor da marca extraída do logo: #F5022B
+   ========================================================================== */
+@font-face { font-family: "Inter Tight"; font-weight: 500; src: url(fonts/inter-tight-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Inter Tight"; font-weight: 600; src: url(fonts/inter-tight-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Inter Tight"; font-weight: 700; src: url(fonts/inter-tight-latin-700-normal.woff2) format("woff2"); }
+@font-face { font-family: "Inter Tight"; font-weight: 800; src: url(fonts/inter-tight-latin-800-normal.woff2) format("woff2"); }
+@font-face { font-family: "Inter Tight"; font-weight: 900; src: url(fonts/inter-tight-latin-900-normal.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 400; src: url(fonts/jetbrains-mono-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-weight: 600; src: url(fonts/jetbrains-mono-latin-600-normal.woff2) format("woff2"); }
+
+:root {
+  --red: #F5022B;
+  --red-hot: #FF2A4A;
+  --red-2: #C40020;
+  --red-deep: #5A000C;
+  --black: #070304;
+  --coal: #120709;
+  --paper: #F4F1F1;
+  --ink: #0B0607;
+  --ok: #2EE07A;
+  --pad: 72px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1350px; overflow: hidden; background: var(--black); }
+
+.post {
+  position: relative; width: 1080px; height: 1350px; overflow: hidden;
+  font-family: "Inter Tight", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.post > * { position: absolute; }
+
+/* ---------- temas ---------- */
+.dark  { background: var(--black); color: #fff; }
+.light { background: var(--paper); color: var(--ink); }
+.redbg { background: var(--red); color: #fff; }
+
+/* grão de filme por cima de tudo */
+.grain::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 50;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: .07; mix-blend-mode: overlay;
+}
+.light.grain::after { opacity: .18; mix-blend-mode: multiply; filter: invert(1); }
+
+/* brilhos vermelhos difusos */
+.glow { border-radius: 50%; filter: blur(90px); pointer-events: none; }
+
+/* "V" gigante de fundo, com brilho */
+.bigv { pointer-events: none; filter: drop-shadow(0 0 60px rgba(245, 2, 43, .55)) drop-shadow(0 40px 80px rgba(0, 0, 0, .6)); }
+
+/* ---------- logo ---------- */
+.logo { height: 80px; }
+.logo-sm { height: 60px; }
+
+/* ---------- tipografia ---------- */
+.h1 { font-weight: 900; font-size: 116px; line-height: .9; letter-spacing: -.048em; word-spacing: .06em; }
+.h2 { font-weight: 800; font-size: 64px; line-height: 1; letter-spacing: -.035em; }
+.lead { font-weight: 500; font-size: 34px; line-height: 1.28; letter-spacing: -.01em; }
+.red { color: var(--red); }
+.hot { color: var(--red-hot); }
+.mute { opacity: .62; }
+.mono { font-family: "JetBrains Mono", monospace; }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 14px;
+  font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: 21px;
+  letter-spacing: .16em; text-transform: uppercase;
+  padding: 14px 22px; border-radius: 999px;
+  border: 1.5px solid rgba(245, 2, 43, .55); background: rgba(245, 2, 43, .1); color: #fff;
+}
+.light .eyebrow { color: var(--red-2); background: rgba(245, 2, 43, .07); }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 6px rgba(245, 2, 43, .22), 0 0 18px var(--red); }
+.dot.ok { background: var(--ok); box-shadow: 0 0 0 5px rgba(46, 224, 122, .18), 0 0 14px var(--ok); }
+
+/* ---------- superfícies ---------- */
+.glass {
+  border-radius: 30px;
+  background: linear-gradient(155deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .035) 55%, rgba(255, 255, 255, .06));
+  border: 1.5px solid rgba(255, 255, 255, .16);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .22);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+}
+.glass-red {
+  border-radius: 30px;
+  background: linear-gradient(150deg, rgba(255, 60, 90, .55), rgba(150, 0, 22, .55) 60%, rgba(60, 0, 8, .7));
+  border: 1.5px solid rgba(255, 120, 140, .45);
+  box-shadow: 0 40px 90px rgba(120, 0, 18, .55), inset 0 1px 0 rgba(255, 255, 255, .35);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+}
+.card-dark {
+  border-radius: 30px; background: #120A0C; color: #fff;
+  box-shadow: 0 30px 70px rgba(30, 0, 5, .35), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+.card-white {
+  border-radius: 30px; background: #fff; color: var(--ink);
+  box-shadow: 0 30px 70px rgba(60, 0, 10, .14);
+}
+
+/* ---------- CTAs ---------- */
+.cta {
+  display: inline-flex; align-items: center; gap: 18px;
+  background: var(--red); color: #fff;
+  font-weight: 800; font-size: 29px; letter-spacing: .01em; text-transform: uppercase;
+  padding: 28px 42px; border-radius: 22px;
+  box-shadow: 0 24px 60px rgba(245, 2, 43, .45), inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+.cta.pill { border-radius: 999px; }
+.cta.black { background: #0B0607; box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }
+.cta.white { background: #fff; color: var(--ink); box-shadow: 0 24px 60px rgba(0, 0, 0, .25); }
+.cta svg { width: 34px; height: 34px; }
+
+/* faixa inclinada (estilo "MIGRE PARA") */
+.slash {
+  left: 60px; right: 60px; height: 112px; display: flex; align-items: center; justify-content: center; gap: 26px;
+  background: #0B0607; color: #fff; transform: skewX(-14deg);
+  font-weight: 900; font-size: 54px; letter-spacing: -.02em; text-transform: uppercase;
+}
+.slash > span, .slash > svg { transform: skewX(14deg); }
+.slash svg { width: 58px; height: 58px; }
+
+/* ---------- rodapé ---------- */
+.footer { left: var(--pad); right: var(--pad); bottom: 58px; display: flex; align-items: center; gap: 30px; }
+.footer .line { flex: 1; height: 2px; background: currentColor; opacity: .3; }
+.footer .tag { font-size: 25px; font-weight: 500; line-height: 1.15; text-align: right; }
+.footer .tag b { font-weight: 800; display: block; }
+
+/* letra miúda */
+.fine { font-size: 17px; font-weight: 500; opacity: .5; letter-spacing: .01em; }

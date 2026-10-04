@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>04 · Pix pago</title>
+<link rel="stylesheet" href="post.css">
+<style>
+  .circle { border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FF3B5C, #F5022B 45%, #B8001E); }
+  .qrcard { left: 110px; top: 615px; width: 430px; padding: 34px; transform: rotate(-5deg); text-align: center; }
+  .qrcard .t { font-family: "JetBrains Mono"; font-size: 18px; letter-spacing: .14em; opacity: .55; margin-bottom: 18px; }
+  .qr { position: relative; width: 362px; height: 362px; margin: 0 auto; }
+  .qr canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+  .qr .mid { position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; margin: -46px 0 0 -46px; background: #fff; border-radius: 20px; display: grid; place-items: center; box-shadow: 0 0 0 6px #fff; }
+  .qr .mid img { width: 66px; }
+  .qrcard .v { margin-top: 22px; font-weight: 900; font-size: 50px; letter-spacing: -.03em; }
+  .qrcard .s { font-size: 20px; font-weight: 600; opacity: .55; }
+
+  .notif { width: 560px; padding: 26px 30px; display: flex; align-items: center; gap: 22px; border-radius: 34px; background: #151012; color: #fff; box-shadow: 0 30px 70px rgba(40,0,8,.35); }
+  .notif .ic { width: 64px; height: 64px; border-radius: 50%; background: var(--ok); display: grid; place-items: center; flex: none; box-shadow: 0 0 30px rgba(46,224,122,.45); }
+  .notif .ic svg { width: 36px; height: 36px; }
+  .notif b { font-size: 29px; font-weight: 800; letter-spacing: -.01em; }
+  .notif p { font-size: 22px; opacity: .7; margin-top: 4px; }
+  .notif time { margin-left: auto; align-self: flex-start; font-size: 19px; opacity: .55; }
+</style></head>
+<body><div class="post light grain">
+  <div class="circle" style="width:820px;height:820px;right:-380px;top:560px"></div>
+
+  <div class="h1" style="left:72px;top:96px;font-size:124px">Pix gerado<br>não é venda.<br><span class="red">Pix pago é.</span></div>
+  <div class="lead" style="left:72px;top:500px;width:800px;color:#3a2b2e">QR Code na hora, confirmação em tempo real e um checkout que não deixa a venda esfriar.</div>
+
+  <div class="card-white qrcard">
+    <div class="t">PAGUE COM PIX</div>
+    <div class="qr"><canvas id="qr" width="33" height="33"></canvas><div class="mid"><img src="assets/logo-icon.png"></div></div>
+    <div class="v">R$ 197,00</div>
+    <div class="s">Expira em 14:59</div>
+  </div>
+
+  <div class="notif" style="left:440px;top:760px">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <div><b>Pix pago</b><p>R$ 197,00 confirmado</p></div><time>agora</time>
+  </div>
+  <div class="notif" style="left:480px;top:960px">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#06210f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <div><b>Pix pago</b><p>R$ 497,00 confirmado</p></div><time>1 min</time>
+  </div>
+
+  <div class="footer">
+    <img class="logo-sm" src="assets/logo-full-light.png">
+    <div class="line"></div>
+    <div class="tag" style="color:#fff">Migre para<b>VulcanoPay</b></div>
+  </div>
+</div>
+<script>
+  // QR decorativo (não codifica nada): padrão pseudo-aleatório com os 3 "olhos".
+  const c = document.getElementById("qr"), x = c.getContext("2d"), N = 33;
+  let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  x.fillStyle = "#fff"; x.fillRect(0, 0, N, N); x.fillStyle = "#0B0607";
+  for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) if (r() > .52) x.fillRect(i, j, 1, 1);
+  const eye = (a, b) => { x.fillStyle = "#fff"; x.fillRect(a - 1, b - 1, 9, 9); x.fillStyle = "#0B0607"; x.fillRect(a, b, 7, 7); x.fillStyle = "#fff"; x.fillRect(a + 1, b + 1, 5, 5); x.fillStyle = "#F5022B"; x.fillRect(a + 2, b + 2, 3, 3); };
+  eye(0, 0); eye(N - 7, 0); eye(0, N - 7);
+</script>
+</body></html>

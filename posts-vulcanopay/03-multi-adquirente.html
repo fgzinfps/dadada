@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>03 · Multi-adquirente</title>
+<link rel="stylesheet" href="post.css">
+<style>
+  .node { padding: 26px 30px; display: flex; align-items: center; gap: 20px; }
+  .node .ic { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); flex: none; }
+  .node .ic svg { width: 34px; height: 34px; }
+  .node b { display: block; font-size: 32px; font-weight: 800; letter-spacing: -.02em; }
+  .node span { font-size: 21px; opacity: .65; font-weight: 500; }
+  .hub {
+    left: 400px; top: 720px; width: 280px; height: 280px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: radial-gradient(circle at 40% 30%, rgba(255,255,255,.16), rgba(255,255,255,.03) 60%);
+    border: 1.5px solid rgba(255,255,255,.18);
+    box-shadow: 0 0 0 26px rgba(245,2,43,.06), 0 0 0 54px rgba(245,2,43,.04), 0 0 120px rgba(245,2,43,.6), inset 0 1px 0 rgba(255,255,255,.25);
+  }
+  .hub img { width: 170px; filter: drop-shadow(0 0 30px rgba(245,2,43,.8)); }
+  svg.wires { left: 0; top: 0; width: 1080px; height: 1350px; }
+  .tagline { left: 72px; top: 1090px; width: 936px; }
+</style></head>
+<body><div class="post dark grain">
+  <div class="glow" style="width:820px;height:820px;left:130px;top:460px;background:rgba(245,2,43,.32)"></div>
+  <div class="glow" style="width:500px;height:500px;right:-200px;top:-200px;background:rgba(160,0,25,.45)"></div>
+
+  <img class="logo" src="assets/logo-full-dark.png" style="left:72px;top:72px">
+
+  <div class="h1" style="left:72px;top:220px;font-size:120px">Uma integração.<br><span class="red">Várias<br>adquirentes.</span></div>
+
+  <svg class="wires" viewBox="0 0 1080 1350" fill="none">
+    <defs>
+      <linearGradient id="w" gradientUnits="userSpaceOnUse" x1="300" x2="790" y1="0" y2="0"><stop offset="0" stop-color="#F5022B" stop-opacity=".15"/><stop offset=".5" stop-color="#FF2A4A"/><stop offset="1" stop-color="#F5022B" stop-opacity=".15"/></linearGradient>
+    </defs>
+    <path d="M300 860 C 350 860, 360 860, 400 860" stroke="url(#w)" stroke-width="4"/>
+    <path d="M680 860 C 730 860, 740 737, 790 737" stroke="url(#w)" stroke-width="4"/>
+    <path d="M680 860 C 730 860, 740 957, 790 957" stroke="url(#w)" stroke-width="4"/>
+    <circle cx="400" cy="860" r="7" fill="#FF2A4A"/><circle cx="680" cy="860" r="7" fill="#FF2A4A"/>
+  </svg>
+
+  <div class="glass node" style="left:40px;top:760px;width:270px;flex-direction:column;align-items:flex-start;gap:14px">
+    <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9M3 9h18v11H3zM9 20v-6h6v6"/></svg></div>
+    <div><b>Sua operação</b><span>1 integração</span></div>
+  </div>
+
+  <div class="hub"><img src="assets/logo-icon.png"></div>
+
+  <div class="glass node" style="left:790px;top:680px;width:270px;flex-direction:column;align-items:flex-start;gap:6px;padding:22px 26px">
+    <b>SimPay</b><span>7 nominais</span>
+  </div>
+  <div class="glass node" style="left:790px;top:900px;width:270px;flex-direction:column;align-items:flex-start;gap:6px;padding:22px 26px">
+    <b>Woovi</b><span>a menor taxa*</span>
+  </div>
+
+  <div class="lead tagline">Você integra <b>uma vez</b>. A VulcanoPay conecta sua operação às adquirentes certas.</div>
+
+  <div class="footer">
+    <span class="fine" style="opacity:.45">*Consulte condições.</span>
+    <div class="line"></div>
+    <div class="tag">Migre para<b>VulcanoPay</b></div>
+  </div>
+</div></body></html>
