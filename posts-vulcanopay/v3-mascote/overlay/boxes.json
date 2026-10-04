@@ -1,0 +1,65 @@
+{
+  "01-taxa.html": [
+    {
+      "src": "cenas/01-taxa.jpg",
+      "left": 0,
+      "top": 0,
+      "width": 1080,
+      "height": 1350
+    }
+  ],
+  "02-simpay.html": [
+    {
+      "src": "cenas/02-simpay.jpg",
+      "left": 0,
+      "top": 0,
+      "width": 1080,
+      "height": 1350
+    }
+  ],
+  "03-24h.html": [
+    {
+      "src": "cenas/03-24h.jpg",
+      "left": 0,
+      "top": 0,
+      "width": 1080,
+      "height": 1350
+    }
+  ],
+  "04-orquestra.html": [
+    {
+      "src": "cenas/04-orquestra.jpg",
+      "left": 0,
+      "top": 0,
+      "width": 1080,
+      "height": 1350
+    }
+  ],
+  "05-funil.html": [
+    {
+      "src": "cenas/05-funil.jpg",
+      "left": 0,
+      "top": 0,
+      "width": 1080,
+      "height": 1350
+    }
+  ],
+  "06-saque.html": [
+    {
+      "src": "cenas/06-saque.jpg",
+      "left": 370,
+      "top": 150,
+      "width": 600,
+      "height": 750
+    }
+  ],
+  "07-f1.html": [
+    {
+      "src": "cenas/07-f1.jpg",
+      "left": 20,
+      "top": 330,
+      "width": 1040,
+      "height": 1300
+    }
+  ]
+}
