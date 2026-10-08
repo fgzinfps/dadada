@@ -1,0 +1,124 @@
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --panel-2: #1f232c;
+  --line: #2b303b;
+  --ink: #eceef2;
+  --muted: #8d94a3;
+  --brand: #ff5a1f;      /* laranja "vulcano" */
+  --brand-ink: #fff;
+  --info: #3b82f6;
+  --warning: #f59e0b;
+  --urgent: #ef4444;
+  --ok: #22c55e;
+  --radius: 12px;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+body { font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.5; min-height: 100vh; }
+a { color: var(--brand); }
+h1 { font-size: 1.4rem; }
+h2 { font-size: 1.1rem; margin-bottom: 12px; }
+small, .muted { color: var(--muted); }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--panel);
+  position: sticky; top: 0; z-index: 5; flex-wrap: wrap;
+}
+.logo { font-weight: 800; letter-spacing: -.02em; font-size: 1.15rem; }
+.logo span { color: var(--brand); }
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 60px; }
+.grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; }
+@media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+
+label { display: block; font-size: .85rem; color: var(--muted); margin: 12px 0 4px; }
+input, textarea, select {
+  width: 100%; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 8px; padding: 10px 12px; font: inherit;
+}
+textarea { min-height: 90px; resize: vertical; }
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--ink);
+  padding: 10px 16px; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none;
+}
+.btn:hover { filter: brightness(1.15); }
+.btn-primary { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.btn-wa { background: #25d366; border-color: #25d366; color: #062b14; }
+.btn-sm { padding: 6px 10px; font-size: .85rem; }
+.btn-danger { color: var(--urgent); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.chip {
+  display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--panel-2); font-size: .85rem; cursor: pointer;
+}
+.chip input { width: auto; }
+
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .75rem; font-weight: 700; }
+.badge.info { background: color-mix(in srgb, var(--info) 20%, transparent); color: var(--info); }
+.badge.warning { background: color-mix(in srgb, var(--warning) 20%, transparent); color: var(--warning); }
+.badge.urgent { background: color-mix(in srgb, var(--urgent) 20%, transparent); color: var(--urgent); }
+.badge.off { background: var(--panel-2); color: var(--muted); }
+
+.notice-item { border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 10px; background: var(--panel-2); }
+.notice-item header { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
+.notice-item .meta { font-size: .8rem; color: var(--muted); margin-top: 6px; }
+.notice-item .actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.stats { display: flex; gap: 14px; font-size: .8rem; margin-top: 6px; }
+.stats b { color: var(--ink); }
+
+.hint { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+.empty { color: var(--muted); text-align: center; padding: 24px 0; }
+
+/* ---------- Modal do aviso (tela do cliente) ---------- */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.72); backdrop-filter: blur(3px);
+  display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50;
+}
+.overlay.open { display: flex; }
+.modal {
+  width: 100%; max-width: 440px; background: var(--panel); border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--line); box-shadow: 0 30px 80px rgba(0,0,0,.5);
+  animation: pop .25s ease-out;
+}
+@keyframes pop { from { transform: translateY(12px) scale(.97); opacity: 0; } }
+.modal .stripe { height: 6px; background: var(--info); }
+.modal.warning .stripe { background: var(--warning); }
+.modal.urgent .stripe { background: var(--urgent); }
+.modal .body { padding: 22px; }
+.modal h3 { font-size: 1.2rem; margin: 8px 0; }
+.modal p { color: #c9ced8; white-space: pre-wrap; }
+.modal .foot { display: flex; flex-direction: column; gap: 8px; padding: 0 22px 22px; }
+.modal .foot .btn { width: 100%; padding: 13px; }
+.modal .close-x {
+  float: right; background: none; border: 0; color: var(--muted); font-size: 1.4rem; cursor: pointer; line-height: 1;
+}
+
+/* Preview no painel admin: o modal fica estático, sem overlay */
+.preview-box { background: #0a0c10; border-radius: var(--radius); padding: 20px; display: flex; justify-content: center; }
+.preview-box .modal { animation: none; box-shadow: none; }
+
+/* ---------- Dashboard fake do gateway ---------- */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 18px 0; }
+.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.kpi .v { font-size: 1.5rem; font-weight: 800; margin-top: 4px; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 500; }
+.table-scroll { overflow-x: auto; }
+
+.support-fab {
+  position: fixed; right: 18px; bottom: 18px; z-index: 20;
+  border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.4);
+}

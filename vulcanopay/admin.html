@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VulcanoPay — Painel de Avisos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo">Vulcano<span>Pay</span> · <small>Painel admin — Avisos para clientes</small></div>
+    <a class="btn btn-sm" href="gateway.html" target="_blank">Abrir tela do cliente ↗</a>
+  </div>
+
+  <div class="wrap grid">
+    <!-- ================= FORMULÁRIO ================= -->
+    <section class="card">
+      <h2 id="formTitle">Novo aviso</h2>
+      <form id="form">
+        <label for="title">Título</label>
+        <input id="title" required maxlength="80" value="Precisamos falar com você, {nome}">
+
+        <label for="message">Mensagem que aparece na tela do cliente</label>
+        <textarea id="message" required maxlength="600">Identificamos uma pendência na sua conta ({id}). Para evitar qualquer bloqueio, fale com nosso suporte pelo WhatsApp.</textarea>
+        <div class="hint">Variáveis: <code>{nome}</code> <code>{id}</code> <code>{email}</code> <code>{doc}</code></div>
+
+        <div class="row">
+          <div>
+            <label for="level">Tipo</label>
+            <select id="level">
+              <option value="info">Informação (azul)</option>
+              <option value="warning">Atenção (amarelo)</option>
+              <option value="urgent" selected>Urgente (vermelho)</option>
+            </select>
+          </div>
+          <div>
+            <label for="buttonText">Texto do botão</label>
+            <input id="buttonText" maxlength="40" value="Falar com o suporte">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="phone">WhatsApp de destino</label>
+            <input id="phone" required inputmode="tel" placeholder="5511999998888" value="5511999998888">
+            <div class="hint">DDI + DDD + número, só dígitos.</div>
+          </div>
+          <div>
+            <label for="expiresAt">Expira em (opcional)</label>
+            <input id="expiresAt" type="datetime-local">
+          </div>
+        </div>
+
+        <label for="waText">Mensagem que já vem escrita no WhatsApp do cliente</label>
+        <textarea id="waText" maxlength="300">Olá! Sou {nome} (ID {id}, {email}). Vi o aviso na minha conta da VulcanoPay.</textarea>
+        <div class="hint">Assim você sabe QUEM está chamando, mesmo sem ter o número dele salvo.</div>
+
+        <label>Para quem aparece</label>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="audience" value="all"> Todos os clientes</label>
+          <label class="chip"><input type="radio" name="audience" value="selected" checked> Só os selecionados</label>
+        </div>
+        <div id="clientPicker" class="chips" style="margin-top:10px"></div>
+
+        <div class="row">
+          <div>
+            <label for="frequency">Frequência</label>
+            <select id="frequency">
+              <option value="until_click">Toda vez que entrar, até clicar no botão</option>
+              <option value="once">Só uma vez</option>
+            </select>
+          </div>
+          <div>
+            <label for="mandatory">Pode fechar?</label>
+            <select id="mandatory">
+              <option value="0">Sim, pode fechar</option>
+              <option value="1">Não — só sai clicando no botão</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:18px; flex-wrap:wrap">
+          <button class="btn btn-primary" type="submit" id="submitBtn">Publicar aviso</button>
+          <button class="btn" type="button" id="cancelEdit" hidden>Cancelar edição</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ================= PREVIEW + LISTA ================= -->
+    <section>
+      <div class="card">
+        <h2>Pré-visualização <small class="muted" id="previewAs"></small></h2>
+        <div class="preview-box" id="preview"></div>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <h2>Avisos publicados</h2>
+        <div id="list"></div>
+        <button class="btn btn-sm btn-danger" id="resetAll" style="margin-top:8px">Zerar demonstração</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="store.js"></script>
+  <script src="modal.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const form = $('form');
+    let editingId = null;
+
+    /* ---------- seletor de clientes ---------- */
+    function renderPicker(selected = []) {
+      const box = $('clientPicker');
+      box.innerHTML = '';
+      VP.load().clients.forEach(c => {
+        const lab = document.createElement('label');
+        lab.className = 'chip';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.value = c.id; cb.checked = selected.includes(c.id);
+        cb.onchange = renderPreview;
+        lab.append(cb, document.createTextNode(` ${c.nome} (${c.id})`));
+        box.appendChild(lab);
+      });
+      toggleAudience();
+    }
+
+    function toggleAudience() {
+      const sel = form.audience.value === 'selected';
+      $('clientPicker').style.display = sel ? 'flex' : 'none';
+    }
+
+    function readForm() {
+      return {
+        title: $('title').value.trim(),
+        message: $('message').value.trim(),
+        level: $('level').value,
+        buttonText: $('buttonText').value.trim() || 'Falar com o suporte',
+        phone: VP.cleanPhone($('phone').value),
+        waText: $('waText').value.trim(),
+        expiresAt: $('expiresAt').value || null,
+        audience: form.audience.value,
+        clientIds: [...$('clientPicker').querySelectorAll('input:checked')].map(i => i.value),
+        frequency: $('frequency').value,
+        mandatory: $('mandatory').value === '1'
+      };
+    }
+
+    /* ---------- preview ao vivo ---------- */
+    function renderPreview() {
+      const n = readForm();
+      const clients = VP.load().clients;
+      const sample = clients.find(c => n.audience === 'all' || n.clientIds.includes(c.id)) || clients[0];
+      $('previewAs').textContent = `— como ${sample.nome} vai ver`;
+      const box = $('preview');
+      box.innerHTML = '';
+      box.appendChild(buildNoticeModal(n, sample));
+    }
+
+    /* ---------- lista ---------- */
+    function renderList() {
+      const data = VP.load();
+      const box = $('list');
+      box.innerHTML = '';
+      if (!data.notices.length) {
+        box.innerHTML = '<div class="empty">Nenhum aviso publicado ainda.</div>';
+        return;
+      }
+      const byId = Object.fromEntries(data.clients.map(c => [c.id, c.nome]));
+      [...data.notices].reverse().forEach(n => {
+        const s = VP.stats(n.id);
+        const expired = n.expiresAt && new Date(n.expiresAt) < new Date();
+        const who = n.audience === 'all' ? 'Todos os clientes' : n.clientIds.map(id => byId[id] || id).join(', ') || '— ninguém selecionado —';
+
+        const el = document.createElement('div');
+        el.className = 'notice-item';
+        el.innerHTML = `
+          <header>
+            <strong class="t"></strong>
+            <span class="badge ${n.active && !expired ? n.level : 'off'}">${!n.active ? 'Pausado' : expired ? 'Expirado' : 'No ar'}</span>
+          </header>
+          <div class="meta"><span class="who"></span> · WhatsApp ${n.phone} · ${n.frequency === 'once' ? 'uma vez' : 'até clicar'}${n.mandatory ? ' · obrigatório' : ''}</div>
+          <div class="stats">
+            <span>👁 Viram: <b>${s.views}</b></span>
+            <span>💬 Clicaram: <b>${s.clicks}</b></span>
+            <span>✖ Fecharam: <b>${s.dismiss}</b></span>
+          </div>
+          <div class="actions">
+            <button class="btn btn-sm" data-a="edit">Editar</button>
+            <button class="btn btn-sm" data-a="toggle">${n.active ? 'Pausar' : 'Reativar'}</button>
+            <button class="btn btn-sm btn-danger" data-a="del">Excluir</button>
+          </div>`;
+        el.querySelector('.t').textContent = n.title;
+        el.querySelector('.who').textContent = 'Para: ' + who;
+        el.querySelector('[data-a=edit]').onclick = () => startEdit(n.id);
+        el.querySelector('[data-a=toggle]').onclick = () => mutate(n.id, x => { x.active = !x.active; });
+        el.querySelector('[data-a=del]').onclick = () => {
+          if (!confirm('Excluir este aviso?')) return;
+          const d = VP.load();
+          d.notices = d.notices.filter(x => x.id !== n.id);
+          d.events = d.events.filter(e => e.noticeId !== n.id);
+          VP.save(d); renderList();
+        };
+        box.appendChild(el);
+      });
+    }
+
+    function mutate(id, fn) {
+      const d = VP.load();
+      const n = d.notices.find(x => x.id === id);
+      if (n) { fn(n); VP.save(d); renderList(); }
+    }
+
+    function startEdit(id) {
+      const n = VP.load().notices.find(x => x.id === id);
+      if (!n) return;
+      editingId = id;
+      ['title','message','level','buttonText','phone','waText','frequency'].forEach(k => $(k).value = n[k]);
+      $('expiresAt').value = n.expiresAt || '';
+      $('mandatory').value = n.mandatory ? '1' : '0';
+      form.audience.value = n.audience;
+      renderPicker(n.clientIds);
+      $('formTitle').textContent = 'Editando aviso';
+      $('submitBtn').textContent = 'Salvar alterações';
+      $('cancelEdit').hidden = false;
+      renderPreview();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function stopEdit() {
+      editingId = null;
+      $('formTitle').textContent = 'Novo aviso';
+      $('submitBtn').textContent = 'Publicar aviso';
+      $('cancelEdit').hidden = true;
+    }
+
+    form.onsubmit = e => {
+      e.preventDefault();
+      const n = readForm();
+      if (n.phone.length < 12) { alert('WhatsApp inválido. Use DDI + DDD + número, ex.: 5511999998888'); return; }
+      if (n.audience === 'selected' && !n.clientIds.length) { alert('Selecione pelo menos um cliente.'); return; }
+
+      const d = VP.load();
+      if (editingId) {
+        const old = d.notices.find(x => x.id === editingId);
+        Object.assign(old, n);
+      } else {
+        d.notices.push({ id: VP.uid(), active: true, createdAt: new Date().toISOString(), ...n });
+      }
+      VP.save(d);
+      stopEdit();
+      renderList();
+    };
+
+    $('cancelEdit').onclick = () => { stopEdit(); form.reset(); renderPicker(['C-1001']); renderPreview(); };
+    $('resetAll').onclick = () => {
+      if (!confirm('Apagar todos os avisos e estatísticas da demonstração?')) return;
+      localStorage.removeItem(VP.KEY); renderList(); renderPicker(['C-1001']); renderPreview();
+    };
+
+    form.addEventListener('input', renderPreview);
+    form.querySelectorAll('input[name=audience]').forEach(r => r.addEventListener('change', () => { toggleAudience(); renderPreview(); }));
+    window.addEventListener('storage', e => { if (e.key === VP.KEY) renderList(); }); // atualiza stats ao vivo
+
+    renderPicker(['C-1001']);
+    renderPreview();
+    renderList();
+  </script>
+</body>
+</html>

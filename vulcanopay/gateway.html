@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VulcanoPay — Minha Conta</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo">Vulcano<span>Pay</span></div>
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+      <small class="muted">Simular login como:</small>
+      <select id="who" style="width:auto"></select>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <h1>Olá, <span id="hello"></span> 👋</h1>
+    <p class="muted">ID da conta: <span id="cid"></span></p>
+
+    <div class="kpis">
+      <div class="kpi"><small>Saldo disponível</small><div class="v">R$ 12.480,90</div></div>
+      <div class="kpi"><small>A receber</small><div class="v">R$ 3.215,00</div></div>
+      <div class="kpi"><small>Vendas hoje</small><div class="v">37</div></div>
+      <div class="kpi"><small>Taxa de aprovação</small><div class="v">94,2%</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Últimas transações</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>ID</th><th>Método</th><th>Valor</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>#88231</td><td>PIX</td><td>R$ 197,00</td><td>Pago</td></tr>
+            <tr><td>#88230</td><td>Cartão</td><td>R$ 497,00</td><td>Pago</td></tr>
+            <tr><td>#88229</td><td>PIX</td><td>R$ 47,90</td><td>Pendente</td></tr>
+            <tr><td>#88228</td><td>Boleto</td><td>R$ 1.200,00</td><td>Pago</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Botão fixo de suporte: reaparece depois que o cliente fecha o aviso -->
+  <a id="fab" class="btn btn-wa support-fab" target="_blank" rel="noopener" hidden>💬 Suporte</a>
+
+  <div class="overlay" id="overlay"></div>
+
+  <script src="store.js"></script>
+  <script src="modal.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+
+    function client() {
+      const id = $('who').value;
+      return VP.load().clients.find(c => c.id === id);
+    }
+
+    function closeModal() {
+      $('overlay').classList.remove('open');
+      $('overlay').innerHTML = '';
+    }
+
+    /* É ISTO que roda quando o cliente entra no gateway. */
+    function onLogin() {
+      const c = client();
+      $('hello').textContent = c.nome;
+      $('cid').textContent = c.id;
+      closeModal();
+
+      const notice = VP.noticeFor(c.id);
+      const fab = $('fab');
+      fab.hidden = true;
+      if (!notice) return;
+
+      // botão flutuante leva ao mesmo WhatsApp, caso o cliente feche o aviso
+      fab.href = VP.whatsappLink(notice.phone, VP.fill(notice.waText, c));
+      fab.onclick = () => VP.track(notice.id, c.id, 'click');
+
+      VP.track(notice.id, c.id, 'view');
+      const modal = buildNoticeModal(notice, c, {
+        onClick:   () => { VP.track(notice.id, c.id, 'click'); closeModal(); fab.hidden = true; },
+        onDismiss: () => { VP.track(notice.id, c.id, 'dismiss'); closeModal(); fab.hidden = false; }
+      });
+      $('overlay').appendChild(modal);
+      $('overlay').classList.add('open');
+    }
+
+    // ESC fecha, se o aviso não for obrigatório
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') $('overlay').querySelector('.close-x')?.click();
+    });
+
+    const sel = $('who');
+    VP.load().clients.forEach(c => sel.add(new Option(`${c.nome} (${c.id})`, c.id)));
+    const fromUrl = new URLSearchParams(location.search).get('cliente');
+    if (fromUrl) sel.value = fromUrl;
+    sel.onchange = onLogin;
+    onLogin();
+  </script>
+</body>
+</html>
