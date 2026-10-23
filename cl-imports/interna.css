@@ -3,9 +3,9 @@
    fundo claro, títulos serifados, rótulos pequenos espaçados,
    muito respiro e linhas finas.
    ========================================================== */
-body.interna { background: #ececea; color: #1c1c1c; }
-.interna .perks { background: #e2e2df; }
-.interna .lux-grid .pmedia { background: #e2e2df; }
+body.interna { background: #dcdcd9; color: #1c1c1c; }
+.interna .perks { background: #cfcfcb; }
+.interna .lux-grid .pmedia { background: #cfcfcb; }
 .interna main { padding-top: 84px; }
 
 .crumbs { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: #9a968e; padding-top: 34px; }
