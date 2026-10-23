@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produto — CL Imports</title>
+  <meta name="theme-color" content="#111111">
+  <link rel="icon" type="image/png" href="assets/monograma-t.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="comum.css">
+  <link rel="stylesheet" href="interna.css">
+</head>
+<body class="interna">
+  <main id="page"></main>
+
+  <script src="dados.js"></script>
+  <script src="comum.js"></script>
+  <script>
+    iniciarPagina("interna");
+
+    const p = byId(+new URLSearchParams(location.search).get("id"));
+    const WA_ICON = `<svg viewBox="0 0 32 32"><path d="M16.04 3C9 3 3.3 8.7 3.3 15.7c0 2.3.6 4.5 1.7 6.4L3.2 29l7.1-1.9a12.7 12.7 0 0 0 5.7 1.4h.1c7 0 12.7-5.7 12.7-12.7S23 3 16.04 3zm0 23.2c-1.9 0-3.8-.5-5.4-1.5l-.4-.2-4.2 1.1 1.1-4.1-.3-.4a10.5 10.5 0 1 1 9.2 5.1z"/></svg>`;
+
+    if (!p) {
+      $("#page").innerHTML = `<div class="notfound px"><h1>Produto não encontrado</h1><a class="btn-ghost" style="max-width:280px;margin:0 auto" href="catalogo.html">Ver catálogo</a></div>`;
+    } else {
+      document.title = `${p.nome} — CL Imports`;
+      const unico = p.tamanhos.length === 1;
+      let tamanho = unico ? p.tamanhos[0] : null, qtd = 1;
+      const off = COM_PRECO && p.de ? Math.round((1 - p.preco / p.de) * 100) : 0;
+      const catLabel = catNome(p.cat);
+
+      $("#page").innerHTML = `
+      <div class="px wrap-in">
+        <div class="crumbs"><a href="index.html">Início</a><span>/</span><a href="catalogo.html?cat=${p.cat}">${esc(catLabel)}</a><span>/</span>${esc(p.nome)}</div>
+
+        <div class="prod">
+          <div class="gallery ${p.fotos.length > 1 ? "" : "single"}">
+            <div class="thumbs-v">${p.fotos.map((f, i) => `<button class="${i ? "" : "active"}" data-i="${i}" aria-label="Foto ${i + 1}"><img src="${foto(f)}" alt=""></button>`).join("")}</div>
+            <div class="main-img" id="mainImg">
+              ${p.fotos.length ? `<img class="photo" id="mainPhoto" src="${foto(p.fotos[0])}" alt="${esc(p.nome)}">` : `<div class="ph"><img src="${MONO_D}" alt=""><small>Foto em breve</small></div>`}
+            </div>
+          </div>
+
+          <div class="info">
+            <div class="eyebrow">${esc(p.marca || catLabel)}</div>
+            <h1>${esc(p.nome)}</h1>
+            <div class="ref">Ref. ${code(p)}</div>
+
+            ${COM_PRECO ? `<div class="price-box">
+              ${p.de ? `<div class="old">${brl(p.de)}</div>` : ""}
+              <div class="now">${brl(p.preco)}${off ? `<span class="off">-${off}%</span>` : ""}</div>
+              <div class="pix"><b>${brl(pixDe(p.preco))}</b> no Pix (${Math.round(LOJA.descontoPix * 100)}% off)</div>
+              <div class="inst">ou ${LOJA.parcelas}x de ${brl(p.preco / LOJA.parcelas)} sem juros</div>
+            </div>` : `<div class="price-box"><div class="consult">Valor sob consulta</div><div class="inst">Fale com a gente no WhatsApp para saber valor, disponibilidade e condições de pagamento.</div></div>`}
+
+            ${unico ? "" : `<div class="opt-label">Tamanho <span id="sizeChosen">Selecione</span></div>
+            <div class="sizes" id="sizes">${p.tamanhos.map(t => `<button data-t="${esc(t)}">${esc(t)}</button>`).join("")}</div>`}
+
+            <div class="buy-row">
+              <div class="qty-lg"><button id="qMinus" aria-label="Diminuir">−</button><span id="qVal">1</span><button id="qPlus" aria-label="Aumentar">+</button></div>
+              <button class="btn-dark" id="add">Adicionar à sacola</button>
+            </div>
+            <a class="btn-ghost" id="buyWa" target="_blank" rel="noopener">${WA_ICON} Comprar pelo WhatsApp</a>
+
+            <div class="trust">
+              <div><svg viewBox="0 0 32 32"><path d="M16 3 5 7v8c0 7 5 12 11 14 6-2 11-7 11-14V7z"/><path d="m11 16 3.5 3.5L21 13"/></svg><b>Original</b><span>Procedência garantida</span></div>
+              <div><svg viewBox="0 0 32 32"><path d="M3 9h17v13H3zM20 13h5l4 5v4h-9z"/><circle cx="9" cy="24" r="2.5"/><circle cx="24" cy="24" r="2.5"/></svg><b>Envio</b><span>Todo o Brasil</span></div>
+              <div><svg viewBox="0 0 32 32"><path d="M6 16a10 10 0 0 1 17-7l3 3M26 16a10 10 0 0 1-17 7l-3-3"/><path d="M26 6v6h-6M6 26v-6h6"/></svg><b>Troca</b><span>Em até 7 dias</span></div>
+            </div>
+
+            <div class="acc">
+              <details open><summary>Descrição</summary><p>${esc(p.desc)}</p></details>
+              <details><summary>Entrega</summary><p>Enviamos para todo o Brasil com código de rastreio. O prazo e o valor do frete dependem do seu CEP e são informados no fechamento do pedido pelo WhatsApp.</p></details>
+              <details><summary>Trocas e devoluções</summary><p>Você tem até 7 dias após o recebimento para solicitar troca ou devolução. A peça deve estar sem uso, com etiquetas e na embalagem original.</p></details>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="perks px">
+        <div class="perks-grid">
+          <div class="perk"><h3>Curadoria Exclusiva</h3><p>Seleção rigorosa das marcas mais desejadas do mundo</p></div>
+          <div class="perk"><h3>Atendimento Premium</h3><p>Suporte via WhatsApp em cada etapa da compra</p></div>
+          <div class="perk"><h3>Pagamento Facilitado</h3><p>Pix com desconto · Cartão em até 12x</p></div>
+        </div>
+      </section>
+
+      <section class="related px">
+        <div class="wrap-in">
+          <div class="sec-t"><div class="eyebrow" style="color:#9a8457">Complete o look</div><h2>Você também pode gostar</h2></div>
+          <div class="lux-grid" id="related"></div>
+        </div>
+      </section>
+
+      <div class="sticky-buy" id="stickyBuy"><div>${esc(p.nome)}<b>${COM_PRECO ? brl(p.preco) : "Valor sob consulta"}</b></div><button class="btn-dark" id="add2">Comprar</button></div>`;
+
+      // galeria + zoom
+      $$(".thumbs-v button").forEach(b => b.onclick = () => {
+        $("#mainPhoto").src = foto(p.fotos[+b.dataset.i]);
+        $$(".thumbs-v button").forEach(x => x.classList.toggle("active", x === b));
+      });
+      const mi = $("#mainImg"), ph = $("#mainPhoto");
+      if (ph && matchMedia("(hover: hover)").matches) {
+        mi.onmousemove = e => { const r = mi.getBoundingClientRect(); ph.style.transformOrigin = `${(e.clientX - r.left) / r.width * 100}% ${(e.clientY - r.top) / r.height * 100}%`; };
+        mi.onmouseenter = () => mi.classList.add("zoom");
+        mi.onmouseleave = () => mi.classList.remove("zoom");
+      }
+
+      // tamanho e quantidade
+      $$("#sizes button").forEach(b => b.onclick = () => {
+        tamanho = b.dataset.t; $("#sizeChosen").textContent = tamanho;
+        $$("#sizes button").forEach(x => x.classList.toggle("active", x === b));
+      });
+      $("#qMinus").onclick = () => { qtd = Math.max(1, qtd - 1); $("#qVal").textContent = qtd; };
+      $("#qPlus").onclick = () => { qtd++; $("#qVal").textContent = qtd; };
+
+      const precisaTamanho = () => {
+        if (tamanho) return false;
+        const s = $("#sizes"); s.scrollIntoView({ behavior: "smooth", block: "center" });
+        s.classList.remove("shake"); void s.offsetWidth; s.classList.add("shake");
+        toast("Escolha um tamanho"); return true;
+      };
+      $("#add").onclick = $("#add2").onclick = () => { if (precisaTamanho()) return; addSacola(p.id, tamanho, qtd); setTimeout(abrirSacola, 250); };
+      $("#buyWa").onclick = e => {
+        e.preventDefault();
+        if (precisaTamanho()) return;
+        window.open(waLink(`Olá, CL Imports! Tenho interesse em:\n\n• ${qtd}x ${p.nome} [${code(p)}]${unico ? "" : " — Tam " + tamanho}${COM_PRECO ? `\n${brl(p.preco * qtd)} (${brl(pixDe(p.preco * qtd))} no Pix)` : ""}\n\n${COM_PRECO ? "Tem disponível?" : "Qual o valor e tem disponível?"}`), "_blank");
+      };
+
+      // barra fixa de compra no celular quando o botão principal sai da tela
+      document.body.classList.add("has-sticky");
+      new IntersectionObserver(([e]) => $("#stickyBuy").classList.toggle("show", !e.isIntersecting && e.boundingClientRect.top < 0)).observe($("#add"));
+
+      // relacionados: mesma categoria primeiro
+      const rel = PRODUTOS.filter(x => x.id !== p.id).sort((a, b) => (b.cat === p.cat) - (a.cat === p.cat)).slice(0, 4);
+      $("#related").innerHTML = rel.map(cardHTML).join("");
+    }
+  </script>
+</body>
+</html>

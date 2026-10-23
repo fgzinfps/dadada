@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo — CL Imports</title>
+  <meta name="description" content="Catálogo CL Imports — streetwear e luxo importado com curadoria.">
+  <meta name="theme-color" content="#111111">
+  <link rel="icon" type="image/png" href="assets/monograma-t.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="comum.css">
+  <link rel="stylesheet" href="interna.css">
+</head>
+<body class="interna">
+  <main>
+    <div class="px wrap-in">
+      <div class="crumbs"><a href="index.html">Início</a><span>/</span><span id="crumbCat" style="margin:0;color:inherit">Catálogo</span></div>
+      <div class="page-head">
+        <div><div class="eyebrow" id="eyebrow">Catálogo completo</div><h1 id="title">Todos os produtos</h1></div>
+        <div class="count" id="count"></div>
+      </div>
+
+      <div class="cat-layout">
+        <aside class="side" id="side">
+          <h4>Categorias</h4>
+          <ul id="sideCats"></ul>
+          <h4>Faixa de preço</h4>
+          <ul id="sidePrice"></ul>
+        </aside>
+
+        <div>
+          <div class="toolbar">
+            <button class="filter-btn" id="filterBtn">Filtrar ▾</button>
+            <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><input type="search" id="q" placeholder="Buscar no catálogo" aria-label="Buscar no catálogo"></label>
+            <select id="sort" aria-label="Ordenar">
+              <option value="novos">Mais recentes</option>
+              <option value="menor">Menor preço</option>
+              <option value="maior">Maior preço</option>
+              <option value="az">A – Z</option>
+            </select>
+          </div>
+          <div class="lux-grid" id="grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="perks px">
+      <div class="perks-grid">
+        <div class="perk"><h3>Curadoria Exclusiva</h3><p>Seleção rigorosa das marcas mais desejadas do mundo</p></div>
+        <div class="perk"><h3>Atendimento Premium</h3><p>Suporte via WhatsApp em cada etapa da compra</p></div>
+        <div class="perk"><h3>Pagamento Facilitado</h3><p>Pix com desconto · Cartão em até 12x</p></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="dados.js"></script>
+  <script src="comum.js"></script>
+  <script>
+    iniciarPagina("interna");
+
+    const params = new URLSearchParams(location.search);
+    let cat = params.get("cat") || "todos", faixa = "todas", busca = params.get("q") || "";
+    $("#q").value = busca;
+
+    const FAIXAS = [
+      { id: "todas", nome: "Todas", ok: () => true },
+      { id: "ate300", nome: "Até R$ 300", ok: v => v <= 300 },
+      { id: "300a600", nome: "R$ 300 – R$ 600", ok: v => v > 300 && v <= 600 },
+      { id: "600mais", nome: "Acima de R$ 600", ok: v => v > 600 }
+    ];
+    if (!COM_PRECO) { $("#sidePrice").previousElementSibling.remove(); $("#sidePrice").remove(); $$('#sort option[value="menor"], #sort option[value="maior"]').forEach(o => o.remove()); }
+    const cats = [{ id: "todos", nome: "Todos" }, { id: "novos", nome: "Lançamentos" }, ...CATEGORIAS];
+    const naCat = (p, c) => c === "todos" || (c === "novos" ? p.novo : p.cat === c);
+
+    function renderSide() {
+      $("#sideCats").innerHTML = cats.map(c => `<li><button data-c="${c.id}" class="${c.id === cat ? "active" : ""}">${esc(c.nome)}<small>${PRODUTOS.filter(p => naCat(p, c.id)).length}</small></button></li>`).join("");
+      if (COM_PRECO) $("#sidePrice").innerHTML = FAIXAS.map(f => `<li><button data-f="${f.id}" class="${f.id === faixa ? "active" : ""}">${esc(f.nome)}</button></li>`).join("");
+      $$("#sideCats button").forEach(b => b.onclick = () => { cat = b.dataset.c; history.replaceState(null, "", cat === "todos" ? "catalogo.html" : `?cat=${cat}`); render(); });
+      if (COM_PRECO) $$("#sidePrice button").forEach(b => b.onclick = () => { faixa = b.dataset.f; render(); });
+    }
+
+    function render() {
+      renderSide();
+      const c = cats.find(x => x.id === cat) || cats[0];
+      $("#title").textContent = c.id === "todos" ? "Todos os produtos" : c.nome;
+      $("#eyebrow").textContent = c.id === "novos" ? "Recém chegados" : c.id === "todos" ? "Catálogo completo" : "Categoria";
+      $("#crumbCat").textContent = c.id === "todos" ? "Catálogo" : c.nome;
+      document.title = `${c.id === "todos" ? "Catálogo" : c.nome} — CL Imports`;
+      $$("#mainNav a").forEach(a => a.classList.toggle("active", a.getAttribute("href") === (c.id === "todos" ? "catalogo.html" : `catalogo.html?cat=${c.id}`)));
+
+      const q = busca.trim().toLowerCase(), f = FAIXAS.find(x => x.id === faixa);
+      let list = PRODUTOS.filter(p => naCat(p, cat) && f.ok(p.preco) && (!q || `${p.nome} ${p.marca || ""} ${catNome(p.cat)}`.toLowerCase().includes(q)));
+      const s = $("#sort").value;
+      if (s === "menor") list.sort((a, b) => a.preco - b.preco);
+      if (s === "maior") list.sort((a, b) => b.preco - a.preco);
+      if (s === "az") list.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+      if (s === "novos") list.sort((a, b) => (b.novo - a.novo) || (b.id - a.id));
+      $("#count").textContent = `${list.length} ${list.length === 1 ? "peça" : "peças"}`;
+      $("#grid").innerHTML = list.length ? list.map(cardHTML).join("") : `<div class="empty">Nenhum produto encontrado.</div>`;
+    }
+
+    $("#q").oninput = e => { busca = e.target.value; render(); };
+    $("#sort").onchange = render;
+    $("#filterBtn").onclick = () => $("#side").classList.toggle("open");
+    render();
+  </script>
+</body>
+</html>

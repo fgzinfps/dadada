@@ -1,13 +1,16 @@
 # CL Imports — site
 
-Site estático (um único `index.html`, sem build). Abra o arquivo no navegador ou publique a pasta em qualquer hospedagem estática (Vercel, Netlify, GitHub Pages).
+Site estático, sem build. Páginas: `index.html` (home), `catalogo.html` (catálogo com filtros) e `produto.html?id=N` (página do produto). Abra o arquivo no navegador ou publique a pasta em qualquer hospedagem estática (Vercel, Netlify, GitHub Pages).
 
-Referências usadas: zennaoficial.com.br (hero preto com transição glitch, vitrine branca, abas de categoria, rodapé com wordmark) e assistrend.online (tipografia serifada, faixa de benefícios, comunidade).
+Referências: zennaoficial.com.br na home (topo preto com transição glitch, rodapé com wordmark) e assistrend.online nas páginas internas (fundo claro, títulos serifados, catálogo e página de produto).
+
+Arquivos: `dados.js` (conteúdo), `comum.js`/`comum.css` (cabeçalho, rodapé, sacola), `interna.css` (catálogo e produto).
 
 ## Como preencher
 
-Tudo que muda fica no bloco **CONFIGURAÇÃO DA LOJA** no início do `<script>` em `index.html`:
+Tudo que muda fica em **`dados.js`** (vale para todas as páginas):
 
+- `LOJA.mostrarPreco` — `false` (padrão) esconde todos os preços: aparece "Consultar valor" e o pedido vai como orçamento pelo WhatsApp. Mude para `true` para exibir os preços.
 - `LOJA` — WhatsApp (só números, `55` + DDD + número), Instagram, TikTok, e-mail, horário, % de desconto no Pix, avisos da faixa.
 - `CATEGORIAS` — abas da vitrine.
 - `PRODUTOS` — nome, categoria, preço, preço antigo (`de`), tamanhos, descrição e fotos.
