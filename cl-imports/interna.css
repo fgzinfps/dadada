@@ -154,3 +154,6 @@ body.interna { background: #f8f8f6; color: #1c1c1c; }
 /* modo sem preço */
 .lux-grid .pconsult { font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: #8a867e; margin-top: 8px; }
 .price-box .consult { font-family: var(--serif); font-size: 28px; }
+.more-wrap { text-align: center; margin-top: 54px; }
+.more-wrap .btn-ghost { display: inline-flex; width: auto; padding: 0 44px; }
+.side ul#sideBrands { max-height: 360px; overflow-y: auto; scrollbar-width: thin; }

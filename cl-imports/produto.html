@@ -16,6 +16,7 @@
   <main id="page"></main>
 
   <script src="dados.js"></script>
+  <script src="produtos.js"></script>
   <script src="comum.js"></script>
   <script>
     iniciarPagina("interna");
@@ -66,7 +67,7 @@
             <a class="btn-ghost" id="buyWa" target="_blank" rel="noopener">${WA_ICON} Comprar pelo WhatsApp</a>
 
             <div class="trust">
-              <div><svg viewBox="0 0 32 32"><path d="M16 3 5 7v8c0 7 5 12 11 14 6-2 11-7 11-14V7z"/><path d="m11 16 3.5 3.5L21 13"/></svg><b>Original</b><span>Procedência garantida</span></div>
+              <div><svg viewBox="0 0 32 32"><path d="M16 3 5 7v8c0 7 5 12 11 14 6-2 11-7 11-14V7z"/><path d="m11 16 3.5 3.5L21 13"/></svg><b>Curadoria</b><span>Peças selecionadas</span></div>
               <div><svg viewBox="0 0 32 32"><path d="M3 9h17v13H3zM20 13h5l4 5v4h-9z"/><circle cx="9" cy="24" r="2.5"/><circle cx="24" cy="24" r="2.5"/></svg><b>Envio</b><span>Todo o Brasil</span></div>
               <div><svg viewBox="0 0 32 32"><path d="M6 16a10 10 0 0 1 17-7l3 3M26 16a10 10 0 0 1-17 7l-3-3"/><path d="M26 6v6h-6M6 26v-6h6"/></svg><b>Troca</b><span>Em até 7 dias</span></div>
             </div>
@@ -135,7 +136,8 @@
       new IntersectionObserver(([e]) => $("#stickyBuy").classList.toggle("show", !e.isIntersecting && e.boundingClientRect.top < 0)).observe($("#add"));
 
       // relacionados: mesma categoria primeiro
-      const rel = PRODUTOS.filter(x => x.id !== p.id).sort((a, b) => (b.cat === p.cat) - (a.cat === p.cat)).slice(0, 4);
+      const score = x => (x.marca === p.marca) * 2 + (x.cat === p.cat);
+      const rel = PRODUTOS.filter(x => x.id !== p.id).sort((a, b) => score(b) - score(a) || a.id - b.id).slice(0, 4);
       $("#related").innerHTML = rel.map(cardHTML).join("");
     }
   </script>

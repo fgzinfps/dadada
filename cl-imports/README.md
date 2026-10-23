@@ -8,17 +8,16 @@ Arquivos: `dados.js` (conteúdo), `comum.js`/`comum.css` (cabeçalho, rodapé, s
 
 ## Como preencher
 
-Tudo que muda fica em **`dados.js`** (vale para todas as páginas):
+Contatos, categorias e FAQ ficam em **`dados.js`**; os produtos ficam em **`produtos.js`** (um por linha, gerado a partir das fotos do Drive). Fotos em `assets/produtos/` (WebP otimizado).
 
 - `LOJA.mostrarPreco` — `false` (padrão) esconde todos os preços: aparece "Consultar valor" e o pedido vai como orçamento pelo WhatsApp. Mude para `true` para exibir os preços.
 - `LOJA` — WhatsApp (só números, `55` + DDD + número), Instagram, TikTok, e-mail, horário, % de desconto no Pix, avisos da faixa.
 - `CATEGORIAS` — abas da vitrine.
-- `PRODUTOS` — nome, categoria, preço, preço antigo (`de`), tamanhos, descrição e fotos.
+- `PRODUTOS` (em `produtos.js`) — marca, nome, categoria, tamanhos, descrição e fotos. `preco`/`de` só aparecem com `mostrarPreco: true`.
   - Coloque as fotos em `assets/produtos/` e liste os nomes em `fotos: ["camiseta-1.jpg", "camiseta-2.jpg"]` (a 2ª aparece no hover).
   - Fotos com **fundo branco** ficam perfeitas na vitrine.
   - `destaque: true` coloca o produto no slider do topo. Para o topo, use `fotoDestaque` com **PNG sem fundo** — o produto fica flutuando no preto, igual à referência.
   - `novo: true` coloca em Lançamentos.
-- `COMUNIDADE` — fotos de clientes (também em `assets/produtos/`).
 
 ## Checkout
 

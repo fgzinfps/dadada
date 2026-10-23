@@ -26,6 +26,8 @@
         <aside class="side" id="side">
           <h4>Categorias</h4>
           <ul id="sideCats"></ul>
+          <h4>Marcas</h4>
+          <ul id="sideBrands"></ul>
           <h4>Faixa de preço</h4>
           <ul id="sidePrice"></ul>
         </aside>
@@ -42,6 +44,7 @@
             </select>
           </div>
           <div class="lux-grid" id="grid"></div>
+          <div class="more-wrap" id="moreWrap"><button class="btn-ghost" id="more">Carregar mais</button></div>
         </div>
       </div>
     </div>
@@ -56,12 +59,15 @@
   </main>
 
   <script src="dados.js"></script>
+  <script src="produtos.js"></script>
   <script src="comum.js"></script>
   <script>
     iniciarPagina("interna");
 
     const params = new URLSearchParams(location.search);
-    let cat = params.get("cat") || "todos", faixa = "todas", busca = params.get("q") || "";
+    let cat = params.get("cat") || "todos", marca = params.get("marca") || "todas", faixa = "todas", busca = params.get("q") || "";
+    const POR_PAGINA = 24; let limite = POR_PAGINA;
+    const MARCAS = [...new Set(PRODUTOS.map(p => p.marca).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
     $("#q").value = busca;
 
     const FAIXAS = [
@@ -77,31 +83,43 @@
     function renderSide() {
       $("#sideCats").innerHTML = cats.map(c => `<li><button data-c="${c.id}" class="${c.id === cat ? "active" : ""}">${esc(c.nome)}<small>${PRODUTOS.filter(p => naCat(p, c.id)).length}</small></button></li>`).join("");
       if (COM_PRECO) $("#sidePrice").innerHTML = FAIXAS.map(f => `<li><button data-f="${f.id}" class="${f.id === faixa ? "active" : ""}">${esc(f.nome)}</button></li>`).join("");
-      $$("#sideCats button").forEach(b => b.onclick = () => { cat = b.dataset.c; history.replaceState(null, "", cat === "todos" ? "catalogo.html" : `?cat=${cat}`); render(); });
+      $("#sideBrands").innerHTML = [`<li><button data-m="todas" class="${marca === "todas" ? "active" : ""}">Todas</button></li>`,
+        ...MARCAS.filter(m => m === marca || PRODUTOS.some(p => p.marca === m && naCat(p, cat))).map(m => `<li><button data-m="${esc(m)}" class="${m === marca ? "active" : ""}">${esc(m)}<small>${PRODUTOS.filter(p => p.marca === m && naCat(p, cat)).length}</small></button></li>`)].join("");
+      $$("#sideCats button").forEach(b => b.onclick = () => { cat = b.dataset.c; limite = POR_PAGINA; syncUrl(); render(); });
+      $$("#sideBrands button").forEach(b => b.onclick = () => { marca = b.dataset.m; limite = POR_PAGINA; syncUrl(); render(); });
       if (COM_PRECO) $$("#sidePrice button").forEach(b => b.onclick = () => { faixa = b.dataset.f; render(); });
     }
 
+    function syncUrl() {
+      const q = new URLSearchParams();
+      if (cat !== "todos") q.set("cat", cat);
+      if (marca !== "todas") q.set("marca", marca);
+      history.replaceState(null, "", "catalogo.html" + (q.toString() ? "?" + q : ""));
+    }
     function render() {
       renderSide();
       const c = cats.find(x => x.id === cat) || cats[0];
-      $("#title").textContent = c.id === "todos" ? "Todos os produtos" : c.nome;
+      $("#title").textContent = marca !== "todas" ? (c.id === "todos" ? marca : `${c.nome} ${marca}`) : (c.id === "todos" ? "Todos os produtos" : c.nome);
       $("#eyebrow").textContent = c.id === "novos" ? "Recém chegados" : c.id === "todos" ? "Catálogo completo" : "Categoria";
       $("#crumbCat").textContent = c.id === "todos" ? "Catálogo" : c.nome;
       document.title = `${c.id === "todos" ? "Catálogo" : c.nome} — CL Imports`;
       $$("#mainNav a").forEach(a => a.classList.toggle("active", a.getAttribute("href") === (c.id === "todos" ? "catalogo.html" : `catalogo.html?cat=${c.id}`)));
 
       const q = busca.trim().toLowerCase(), f = FAIXAS.find(x => x.id === faixa);
-      let list = PRODUTOS.filter(p => naCat(p, cat) && f.ok(p.preco) && (!q || `${p.nome} ${p.marca || ""} ${catNome(p.cat)}`.toLowerCase().includes(q)));
+      let list = PRODUTOS.filter(p => naCat(p, cat) && (marca === "todas" || p.marca === marca) && (!COM_PRECO || f.ok(p.preco)) && (!q || `${p.nome} ${p.marca || ""} ${catNome(p.cat)}`.toLowerCase().includes(q)));
       const s = $("#sort").value;
       if (s === "menor") list.sort((a, b) => a.preco - b.preco);
       if (s === "maior") list.sort((a, b) => b.preco - a.preco);
       if (s === "az") list.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-      if (s === "novos") list.sort((a, b) => (b.novo - a.novo) || (b.id - a.id));
+      if (s === "novos") list.sort((a, b) => (!!b.novo - !!a.novo) || (a.id - b.id));
       $("#count").textContent = `${list.length} ${list.length === 1 ? "peça" : "peças"}`;
-      $("#grid").innerHTML = list.length ? list.map(cardHTML).join("") : `<div class="empty">Nenhum produto encontrado.</div>`;
+      $("#grid").innerHTML = list.length ? list.slice(0, limite).map((p, i) => cardHTML(p, i % POR_PAGINA)).join("") : `<div class="empty">Nenhum produto encontrado.</div>`;
+      $("#moreWrap").style.display = list.length > limite ? "" : "none";
+      $("#more").textContent = `Carregar mais (${list.length - limite})`;
     }
 
-    $("#q").oninput = e => { busca = e.target.value; render(); };
+    $("#q").oninput = e => { busca = e.target.value; limite = POR_PAGINA; render(); };
+    $("#more").onclick = () => { limite += POR_PAGINA; render(); };
     $("#sort").onchange = render;
     $("#filterBtn").onclick = () => $("#side").classList.toggle("open");
     render();

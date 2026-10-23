@@ -27,7 +27,7 @@ const ICON_CLOSE = `<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></s
 function montarCabecalho(variante) {
   const interna = variante === "interna";
   const links = interna
-    ? [["catalogo.html", "Todos"], ["catalogo.html?cat=novos", "Lançamentos"], ...CATEGORIAS.slice(0, 4).map(c => [`catalogo.html?cat=${c.id}`, c.nome])]
+    ? [["catalogo.html", "Todos"], ["catalogo.html?cat=novos", "Lançamentos"], ["catalogo.html?cat=tenis", "Tênis"], ["catalogo.html?cat=sandalias", "Sandálias"], ["catalogo.html?cat=moletons", "Moletons"]]
     : [["catalogo.html", "Produtos"], ["catalogo.html?cat=novos", "Lançamentos"], ["#contato", "Contato"]];
   document.body.insertAdjacentHTML("afterbegin", `
   <header class="site ${interna ? "inner solid" : ""}" id="header">

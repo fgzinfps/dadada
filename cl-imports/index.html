@@ -22,11 +22,13 @@
       background: radial-gradient(ellipse 45% 50% at 50% 52%, rgba(201,162,74,.12), transparent 70%);
     }
     .stage { position: absolute; left: 50%; top: 53%; transform: translate(-50%, -50%); width: min(560px, 62vw); height: min(64vh, 620px); }
-    .stage img.slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 30px 60px rgba(0,0,0,.6)); }
-    .stage.placeholder img.slide { padding: 14%; opacity: .95; }
+    .stage img.slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+    /* modos da foto no topo: "frame" = foto com fundo (moldura), "cutout" = foto com fundo preto (flutua no preto) */
+    .stage img.frame { object-fit: cover; box-shadow: 0 40px 80px -20px rgba(0,0,0,.9), 0 0 0 1px rgba(201,162,74,.35); }
+    .stage img.cutout { object-fit: contain; filter: drop-shadow(0 30px 50px rgba(0,0,0,.8)); }
+    .stage img.mono { padding: 14%; }
     .gslice { position: absolute; inset: 0; pointer-events: none; will-change: transform, clip-path; }
-    .gslice img { width: 100%; height: 100%; object-fit: contain; }
-    .stage.placeholder .gslice img { padding: 14%; }
+    .gslice img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
     .gslice.a { filter: drop-shadow(-6px 0 0 var(--glitch-a)) drop-shadow(6px 0 0 var(--glitch-b)); }
     .scanline {
       position: absolute; left: 50%; width: min(900px, 90vw); height: 3px; transform: translateX(-50%); top: -10px; opacity: 0; pointer-events: none;
@@ -90,8 +92,8 @@
     .grid.big { grid-template-columns: repeat(4, 1fr); }
     .pcard { text-align: center; opacity: 0; transform: translateY(20px); animation: rise .6s ease forwards; }
     @keyframes rise { to { opacity: 1; transform: none; } }
-    .pmedia { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--white); cursor: none; }
-    .pmedia img.photo { width: 100%; height: 100%; object-fit: contain; transition: transform .7s ease, opacity .4s; }
+    .pmedia { position: relative; aspect-ratio: 4/5; overflow: hidden; background: #f3f2ef; }
+    .pmedia img.photo { width: 100%; height: 100%; object-fit: cover; transition: transform .7s ease, opacity .4s; }
     .pmedia img.photo.alt { position: absolute; inset: 0; opacity: 0; }
     .pcard:hover .pmedia img.photo { transform: scale(1.04); }
     .pcard:hover .pmedia img.photo.alt { opacity: 1; }
@@ -99,7 +101,8 @@
     .ph img { width: 30%; opacity: .2; }
     .ph small { position: absolute; bottom: 12px; font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em; color: #aaa; text-transform: uppercase; }
     .ptag { position: absolute; top: 10px; left: 10px; z-index: 2; background: #000; color: var(--gold-2); font-family: var(--mono); font-size: 9px; letter-spacing: .1em; padding: 3px 7px; text-transform: uppercase; }
-    .pname { font-size: 17px; line-height: 1.25; margin-top: 16px; max-width: 240px; margin-left: auto; margin-right: auto; }
+    .pcat { display: block; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted-l); margin-top: 14px; }
+    .pname { font-size: 17px; line-height: 1.25; margin-top: 4px; max-width: 240px; margin-left: auto; margin-right: auto; }
     .pprice { font-size: 30px; font-weight: 700; letter-spacing: -.01em; margin-top: 6px; }
     .pold { font-size: 13px; color: #aaa; text-decoration: line-through; margin-right: 6px; font-weight: 400; vertical-align: middle; }
     .pinst { font-size: 13px; color: var(--muted-l); }
@@ -115,7 +118,7 @@
     .strip-track { display: flex; gap: 10px; width: max-content; animation: marquee 50s linear infinite; }
     .strip-track > div { width: 130px; height: 150px; background: #fff; flex-shrink: 0; display: grid; place-items: center; overflow: hidden; }
     .strip-track > div:nth-child(even) { margin-top: 20px; }
-    .strip-track img { width: 100%; height: 100%; object-fit: contain; }
+    .strip-track img { width: 100%; height: 100%; object-fit: cover; }
     .strip-track .ph-mini { background: #1a1a1a; }
     .strip-track .ph-mini img { width: 40%; height: auto; opacity: .35; }
     .strip-title { position: absolute; left: var(--pad); bottom: 22px; z-index: 2; color: #fff; pointer-events: none; }
@@ -175,10 +178,12 @@
     }
     @media (max-width: 900px) {
       .stage { width: 78vw; height: 52vh; top: 47%; }
-      .arrow { top: auto; bottom: 120px; transform: none; width: 64px; height: 44px; }
+      .arrow { top: auto; bottom: 6px; transform: none; width: 64px; height: 44px; }
       .arrow svg { width: 36px; }
       .arrow.prev { left: 16px; } .arrow.next { right: 16px; }
-      .hero-info { bottom: 112px; left: 0; right: 0; text-align: center; }
+      .hero-info { bottom: 64px; left: 0; right: 0; text-align: center; }
+      .stage { top: 44%; }
+      .wa-float { bottom: 66px; right: 14px; width: 52px; height: 52px; }
       .dots { right: 50%; transform: translateX(50%); bottom: 18px; gap: 6px; }
       .dots button { width: 22px; }
       .grid, .grid.big { grid-template-columns: repeat(2, 1fr); gap: 30px 12px; }
@@ -265,21 +270,14 @@
       <div class="reveal">
         <div class="eyebrow">Sobre a CL Imports</div>
         <h2 class="serif-title" style="margin-top:14px">Curadoria é o<br><em class="gold-text">nosso padrão.</em></h2>
-        <p>Cada peça passa por uma seleção criteriosa antes de chegar até você. Trabalhamos só com produtos originais e atendimento próximo, do primeiro contato até a entrega.</p>
+        <p>Cada peça passa por uma seleção criteriosa antes de chegar até você. São mais de 280 modelos das marcas mais desejadas, com atendimento próximo do primeiro contato até a entrega.</p>
         <div class="stats">
-          <div><b class="gold-text" data-count="2000" data-suffix="+">0</b><span>Clientes</span></div>
-          <div><b class="gold-text" data-count="100" data-suffix="%">0</b><span>Originais</span></div>
-          <div><b class="gold-text" data-count="27">0</b><span>Estados</span></div>
+          <div><b class="gold-text" data-count="280" data-suffix="+">0</b><span>Modelos</span></div>
+          <div><b class="gold-text" data-count="19">0</b><span>Marcas</span></div>
+          <div><b class="gold-text" data-count="9">0</b><span>Categorias</span></div>
         </div>
         <a href="catalogo.html" class="btn-pill">Ver catálogo →</a>
       </div>
-    </section>
-
-    <!-- ===================== COMUNIDADE ===================== -->
-    <section class="community px">
-      <div class="eyebrow" style="color:var(--muted-l)">Nossa família</div>
-      <h2 class="serif-title reveal">Comunidade <em class="gold-text">CL Imports</em></h2>
-      <div class="comm-grid" id="comm"></div>
     </section>
 
     <!-- ===================== FAQ ===================== -->
@@ -293,13 +291,15 @@
   </main>
 
   <script src="dados.js"></script>
+  <script src="produtos.js"></script>
   <script src="comum.js"></script>
   <script>
     iniciarPagina("home");
 
     /* ---------------- HERO com transição GLITCH ---------------- */
-    const slides = PRODUTOS.filter(p => p.destaque);
+    const slides = PRODUTOS.filter(p => p.destaque).sort((a, b) => a.destaque - b.destaque);
     const heroSrc = p => p.fotoDestaque ? foto(p.fotoDestaque) : (p.fotos[0] ? foto(p.fotos[0]) : MONO);
+    const modo = {}; slides.forEach(p => modo[heroSrc(p)] = !p.fotos[0] ? "mono" : p.fundoPreto ? "cutout" : "frame");
     let cur = 0, busy = false, timer;
     document.documentElement.style.setProperty("--slide-ms", LOJA.slideMs + "ms");
     $("#ticker1").innerHTML = Array(6).fill(LOJA.avisos).flat().map(a => `<span>${esc(a)}</span><span class="star">✦</span>`).join("");
@@ -318,7 +318,7 @@
     function setImg(i) {
       const src = heroSrc(slides[i]);
       $("#slideImg").src = src;
-      $("#stage").classList.toggle("placeholder", src === MONO);
+      $("#slideImg").className = "slide " + (modo[src] || "frame");
     }
     function go(i) {
       if (busy || !slides.length) return;
@@ -329,14 +329,13 @@
       busy = true;
       const hero = $("#hero"), stage = $("#stage"), info = $("#heroInfo");
       const oldSrc = heroSrc(slides[cur]), newSrc = heroSrc(slides[i]);
-      const placeholderNew = newSrc === MONO;
 
       // fatias horizontais com deslocamento e separação RGB
       const N = 14, slices = [];
       for (let k = 0; k < N; k++) {
         const d = document.createElement("div");
         d.className = "gslice" + (Math.random() > .35 ? " a" : "");
-        d.innerHTML = `<img alt="" src="${oldSrc}">`;
+        d.innerHTML = `<img alt="" src="${oldSrc}" class="${modo[oldSrc]}">`;
         const top = (k / N) * 100, h = 100 / N;
         d.style.clipPath = `inset(${top}% 0 ${100 - top - h}% 0)`;
         stage.appendChild(d); slices.push(d);
@@ -354,8 +353,7 @@
           // a partir da metade, as fatias passam a mostrar a nova imagem (de cima pra baixo)
           const useNew = progress > .35 && Math.random() < progress + (k / N) * .3;
           const img = d.firstChild, want = useNew ? newSrc : oldSrc;
-          if (img.getAttribute("src") !== want) img.setAttribute("src", want);
-          stage.classList.toggle("placeholder", useNew ? placeholderNew : oldSrc === MONO);
+          if (img.getAttribute("src") !== want) { img.setAttribute("src", want); img.className = modo[want]; }
           const amp = (1 - Math.abs(progress - .5) * 1.4) * 90;
           d.style.transform = Math.random() < .7 ? `translateX(${(Math.random() * 2 - 1) * amp}px)` : "none";
           d.style.opacity = Math.random() < .08 ? 0 : 1;
@@ -390,8 +388,15 @@
     $("#tabs").innerHTML = [{ id: "todos", nome: "Todos" }, { id: "novos", nome: "Lançamentos" }, ...CATEGORIAS]
       .map(c => `<button data-f="${c.id}" class="${c.id === filtro ? "active" : ""}">${esc(c.nome)}</button>`).join("");
     $$("#tabs button").forEach(b => b.onclick = () => { filtro = b.dataset.f; $$("#tabs button").forEach(x => x.classList.toggle("active", x === b)); renderAll(); });
+    // intercala as marcas para a vitrine não mostrar só uma
+    function misturar(lista) {
+      const porMarca = {}; lista.forEach(p => (porMarca[p.marca] = porMarca[p.marca] || []).push(p));
+      const filas = Object.values(porMarca), out = [];
+      for (let k = 0; out.length < lista.length; k++) filas.forEach(f => f[k] && out.push(f[k]));
+      return out;
+    }
     function renderAll() {
-      const list = PRODUTOS.filter(p => filtro === "todos" || (filtro === "novos" ? p.novo : p.cat === filtro)).slice(0, 8);
+      const list = misturar(PRODUTOS.filter(p => filtro === "todos" || (filtro === "novos" ? p.novo : p.cat === filtro))).slice(0, 8);
       $("#gridAll").innerHTML = list.length ? list.map(cardHTML).join("") : `<div class="empty">Nenhum produto nesta categoria ainda.</div>`;
     }
     renderAll();
@@ -400,9 +405,7 @@
     const stripItems = PRODUTOS.map(p => p.fotos[0] ? `<div><img src="${foto(p.fotos[0])}" alt=""></div>` : `<div class="ph-mini"><img src="${MONO}" alt=""></div>`);
     $("#strip").innerHTML = Array(Math.max(2, Math.ceil(24 / stripItems.length)) * 2).fill(stripItems.join("")).join("");
 
-    // Comunidade e FAQ
-    $("#comm").innerHTML = COMUNIDADE.map(f => f ? `<a href="${LOJA.instagram}" target="_blank" rel="noopener"><img class="photo" src="${foto(f)}" alt="Cliente CL Imports" loading="lazy"></a>`
-      : `<a href="${LOJA.instagram}" target="_blank" rel="noopener"><img class="mono" src="${MONO_D}" alt=""><span>@climports</span></a>`).join("");
+    // FAQ
     $("#faq").innerHTML = FAQ.map(f => `<details class="reveal"><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("");
 
     animarAoRolar();
