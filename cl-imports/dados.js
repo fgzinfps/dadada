@@ -4,7 +4,7 @@
    ================================================================= */
 
 const LOJA = {
-  whatsapp: "5500000000000",            // só números: 55 + DDD + número
+  whatsapp: "5521996465566",            // só números: 55 + DDD + número
   instagram: "https://instagram.com/",
   tiktok: "https://tiktok.com/",
   email: "contato@climports.com.br",
