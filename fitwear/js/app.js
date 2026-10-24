@@ -60,8 +60,8 @@
         return `<li class="card">
           <div class="card__foto">
             ${p.selo ? `<span class="selo">${esc(p.selo)}</span>` : ""}
-            <img src="${f1}" alt="${esc(p.nome)}" loading="lazy" width="800" height="1000">
-            ${f2 ? `<img src="${f2}" alt="" loading="lazy" width="800" height="1000">` : ""}
+            <img src="${f1}" alt="${esc(p.nome)}" loading="lazy" width="1000" height="1250">
+            ${f2 ? `<img src="${f2}" alt="" loading="lazy" width="1000" height="1250">` : ""}
           </div>
           <div class="card__info">
             <button class="card__nome" data-abrir="${p.id}">${esc(p.nome)}</button>
