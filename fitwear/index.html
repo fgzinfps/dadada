@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moda Fitness Feminina</title>
+  <meta name="description" content="Roupas fitness femininas para academia: conjuntos, tops e shorts. Peça pelo WhatsApp.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Moda Fitness Feminina">
+  <meta property="og:image" content="img/conjunto-2.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#catalogo">Pular para o catálogo</a>
+
+  <div class="promo" id="promo" hidden></div>
+
+  <header class="topo">
+    <div class="wrap topo__in">
+      <a href="#" class="logo" data-marca></a>
+      <nav class="menu" aria-label="Principal">
+        <a href="#catalogo">Catálogo</a>
+        <a href="#medidas">Medidas</a>
+        <a href="#duvidas">Dúvidas</a>
+      </nav>
+      <button class="sacola-btn" id="abrirSacola" aria-label="Abrir sacola">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7Z M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span class="sacola-btn__qtd" id="qtdSacola">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero__in">
+        <div class="hero__txt">
+          <p class="eyebrow">Nova coleção</p>
+          <h1>Treine com <em>confiança</em>.</h1>
+          <p class="hero__sub" data-slogan></p>
+          <div class="hero__cta">
+            <a href="#catalogo" class="btn btn--cheio">Ver catálogo</a>
+            <a href="#" class="btn btn--linha" data-whats-link>Falar no WhatsApp</a>
+          </div>
+        </div>
+        <figure class="hero__img">
+          <img src="img/conjunto-2.webp" alt="Modelo vestindo conjunto fitness preto: top de alcinhas e short de cintura alta" width="1200" height="1200" fetchpriority="high">
+        </figure>
+      </div>
+    </section>
+
+    <!-- BENEFÍCIOS -->
+    <section class="faixa" aria-label="Vantagens">
+      <ul class="wrap faixa__in">
+        <li><strong>Compra pelo WhatsApp</strong><span>Atendimento direto, sem cadastro</span></li>
+        <li><strong>Envio para todo o Brasil</strong><span data-frete-texto>Frete calculado no atendimento</span></li>
+        <li><strong>Troca facilitada</strong><span>Tamanho não serviu? A gente troca</span></li>
+      </ul>
+    </section>
+
+    <!-- CATÁLOGO -->
+    <section class="secao" id="catalogo">
+      <div class="wrap">
+        <div class="secao__cab">
+          <h2>Catálogo</h2>
+          <div class="filtros" id="filtros" role="tablist" aria-label="Filtrar por categoria"></div>
+        </div>
+        <ul class="grade" id="grade"></ul>
+      </div>
+    </section>
+
+    <!-- TABELA DE MEDIDAS -->
+    <section class="secao secao--clara" id="medidas">
+      <div class="wrap medidas">
+        <div>
+          <h2>Tabela de medidas</h2>
+          <p class="nota">Medidas do corpo em centímetros. Ficou entre dois tamanhos? Para mais compressão, escolha o menor.</p>
+          <!-- TODO: confirme a tabela com o fornecedor/modelagem real -->
+        </div>
+        <div class="tabela-wrap">
+          <table class="tabela">
+            <thead><tr><th>Tam.</th><th>Busto</th><th>Cintura</th><th>Quadril</th></tr></thead>
+            <tbody>
+              <tr><td>P</td><td>80–86</td><td>62–68</td><td>88–94</td></tr>
+              <tr><td>M</td><td>86–92</td><td>68–74</td><td>94–100</td></tr>
+              <tr><td>G</td><td>92–98</td><td>74–80</td><td>100–106</td></tr>
+              <tr><td>GG</td><td>98–104</td><td>80–86</td><td>106–112</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="secao" id="duvidas">
+      <div class="wrap estreito">
+        <h2>Dúvidas frequentes</h2>
+        <details>
+          <summary>Como faço meu pedido?</summary>
+          <p>Escolha as peças, tamanho e coloque na sacola. Ao finalizar, abrimos o WhatsApp com o pedido já escrito — é só enviar que a gente confirma estoque, frete e pagamento.</p>
+        </details>
+        <details>
+          <summary>Quais as formas de pagamento?</summary>
+          <p>Pix e cartão de crédito. Os detalhes são passados no atendimento.</p>
+        </details>
+        <details>
+          <summary>Qual o prazo de entrega?</summary>
+          <p>Postamos em até 2 dias úteis após a confirmação do pagamento. O prazo dos Correios/transportadora depende do seu CEP.</p>
+        </details>
+        <details>
+          <summary>Posso trocar?</summary>
+          <p>Sim. Você tem 7 dias corridos após o recebimento para pedir troca ou devolução (Código de Defesa do Consumidor, art. 49). A peça precisa estar sem uso e com etiqueta.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <div class="wrap rodape__in">
+      <div>
+        <p class="logo" data-marca></p>
+        <p class="nota" data-slogan></p>
+      </div>
+      <ul class="rodape__links">
+        <li><a href="#" data-whats-link>WhatsApp</a></li>
+        <li><a href="#" data-insta-link target="_blank" rel="noopener">Instagram</a></li>
+        <li><a href="#" data-email-link></a></li>
+      </ul>
+    </div>
+    <p class="wrap rodape__copy">© <span id="ano"></span> <span data-marca></span>. Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- MODAL DE PRODUTO -->
+  <dialog class="modal" id="modal" aria-labelledby="modalNome">
+    <button class="fechar" data-fechar aria-label="Fechar">×</button>
+    <div class="modal__in">
+      <div class="galeria">
+        <img id="modalFoto" alt="">
+        <div class="galeria__miniaturas" id="modalMinis"></div>
+      </div>
+      <form class="modal__info" id="modalForm">
+        <p class="eyebrow" id="modalCat"></p>
+        <h3 id="modalNome"></h3>
+        <p class="preco" id="modalPreco"></p>
+        <p id="modalDesc"></p>
+        <fieldset>
+          <legend>Cor: <span id="modalCorNome"></span></legend>
+          <div class="opcoes" id="modalCores"></div>
+        </fieldset>
+        <fieldset>
+          <legend>Tamanho <a href="#medidas" data-fechar class="link-sutil">ver medidas</a></legend>
+          <div class="opcoes" id="modalTams"></div>
+        </fieldset>
+        <p class="erro" id="modalErro" role="alert"></p>
+        <button class="btn btn--cheio btn--largo" type="submit">Adicionar à sacola</button>
+        <ul class="detalhes" id="modalDetalhes"></ul>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- SACOLA -->
+  <div class="veu" id="veu" hidden></div>
+  <aside class="sacola" id="sacola" aria-label="Sacola" aria-hidden="true">
+    <div class="sacola__cab">
+      <h3>Sua sacola</h3>
+      <button class="fechar" id="fecharSacola" aria-label="Fechar sacola">×</button>
+    </div>
+    <ul class="sacola__itens" id="itensSacola"></ul>
+    <div class="sacola__rodape">
+      <p class="sacola__total"><span>Subtotal</span><strong id="totalSacola">R$ 0,00</strong></p>
+      <p class="nota">Frete e pagamento são combinados no WhatsApp.</p>
+      <button class="btn btn--cheio btn--largo" id="finalizar">Finalizar pelo WhatsApp</button>
+    </div>
+  </aside>
+
+  <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
