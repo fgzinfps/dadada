@@ -182,8 +182,14 @@
       .arrow svg { width: 36px; }
       .arrow.prev { left: 16px; } .arrow.next { right: 16px; }
       .hero-info { bottom: 64px; left: 0; right: 0; text-align: center; }
-      .stage { top: 44%; }
-      .wa-float { bottom: 66px; right: 14px; width: 52px; height: 52px; }
+      .hero { height: 86svh; min-height: 560px; }
+      .stage { width: 88vw; height: 50svh; top: 45%; }
+      #gridNew .pcard:nth-child(5) { display: none; }
+      .pname { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.5em; }
+      .pconsult { font-size: 10px; letter-spacing: .1em; }
+      .shop-head { margin-bottom: 18px; }
+      section.shop { padding-top: 56px; padding-bottom: 48px; }
+      .strip-title h2 { font-size: 40px; }
       .dots { right: 50%; transform: translateX(50%); bottom: 18px; gap: 6px; }
       .dots button { width: 22px; }
       .grid, .grid.big { grid-template-columns: repeat(2, 1fr); gap: 30px 12px; }
@@ -407,6 +413,10 @@
 
     // FAQ
     $("#faq").innerHTML = FAQ.map(f => `<details class="reveal"><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("");
+
+    // no celular, o botão do WhatsApp só aparece depois do topo (para não cobrir o nome do produto)
+    const waHero = () => document.body.classList.toggle("no-wa", scrollY < innerHeight * .55);
+    addEventListener("scroll", waHero, { passive: true }); waHero();
 
     animarAoRolar();
   </script>

@@ -159,3 +159,21 @@ body.interna { background: #dcdcd9; color: #1c1c1c; }
 .more-wrap { text-align: center; margin-top: 54px; }
 .more-wrap .btn-ghost { display: inline-flex; width: auto; padding: 0 44px; }
 .side ul#sideBrands { max-height: 360px; overflow-y: auto; scrollbar-width: thin; }
+
+/* ===== Ajustes finos para celular ===== */
+@media (max-width: 900px) {
+  .crumbs { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-top: 22px; }
+  .page-head { padding-top: 16px; padding-bottom: 22px; gap: 6px; }
+  .page-head h1 { font-size: 38px; }
+  .lux-grid .pname { font-size: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
+  .lux-grid .pcat { margin-top: 12px; font-size: 9px; }
+  .lux-grid .pconsult { font-size: 9.5px; letter-spacing: .16em; }
+  .prod { padding-top: 14px; gap: 24px; padding-bottom: 60px; }
+  .info h1 { font-size: 32px; }
+  .price-box { margin: 20px 0; padding: 18px 0; }
+  .sizes { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .sizes button { min-width: 0; }
+  .buy-row { grid-template-columns: 104px 1fr; }
+  .related { padding-top: 56px; padding-bottom: 64px; }
+  .related .sec-t { margin-bottom: 30px; }
+}

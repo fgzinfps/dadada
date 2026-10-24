@@ -209,3 +209,17 @@ a.pcard { display: block; }
   .pcard, .reveal { opacity: 1; transform: none; }
 }
 header.site nav.main a { white-space: nowrap; }
+
+/* ===== Ajustes finos para celular ===== */
+@media (max-width: 900px) {
+  .wordmark span { font-size: 15.4vw; }
+  .perks { padding-top: 44px; padding-bottom: 44px; }
+  .perks-grid { gap: 26px; }
+  .perk::before { margin-bottom: 16px; }
+  .perk h3 { font-size: 20px; }
+  .wa-float { width: 52px; height: 52px; right: 14px; bottom: 16px; box-shadow: 0 0 0 6px rgba(37,211,102,.18); }
+  .wa-float svg { width: 26px; height: 26px; }
+  body.has-sticky .wa-float, body.no-wa .wa-float { opacity: 0; pointer-events: none; transform: scale(.6); }
+  .wa-float { transition: opacity .25s, transform .25s; }
+  .foot-top { gap: 26px 20px; padding-top: 44px; }
+}
