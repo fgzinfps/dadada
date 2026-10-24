@@ -47,16 +47,23 @@
       .join("");
   }
 
+  // preco null = produto ainda sem preço definido; o valor é passado no WhatsApp.
+  const valor = (p, qtd = 1) => (p.preco == null ? "a consultar" : brl(p.preco * qtd));
+
   function precoHtml(p) {
+    if (p.preco == null) return "Consulte o preço";
     return (p.precoAntigo ? `<s>${brl(p.precoAntigo)}</s>` : "") + brl(p.preco);
   }
 
   function desenharGrade() {
-    const lista = L.produtos.filter((p) => filtroAtual === "Todos" || p.categoria === filtroAtual);
+    // Produtos com preço aparecem antes dos "consulte o preço".
+    const lista = L.produtos
+      .filter((p) => filtroAtual === "Todos" || p.categoria === filtroAtual)
+      .sort((a, b) => (a.preco == null) - (b.preco == null));
     $("#grade").innerHTML = lista
       .map((p) => {
         const [f1, f2] = p.fotos;
-        const parcela = L.parcelas > 1 ? `<p class="parcela">ou ${L.parcelas}x de ${brl(p.preco / L.parcelas)} sem juros</p>` : "";
+        const parcela = L.parcelas > 1 && p.preco != null ? `<p class="parcela">ou ${L.parcelas}x de ${brl(p.preco / L.parcelas)} sem juros</p>` : "";
         return `<li class="card">
           <div class="card__foto">
             ${p.selo ? `<span class="selo">${esc(p.selo)}</span>` : ""}
@@ -67,7 +74,6 @@
             <button class="card__nome" data-abrir="${p.id}">${esc(p.nome)}</button>
             <p class="preco">${precoHtml(p)}</p>
             ${parcela}
-            <div class="bolinhas">${p.cores.map((c) => `<i style="background:${c.hex}" title="${esc(c.nome)}"></i>`).join("")}</div>
           </div>
         </li>`;
       })
@@ -102,21 +108,18 @@
     $("#modalCat").textContent = p.categoria;
     $("#modalNome").textContent = p.nome;
     $("#modalPreco").innerHTML = precoHtml(p);
-    $("#modalDesc").textContent = p.descricao;
+    $("#modalDesc").textContent = p.descricao || "";
     $("#modalFoto").alt = p.nome;
     $("#modalMinis").innerHTML =
       p.fotos.length > 1
         ? p.fotos.map((f, i) => `<button type="button" data-foto="${i}" aria-label="Foto ${i + 1}"><img src="${f}" alt=""></button>`).join("")
         : "";
-    $("#modalCores").innerHTML = p.cores
-      .map((c, i) => `<input type="radio" name="cor" id="cor${i}" value="${esc(c.nome)}" ${i === 0 ? "checked" : ""}>
-        <label for="cor${i}" class="cor" style="background:${c.hex}" title="${esc(c.nome)}"><span class="skip">${esc(c.nome)}</span></label>`)
-      .join("");
-    $("#modalCorNome").textContent = p.cores[0].nome;
+    // A maioria das fotos mostra várias cores; a cliente escreve qual quer.
+    $("#modalCor").value = "";
     $("#modalTams").innerHTML = p.tamanhos
       .map((t, i) => `<input type="radio" name="tam" id="tam${i}" value="${esc(t)}"><label for="tam${i}">${esc(t)}</label>`)
       .join("");
-    $("#modalDetalhes").innerHTML = p.detalhes.map((d) => `<li>${esc(d)}</li>`).join("");
+    $("#modalDetalhes").innerHTML = (p.detalhes || []).map((d) => `<li>${esc(d)}</li>`).join("");
     $("#modalErro").textContent = "";
     trocarFoto(0);
     modal.showModal();
@@ -126,7 +129,6 @@
     const b = e.target.closest("[data-foto]");
     if (b) trocarFoto(+b.dataset.foto);
   });
-  $("#modalCores").addEventListener("change", (e) => ($("#modalCorNome").textContent = e.target.value));
   modal.addEventListener("click", (e) => {
     if (e.target === modal || e.target.closest("[data-fechar]")) modal.close();
   });
@@ -134,11 +136,16 @@
   $("#modalForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const dados = new FormData(e.target);
+    const cor = (dados.get("cor") || "").trim();
+    if (!cor) {
+      $("#modalErro").textContent = "Escreva a cor que você quer.";
+      return;
+    }
     if (!dados.get("tam")) {
       $("#modalErro").textContent = "Escolha um tamanho.";
       return;
     }
-    adicionar(produtoAberto.id, dados.get("cor"), dados.get("tam"));
+    adicionar(produtoAberto.id, cor, dados.get("tam"));
     modal.close();
     avisar("Adicionado à sacola");
   });
@@ -166,14 +173,15 @@
     desenharSacola();
   }
 
-  const total = () => sacola.reduce((s, i) => s + porId(i.id).preco * i.qtd, 0);
+  const total = () => sacola.reduce((s, i) => s + (porId(i.id).preco || 0) * i.qtd, 0);
+  const temSemPreco = () => sacola.some((i) => porId(i.id).preco == null);
 
   function desenharSacola() {
     const qtd = sacola.reduce((s, i) => s + i.qtd, 0);
     const badge = $("#qtdSacola");
     badge.textContent = qtd;
     badge.toggleAttribute("data-zero", qtd === 0);
-    $("#totalSacola").textContent = brl(total());
+    $("#totalSacola").textContent = brl(total()) + (temSemPreco() ? " + itens a consultar" : "");
     $("#finalizar").disabled = qtd === 0;
     $("#itensSacola").innerHTML = qtd
       ? sacola
@@ -189,7 +197,7 @@
                 </div>
               </div>
               <div class="item__dir">
-                <strong>${brl(p.preco * i.qtd)}</strong>
+                <strong>${valor(p, i.qtd)}</strong>
                 <button class="remover" data-remover="${n}">Remover</button>
               </div>
             </li>`;
@@ -225,9 +233,9 @@
   $("#finalizar").addEventListener("click", () => {
     const linhas = sacola.map((i) => {
       const p = porId(i.id);
-      return `• ${i.qtd}x ${p.nome} — ${i.cor}, tam. ${i.tam} — ${brl(p.preco * i.qtd)}`;
+      return `• ${i.qtd}x ${p.nome} — cor ${i.cor}, tam. ${i.tam} — ${valor(p, i.qtd)}`;
     });
-    const msg = [`Olá! Quero fazer este pedido na ${L.marca}:`, "", ...linhas, "", `Subtotal: ${brl(total())}`, "", "Pode me passar o frete e as formas de pagamento?"].join("\n");
+    const msg = [`Olá! Quero fazer este pedido na ${L.marca}:`, "", ...linhas, "", `Subtotal: ${brl(total())}${temSemPreco() ? " (+ itens com preço a consultar)" : ""}`, "", "Pode me passar o frete e as formas de pagamento?"].join("\n");
     window.open(whatsUrl(msg), "_blank", "noopener");
   });
 
