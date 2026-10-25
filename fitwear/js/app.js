@@ -26,12 +26,21 @@
     el.textContent = L.email;
   });
   $("#ano").textContent = new Date().getFullYear();
+  const avisosPromo = [];
+  if (L.pedidoMinimo > 0) avisosPromo.push(`Pedido mínimo de ${brl(L.pedidoMinimo)}`);
   if (L.freteGratisAcimaDe > 0) {
-    const promo = $("#promo");
-    promo.textContent = `Frete grátis em compras acima de ${brl(L.freteGratisAcimaDe)}`;
-    promo.hidden = false;
+    avisosPromo.push(`Frete grátis acima de ${brl(L.freteGratisAcimaDe)}`);
     $("[data-frete-texto]").textContent = `Frete grátis acima de ${brl(L.freteGratisAcimaDe)}`;
   }
+  if (avisosPromo.length) {
+    $("#promo").textContent = avisosPromo.join(" · ");
+    $("#promo").hidden = false;
+  }
+  $("[data-minimo-faq]").textContent =
+    L.pedidoMinimo > 0
+      ? `Sim, o pedido mínimo é de ${brl(L.pedidoMinimo)}. Pode misturar modelos, cores e tamanhos para chegar no valor.`
+      : "Não, você pode comprar a partir de uma peça.";
+  if (!(L.pedidoMinimo > 0)) $("[data-minimo-faq]").closest("details").remove();
 
   /* ------------------------------------------------------------------------
      Catálogo + filtros
@@ -182,7 +191,18 @@
     badge.textContent = qtd;
     badge.toggleAttribute("data-zero", qtd === 0);
     $("#totalSacola").textContent = brl(total()) + (temSemPreco() ? " + itens a consultar" : "");
-    $("#finalizar").disabled = qtd === 0;
+    // Pedido mínimo: só dá para garantir com itens de preço conhecido.
+    // Se houver item "a consultar", libera e o mínimo é conferido no WhatsApp.
+    const falta = L.pedidoMinimo > 0 ? L.pedidoMinimo - total() : 0;
+    const bloqueia = falta > 0 && !temSemPreco();
+    $("#finalizar").disabled = qtd === 0 || bloqueia;
+    $("#minimo").hidden = !(qtd > 0 && falta > 0);
+    if (qtd > 0 && falta > 0) {
+      $("#minimoTexto").textContent = temSemPreco()
+        ? `Pedido mínimo: ${brl(L.pedidoMinimo)}. Como há itens a consultar, conferimos o valor no WhatsApp.`
+        : `Faltam ${brl(falta)} para o pedido mínimo de ${brl(L.pedidoMinimo)}.`;
+      $("#minimoBarra").style.width = `${Math.min(100, (total() / L.pedidoMinimo) * 100)}%`;
+    }
     $("#itensSacola").innerHTML = qtd
       ? sacola
           .map((i, n) => {

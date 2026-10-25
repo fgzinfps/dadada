@@ -99,6 +99,10 @@
       <div class="wrap estreito">
         <h2>Dúvidas frequentes</h2>
         <details>
+          <summary>Tem pedido mínimo?</summary>
+          <p data-minimo-faq></p>
+        </details>
+        <details>
           <summary>Como faço meu pedido?</summary>
           <p>Escolha as peças, tamanho e coloque na sacola. Ao finalizar, abrimos o WhatsApp com o pedido já escrito — é só enviar que a gente confirma estoque, frete e pagamento.</p>
         </details>
@@ -171,6 +175,10 @@
     <ul class="sacola__itens" id="itensSacola"></ul>
     <div class="sacola__rodape">
       <p class="sacola__total"><span>Subtotal</span><strong id="totalSacola">R$ 0,00</strong></p>
+      <div class="minimo" id="minimo" hidden>
+        <p id="minimoTexto"></p>
+        <div class="minimo__barra"><span id="minimoBarra"></span></div>
+      </div>
       <p class="nota">Frete e pagamento são combinados no WhatsApp.</p>
       <button class="btn btn--cheio btn--largo" id="finalizar">Finalizar pelo WhatsApp</button>
     </div>

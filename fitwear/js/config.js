@@ -10,6 +10,7 @@ window.LOJA = {
   whatsapp: "5500000000000",         // TODO: DDI + DDD + número, só dígitos (ex.: 5511987654321)
   instagram: "suamarcafit",          // TODO: @ do Instagram, sem o @
   email: "contato@suamarca.com.br",  // TODO
+  pedidoMinimo: 100,                 // valor mínimo do pedido em reais (0 = sem mínimo)
   freteGratisAcimaDe: 0,             // TODO: valor em reais para frete grátis (0 = não mostra)
   parcelas: 3,                       // TODO: parcelas sem juros exibidas no card
 

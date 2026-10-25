@@ -241,6 +241,11 @@ legend span { font-weight: 400; color: var(--muted); }
 .item__dir { text-align: right; display: flex; flex-direction: column; justify-content: space-between; align-items: end; }
 .remover { border: 0; background: none; color: var(--muted); font-size: .8rem; text-decoration: underline; padding: 0; }
 .sacola__rodape { padding: 20px 24px; border-top: 1px solid var(--line); }
+.minimo { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; margin: 8px 0 12px; font-size: .88rem; }
+.minimo p { margin: 0 0 8px; }
+.minimo__barra { height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--accent) 20%, transparent); overflow: hidden; }
+.minimo__barra span { display: block; height: 100%; background: var(--accent); transition: width .3s; }
+#finalizar:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 .sacola__total { display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 4px; }
 
 /* Aviso flutuante */
