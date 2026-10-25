@@ -7,7 +7,7 @@
 window.LOJA = {
   marca: "Sua Marca Fit",            // TODO: nome real da empresa
   slogan: "Feita para treinar. Pensada para você.",
-  whatsapp: "5500000000000",         // TODO: DDI + DDD + número, só dígitos (ex.: 5511987654321)
+  whatsapp: "5521984508660",         // DDI + DDD + número, só dígitos
   instagram: "suamarcafit",          // TODO: @ do Instagram, sem o @
   email: "contato@suamarca.com.br",  // TODO
   pedidoMinimo: 100,                 // valor mínimo do pedido em reais (0 = sem mínimo)
