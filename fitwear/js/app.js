@@ -311,7 +311,10 @@
 
     // Pedido mínimo: com item sem preço, libera e confere no WhatsApp.
     const falta = L.pedidoMinimo > 0 ? L.pedidoMinimo - total() : 0;
-    $("#finalizar").disabled = qtd === 0 || (falta > 0 && !temSemPreco());
+    const travado = qtd === 0 || (falta > 0 && !temSemPreco());
+    $("#finalizar").setAttribute("aria-disabled", travado);
+    if (travado) $("#finalizar").removeAttribute("href");
+    else $("#finalizar").href = whatsUrl(mensagemPedido());
     $("#minimo").hidden = !(qtd > 0 && falta > 0);
     if (qtd > 0 && falta > 0) {
       $("#minimoTexto").textContent = temSemPreco()
@@ -352,14 +355,18 @@
     desenharSacola();
   });
 
-  $("#finalizar").addEventListener("click", () => {
+  // O botão é um link comum para o WhatsApp (abre em nova aba em qualquer lugar,
+  // inclusive dentro de páginas que bloqueiam window.open).
+  function mensagemPedido() {
     const linhas = sacola.map((i) => {
       const p = porId(i.id);
       return `• ${i.qtd}x ${p.nome} (${p.ref}) — cor ${i.cor}, tam. ${i.tam} — ${valor(p, i.qtd)}`;
     });
     const sub = `Subtotal: ${brl(total())}${temSemPreco() ? " (+ itens a consultar)" : ""}`;
-    const msg = [`Olá! Quero fazer este pedido na ${L.marca}:`, "", ...linhas, "", sub, "", "Pode me passar o frete e as formas de pagamento?"].join("\n");
-    window.open(whatsUrl(msg), "_blank", "noopener");
+    return [`Olá! Quero fazer este pedido na ${L.marca}:`, "", ...linhas, "", sub, "", "Pode me passar o frete e as formas de pagamento?"].join("\n");
+  }
+  $("#finalizar").addEventListener("click", (e) => {
+    if (e.currentTarget.getAttribute("aria-disabled") === "true") e.preventDefault();
   });
 
   /* ------------------------------------------------------------------------ */
