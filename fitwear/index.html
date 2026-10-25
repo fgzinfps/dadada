@@ -2,189 +2,230 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Moda Fitness Feminina</title>
-  <meta name="description" content="Roupas fitness femininas para academia: conjuntos, tops e shorts. Peça pelo WhatsApp.">
+  <meta name="description" content="Moda fitness feminina: conjuntos, macaquinhos, macacões e leggings. Peça pelo WhatsApp.">
+  <meta name="theme-color" content="#ffffff">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Moda Fitness Feminina">
   <meta property="og:image" content="img/conjunto-corta-vento-short-saia-1.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <a class="skip" href="#catalogo">Pular para o catálogo</a>
+  <a class="pular" href="#grade">Pular para os produtos</a>
 
-  <div class="promo" id="promo" hidden></div>
+  <!-- Faixa de avisos (mensagens alternam sozinhas) -->
+  <div class="avisos" id="avisos" aria-live="off"></div>
+
+  <!-- Atalhos de categoria -->
+  <nav class="atalhos" id="atalhos" aria-label="Categorias"></nav>
 
   <header class="topo">
-    <div class="wrap topo__in">
-      <a href="#" class="logo" data-marca></a>
-      <nav class="menu" aria-label="Principal">
-        <a href="#catalogo">Catálogo</a>
-        <a href="#medidas">Medidas</a>
-        <a href="#duvidas">Dúvidas</a>
-      </nav>
-      <button class="sacola-btn" id="abrirSacola" aria-label="Abrir sacola">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7Z M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        <span class="sacola-btn__qtd" id="qtdSacola">0</span>
+    <div class="topo__esq">
+      <button class="icone" id="abrirMenu" aria-label="Abrir menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+      <button class="icone" id="abrirBusca" aria-label="Buscar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
       </button>
     </div>
+    <a href="#" class="marca" data-marca></a>
+    <div class="topo__dir">
+      <a class="icone" data-whats-link aria-label="Falar no WhatsApp">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19l1.2-3.6A7.5 7.5 0 1 1 9 18.3L5 19Z"/></svg>
+      </a>
+      <button class="icone sacola-btn" id="abrirSacola" aria-label="Abrir sacola">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8h13l-1 12h-11l-1-12Z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></svg>
+        <span class="sacola-btn__qtd" id="qtdSacola" data-zero>0</span>
+      </button>
+    </div>
+    <form class="busca" id="busca" role="search" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+      <input type="search" id="campoBusca" placeholder="O que você procura?" aria-label="Buscar produtos" autocomplete="off">
+      <button type="button" class="busca__fechar" id="fecharBusca">Cancelar</button>
+    </form>
   </header>
 
   <main>
-    <!-- HERO -->
-    <section class="hero">
-      <div class="wrap hero__in">
-        <div class="hero__txt">
-          <p class="eyebrow">Nova coleção</p>
-          <h1>Treine com <em>confiança</em>.</h1>
-          <p class="hero__sub" data-slogan></p>
-          <div class="hero__cta">
-            <a href="#catalogo" class="btn btn--cheio">Ver catálogo</a>
-            <a href="#" class="btn btn--linha" data-whats-link>Falar no WhatsApp</a>
-          </div>
-        </div>
-        <figure class="hero__img">
-          <img src="img/conjunto-corta-vento-short-saia-1.webp" alt="Modelo vestindo conjunto preto de blusa corta-vento e short-saia" width="1000" height="1250" fetchpriority="high">
-        </figure>
+    <section class="colecao">
+      <h1 id="tituloColecao">Todos os produtos</h1>
+      <p id="descColecao"></p>
+    </section>
+
+    <nav class="trilha" aria-label="Você está em">
+      <a href="#" data-cat-link="Todos">Início</a>
+      <span aria-hidden="true">›</span>
+      <span id="trilhaAtual">Todos os produtos</span>
+    </nav>
+
+    <section class="vitrine" aria-label="Comprar por categoria">
+      <ul class="vitrine__lista" id="vitrine"></ul>
+    </section>
+
+    <div class="barra" id="barra">
+      <button class="barra__filtro" id="abrirFiltro">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
+        Filtrar <span class="barra__n" id="nFiltros" hidden></span>
+      </button>
+      <span class="barra__total" id="totalProdutos"></span>
+      <label class="barra__ordem">
+        <span>Classificar</span>
+        <select id="ordem">
+          <option value="destaque">Destaques</option>
+          <option value="menor">Menor preço</option>
+          <option value="maior">Maior preço</option>
+          <option value="az">A–Z</option>
+        </select>
+      </label>
+    </div>
+
+    <ul class="grade" id="grade"></ul>
+    <p class="vazio" id="vazio" hidden>Nenhum produto encontrado. <button class="link" id="limparTudo">Limpar filtros</button></p>
+
+    <section class="bloco" id="medidas">
+      <h2>Tabela de medidas</h2>
+      <p class="sub">Medidas do corpo, em centímetros. Entre dois tamanhos, escolha o menor para mais compressão.</p>
+      <!-- TODO: confirmar com a modelagem do fornecedor -->
+      <div class="tabela-wrap">
+        <table class="tabela">
+          <thead><tr><th>Tam.</th><th>Busto</th><th>Cintura</th><th>Quadril</th></tr></thead>
+          <tbody>
+            <tr><td>P</td><td>80–86</td><td>62–68</td><td>88–94</td></tr>
+            <tr><td>M</td><td>86–92</td><td>68–74</td><td>94–100</td></tr>
+            <tr><td>G</td><td>92–98</td><td>74–80</td><td>100–106</td></tr>
+            <tr><td>GG</td><td>98–104</td><td>80–86</td><td>106–112</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
-    <!-- BENEFÍCIOS -->
-    <section class="faixa" aria-label="Vantagens">
-      <ul class="wrap faixa__in">
-        <li><strong>Compra pelo WhatsApp</strong><span>Atendimento direto, sem cadastro</span></li>
-        <li><strong>Envio para todo o Brasil</strong><span data-frete-texto>Frete calculado no atendimento</span></li>
-        <li><strong>Troca facilitada</strong><span>Tamanho não serviu? A gente troca</span></li>
-      </ul>
-    </section>
-
-    <!-- CATÁLOGO -->
-    <section class="secao" id="catalogo">
-      <div class="wrap">
-        <div class="secao__cab">
-          <h2>Catálogo</h2>
-          <div class="filtros" id="filtros" role="tablist" aria-label="Filtrar por categoria"></div>
-        </div>
-        <ul class="grade" id="grade"></ul>
-      </div>
-    </section>
-
-    <!-- TABELA DE MEDIDAS -->
-    <section class="secao secao--clara" id="medidas">
-      <div class="wrap medidas">
-        <div>
-          <h2>Tabela de medidas</h2>
-          <p class="nota">Medidas do corpo em centímetros. Ficou entre dois tamanhos? Para mais compressão, escolha o menor.</p>
-          <!-- TODO: confirme a tabela com o fornecedor/modelagem real -->
-        </div>
-        <div class="tabela-wrap">
-          <table class="tabela">
-            <thead><tr><th>Tam.</th><th>Busto</th><th>Cintura</th><th>Quadril</th></tr></thead>
-            <tbody>
-              <tr><td>P</td><td>80–86</td><td>62–68</td><td>88–94</td></tr>
-              <tr><td>M</td><td>86–92</td><td>68–74</td><td>94–100</td></tr>
-              <tr><td>G</td><td>92–98</td><td>74–80</td><td>100–106</td></tr>
-              <tr><td>GG</td><td>98–104</td><td>80–86</td><td>106–112</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="secao" id="duvidas">
-      <div class="wrap estreito">
-        <h2>Dúvidas frequentes</h2>
-        <details>
-          <summary>Tem pedido mínimo?</summary>
-          <p data-minimo-faq></p>
-        </details>
-        <details>
-          <summary>Como faço meu pedido?</summary>
-          <p>Escolha as peças, tamanho e coloque na sacola. Ao finalizar, abrimos o WhatsApp com o pedido já escrito — é só enviar que a gente confirma estoque, frete e pagamento.</p>
-        </details>
-        <details>
-          <summary>Quais as formas de pagamento?</summary>
-          <p>Pix e cartão de crédito. Os detalhes são passados no atendimento.</p>
-        </details>
-        <details>
-          <summary>Qual o prazo de entrega?</summary>
-          <p>Postamos em até 2 dias úteis após a confirmação do pagamento. O prazo dos Correios/transportadora depende do seu CEP.</p>
-        </details>
-        <details>
-          <summary>Posso trocar?</summary>
-          <p>Sim. Você tem 7 dias corridos após o recebimento para pedir troca ou devolução (Código de Defesa do Consumidor, art. 49). A peça precisa estar sem uso e com etiqueta.</p>
-        </details>
-      </div>
+    <section class="bloco" id="duvidas">
+      <h2>Dúvidas</h2>
+      <details>
+        <summary>Tem pedido mínimo?</summary>
+        <p data-minimo-faq></p>
+      </details>
+      <details>
+        <summary>Como faço meu pedido?</summary>
+        <p>Escolha cor e tamanho, coloque na sacola e toque em “Finalizar pelo WhatsApp”. A conversa abre com o pedido já escrito; a gente confirma estoque, frete e pagamento.</p>
+      </details>
+      <details>
+        <summary>Quais as formas de pagamento?</summary>
+        <p>Pix e cartão de crédito. Os detalhes são passados no atendimento.</p>
+      </details>
+      <details>
+        <summary>Qual o prazo de entrega?</summary>
+        <p>Postamos em até 2 dias úteis depois do pagamento. O prazo dos Correios ou da transportadora depende do seu CEP.</p>
+      </details>
+      <details>
+        <summary>Posso trocar?</summary>
+        <p>Sim. Você tem 7 dias corridos após o recebimento para pedir troca ou devolução (Código de Defesa do Consumidor, art. 49). A peça precisa estar sem uso e com etiqueta.</p>
+      </details>
     </section>
   </main>
 
   <footer class="rodape">
-    <div class="wrap rodape__in">
-      <div>
-        <p class="logo" data-marca></p>
-        <p class="nota" data-slogan></p>
-      </div>
-      <ul class="rodape__links">
-        <li><a href="#" data-whats-link>WhatsApp</a></li>
-        <li><a href="#" data-insta-link target="_blank" rel="noopener">Instagram</a></li>
-        <li><a href="#" data-email-link></a></li>
-      </ul>
-    </div>
-    <p class="wrap rodape__copy">© <span id="ano"></span> <span data-marca></span>. Todos os direitos reservados.</p>
+    <p class="marca marca--rodape" data-marca></p>
+    <ul class="rodape__links">
+      <li><a data-whats-link>WhatsApp</a></li>
+      <li><a data-insta-link target="_blank" rel="noopener">Instagram</a></li>
+      <li><a href="#medidas">Tabela de medidas</a></li>
+      <li><a href="#duvidas">Trocas e dúvidas</a></li>
+    </ul>
+    <p class="rodape__copy">© <span id="ano"></span> <span data-marca></span></p>
   </footer>
 
-  <!-- MODAL DE PRODUTO -->
-  <dialog class="modal" id="modal" aria-labelledby="modalNome">
-    <button class="fechar" data-fechar aria-label="Fechar">×</button>
-    <div class="modal__in">
-      <div class="galeria">
-        <img id="modalFoto" alt="">
-        <div class="galeria__miniaturas" id="modalMinis"></div>
+  <!-- Menu lateral -->
+  <aside class="gaveta gaveta--esq" id="menu" aria-label="Menu" hidden>
+    <div class="gaveta__cab">
+      <span class="marca" data-marca></span>
+      <button class="icone" data-fechar aria-label="Fechar menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="menu">
+      <p class="menu__titulo">Categorias</p>
+      <ul id="menuCats"></ul>
+      <p class="menu__titulo">Atendimento</p>
+      <ul>
+        <li><a data-whats-link>WhatsApp</a></li>
+        <li><a href="#medidas" data-fechar>Tabela de medidas</a></li>
+        <li><a href="#duvidas" data-fechar>Trocas e dúvidas</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Filtros -->
+  <aside class="gaveta gaveta--baixo" id="filtro" aria-label="Filtros" hidden>
+    <div class="gaveta__cab">
+      <span class="gaveta__titulo">Filtrar</span>
+      <button class="icone" data-fechar aria-label="Fechar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="filtro">
+      <fieldset>
+        <legend>Categoria</legend>
+        <div class="chips" id="filtroCats"></div>
+      </fieldset>
+      <fieldset>
+        <legend>Preço</legend>
+        <div class="chips" id="filtroPreco"></div>
+      </fieldset>
+    </div>
+    <div class="gaveta__rodape filtro__acoes">
+      <button class="btn btn--linha" id="limparFiltro">Limpar</button>
+      <button class="btn" data-fechar id="verResultados">Ver produtos</button>
+    </div>
+  </aside>
+
+  <!-- Produto -->
+  <aside class="gaveta gaveta--produto" id="produto" aria-labelledby="pNome" hidden>
+    <button class="icone produto__fechar" data-fechar aria-label="Fechar produto"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    <div class="produto">
+      <div class="produto__fotos">
+        <div class="carrossel" id="pFotos"></div>
+        <div class="pontos" id="pPontos"></div>
       </div>
-      <form class="modal__info" id="modalForm">
-        <p class="eyebrow" id="modalCat"></p>
-        <h3 id="modalNome"></h3>
-        <p class="preco" id="modalPreco"></p>
-        <p id="modalDesc"></p>
+      <form class="produto__info" id="pForm">
+        <p class="ref" id="pRef"></p>
+        <h2 id="pNome"></h2>
+        <p class="preco preco--grande" id="pPreco"></p>
+        <p class="parcela" id="pParcela"></p>
         <label class="campo">
-          <span>Cor</span>
-          <input type="text" name="cor" id="modalCor" placeholder="Qual cor da foto? Ex.: rosa" autocomplete="off" maxlength="40">
+          <span class="rotulo">Cor</span>
+          <input type="text" name="cor" id="pCor" placeholder="Qual cor da foto? Ex.: rosa" autocomplete="off" maxlength="40">
         </label>
-        <fieldset>
-          <legend>Tamanho <a href="#medidas" data-fechar class="link-sutil">ver medidas</a></legend>
-          <div class="opcoes" id="modalTams"></div>
-        </fieldset>
-        <p class="erro" id="modalErro" role="alert"></p>
-        <button class="btn btn--cheio btn--largo" type="submit">Adicionar à sacola</button>
-        <ul class="detalhes" id="modalDetalhes"></ul>
+        <div class="campo">
+          <span class="rotulo">Tamanho <a href="#medidas" class="link" data-fechar>Tabela de medidas</a></span>
+          <div class="tams" id="pTams"></div>
+        </div>
+        <p class="erro" id="pErro" role="alert"></p>
+        <button class="btn btn--largo" type="submit">Adicionar à sacola</button>
+        <p class="nota" data-minimo-nota></p>
       </form>
     </div>
-  </dialog>
+  </aside>
 
-  <!-- SACOLA -->
-  <div class="veu" id="veu" hidden></div>
-  <aside class="sacola" id="sacola" aria-label="Sacola" aria-hidden="true">
-    <div class="sacola__cab">
-      <h3>Sua sacola</h3>
-      <button class="fechar" id="fecharSacola" aria-label="Fechar sacola">×</button>
+  <!-- Sacola -->
+  <aside class="gaveta gaveta--dir" id="sacola" aria-label="Sacola" hidden>
+    <div class="gaveta__cab">
+      <span class="gaveta__titulo">Sacola <span id="sacolaQtd"></span></span>
+      <button class="icone" data-fechar aria-label="Fechar sacola"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
     </div>
-    <ul class="sacola__itens" id="itensSacola"></ul>
-    <div class="sacola__rodape">
-      <p class="sacola__total"><span>Subtotal</span><strong id="totalSacola">R$ 0,00</strong></p>
+    <ul class="itens" id="itensSacola"></ul>
+    <div class="gaveta__rodape">
       <div class="minimo" id="minimo" hidden>
         <p id="minimoTexto"></p>
         <div class="minimo__barra"><span id="minimoBarra"></span></div>
       </div>
+      <p class="total"><span>Subtotal</span><strong id="totalSacola">R$ 0,00</strong></p>
+      <button class="btn btn--largo" id="finalizar">Finalizar pelo WhatsApp</button>
       <p class="nota">Frete e pagamento são combinados no WhatsApp.</p>
-      <button class="btn btn--cheio btn--largo" id="finalizar">Finalizar pelo WhatsApp</button>
     </div>
   </aside>
 
-  <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+  <div class="veu" id="veu" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="js/produtos.js"></script>
   <script src="js/config.js"></script>
