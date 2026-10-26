@@ -136,10 +136,11 @@
           <p class="produto__cat" id="pCat"></p>
           <h2 class="produto__nome" id="pNome"></h2>
           <p class="produto__preco" id="pPreco"></p>
-          <label class="campo" for="pCor">
-            <span class="campo__rotulo">Cor</span>
-            <input type="text" id="pCor" placeholder="A cor que você viu na foto" autocomplete="off" maxlength="40">
-          </label>
+          <p class="estoque" id="pEstoque"></p>
+          <fieldset class="campo">
+            <legend class="campo__rotulo">Cor: <span class="campo__valor" id="pCorNome">escolha</span></legend>
+            <div class="cores" id="pCores"></div>
+          </fieldset>
           <fieldset class="campo">
             <legend class="campo__rotulo">Tamanho <a href="#medidas" data-fechar>ver medidas</a></legend>
             <div class="tams" id="pTams"></div>

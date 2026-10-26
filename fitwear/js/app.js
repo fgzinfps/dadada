@@ -12,6 +12,12 @@
   // Referência por produto, usada na mensagem do pedido para facilitar a separação.
   L.produtos.forEach((p, i) => (p.ref = "REF " + String(i + 1).padStart(3, "0")));
   const porId = (id) => L.produtos.find((p) => p.id === id);
+  const coresDe = (p) => p.cores || L.cores || [];
+  const hexDe = (p, nome) => (coresDe(p).find((c) => c.nome === nome) || {}).hex || "#ddd";
+  // Estoque da peça somando todas as cores/tamanhos; sem o campo, não limita.
+  const estoqueDe = (p) => (typeof p.estoque === "number" ? p.estoque : Infinity);
+  const naSacola = (id) => sacola.filter((i) => i.id === id).reduce((s, i) => s + i.qtd, 0);
+  const disponivel = (p) => estoqueDe(p) - naSacola(p.id);
 
   const ORDEM_CATS = ["Conjuntos", "Macaquinhos e Macacões", "Leggings e Shorts", "Coleção Brasil", "Plus Size", "Camisetas"];
   const APELIDO = { "Macaquinhos e Macacões": "Macaquinhos", "Leggings e Shorts": "Leggings e shorts", "Coleção Brasil": "Brasil" };
@@ -144,9 +150,12 @@
     $("#vitrine").innerHTML = r
       .map((p, i) => {
         const tem = noLook.has(p.id);
+        const cs = coresDe(p);
+        const esgotado = estoqueDe(p) <= 0;
         return `<li class="peca${grande(i) ? " peca--grande" : ""}">
           <div class="peca__foto">
             ${p.selo ? `<span class="peca__selo">${esc(p.selo)}</span>` : ""}
+            ${esgotado ? `<span class="peca__esgotado">Esgotado</span>` : ""}
             <img src="${p.fotos[0]}" alt="${esc(p.nome)}" loading="${i < 4 ? "eager" : "lazy"}" width="1000" height="1250">
             <button class="peca__abrir" data-abrir="${p.id}" aria-label="Ver ${esc(p.nome)}"></button>
             <button class="peca__add${tem ? " tem" : ""}" data-abrir="${p.id}" aria-label="${tem ? "Já está no seu look. Adicionar outro" : "Adicionar ao look"}: ${esc(p.nome)}">${tem ? ICONE_OK : ICONE_MAIS}</button>
@@ -154,6 +163,7 @@
           <div class="peca__info">
             <span class="peca__preco">${p.preco == null ? "Consulte" : brl(p.preco)}</span>
             <span class="peca__nome">${esc(p.nome)}</span>
+            ${cs.length ? `<span class="peca__cores" aria-label="${cs.length} cores">${cs.slice(0, 6).map((c) => `<i style="--c:${c.hex}"></i>`).join("")}${cs.length > 6 ? `<span>+${cs.length - 6}</span>` : ""}</span>` : ""}
           </div>
         </li>`;
       })
@@ -201,6 +211,18 @@
      ------------------------------------------------------------------------ */
   let atual = null;
   let tam = null;
+  let cor = null;
+  function desenharEstoque() {
+    const p = atual;
+    const d = disponivel(p);
+    const el = $("#pEstoque");
+    el.hidden = estoqueDe(p) === Infinity;
+    el.className = "estoque" + (d <= 0 ? " zero" : d <= 5 ? " baixo" : "");
+    el.textContent = estoqueDe(p) <= 0 ? "Esgotado" : d <= 0 ? "Você já pegou todas as peças em estoque" : `${d} em estoque`;
+    const add = $("#pAdd");
+    add.disabled = d <= 0;
+    add.textContent = estoqueDe(p) <= 0 ? "Esgotado" : d <= 0 ? "Limite do estoque" : "Adicionar ao look";
+  }
   function abrirProduto(id, origem) {
     const p = (atual = porId(id));
     tam = null;
@@ -210,9 +232,12 @@
     $("#pFotos").innerHTML = p.fotos.map((f, i) => `<img src="${f}" alt="${i ? `${esc(p.nome)}, foto ${i + 1}` : esc(p.nome)}">`).join("");
     $("#pPontos").innerHTML = p.fotos.length > 1 ? p.fotos.map((_, i) => `<span aria-current="${i === 0}"></span>`).join("") : "";
     $("#pTams").innerHTML = p.tamanhos.map((t) => `<button type="button" class="tam" data-tam="${esc(t)}" aria-pressed="false">${esc(t)}</button>`).join("");
-    const ultimaCor = (sacola.filter((i) => i.id === id).pop() || {}).cor || "";
-    $("#pCor").value = ultimaCor;
-    $("#pCor").removeAttribute("aria-invalid");
+    cor = null;
+    $("#pCores").innerHTML = coresDe(p)
+      .map((c) => `<button type="button" class="cor" style="--c:${c.hex}" data-cor="${esc(c.nome)}" aria-pressed="false" aria-label="${esc(c.nome)}" title="${esc(c.nome)}"></button>`)
+      .join("");
+    $("#pCorNome").textContent = "escolha";
+    desenharEstoque();
     $("#pErro").textContent = "";
     abrir("produto", origem);
     $("#produto .folha__painel").scrollTop = 0;
@@ -229,17 +254,19 @@
     $$("#pTams .tam").forEach((x) => x.setAttribute("aria-pressed", x === b));
     if ($("#pErro").textContent.includes("tamanho")) $("#pErro").textContent = "";
   });
-  $("#pCor").addEventListener("input", () => {
-    $("#pCor").removeAttribute("aria-invalid");
+  $("#pCores").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-cor]");
+    if (!b) return;
+    cor = b.dataset.cor;
+    $$("#pCores .cor").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    $("#pCorNome").textContent = cor;
     if ($("#pErro").textContent.includes("cor")) $("#pErro").textContent = "";
   });
   $("#pForm").addEventListener("submit", (e) => {
     e.preventDefault();
-    const cor = $("#pCor").value.trim();
+    if (disponivel(atual) <= 0) return;
     if (!cor) {
-      $("#pCor").setAttribute("aria-invalid", "true");
-      $("#pErro").textContent = "Escreva a cor que você quer, como aparece na foto.";
-      $("#pCor").focus();
+      $("#pErro").textContent = "Escolha uma cor.";
       return;
     }
     if (!tam) {
@@ -326,9 +353,9 @@
               <img src="${p.fotos[0]}" alt="">
               <div>
                 <div class="item__topo"><p class="item__nome">${esc(p.nome)}</p><span class="item__preco">${valor(p, i.qtd)}</span></div>
-                <p class="item__var">Cor ${esc(i.cor)} · Tam. ${esc(i.tam)}</p>
+                <p class="item__var"><i class="item__cor" style="--c:${hexDe(p, i.cor)}"></i>${esc(i.cor)} · Tam. ${esc(i.tam)}</p>
                 <div class="item__acoes">
-                  <div class="qtd"><button data-menos="${k}" aria-label="Tirar uma">−</button><span>${i.qtd}</span><button data-mais="${k}" aria-label="Mais uma">+</button></div>
+                  <div class="qtd"><button data-menos="${k}" aria-label="Tirar uma">−</button><span>${i.qtd}</span><button data-mais="${k}" aria-label="Mais uma"${disponivel(p) <= 0 ? " disabled" : ""}>+</button></div>
                   <button class="remover" data-remover="${k}">Remover</button>
                 </div>
               </div>
@@ -344,7 +371,7 @@
     const b = e.target.closest("[data-mais],[data-menos],[data-remover]");
     if (!b) return;
     const { mais, menos, remover } = b.dataset;
-    if (mais !== undefined) sacola[mais].qtd++;
+    if (mais !== undefined && disponivel(porId(sacola[mais].id)) > 0) sacola[mais].qtd++;
     if (menos !== undefined && --sacola[menos].qtd === 0) sacola.splice(menos, 1);
     if (remover !== undefined) sacola.splice(remover, 1);
     salvar();
