@@ -7,107 +7,83 @@
   const brl = (v) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const whatsUrl = (msg) => `https://wa.me/${L.whatsapp}${msg ? "?text=" + encodeURIComponent(msg) : ""}`;
+  const MIN = L.pedidoMinimo > 0 ? L.pedidoMinimo : 0;
 
-  // Referência curta por produto (ordem do catálogo), estilo etiqueta de loja.
+  // Referência por produto, usada na mensagem do pedido para facilitar a separação.
   L.produtos.forEach((p, i) => (p.ref = "REF " + String(i + 1).padStart(3, "0")));
   const porId = (id) => L.produtos.find((p) => p.id === id);
 
   const ORDEM_CATS = ["Conjuntos", "Macaquinhos e Macacões", "Leggings e Shorts", "Coleção Brasil", "Plus Size", "Camisetas"];
-  const DESCRICAO = {
-    Todos: "Conjuntos, macaquinhos, macacões e leggings para treinar com conforto. Escolha cor e tamanho e finalize o pedido direto no WhatsApp.",
-    Conjuntos: "Top e short ou legging pensados para combinar. Tecidos com elasticidade para treino e para o dia a dia.",
-    "Macaquinhos e Macacões": "Peça única, sem preocupação com combinação: veste e vai treinar.",
-    "Leggings e Shorts": "Partes de baixo com cintura alta e boa sustentação.",
-    "Coleção Brasil": "Verde e amarelo para torcer e para treinar.",
-    "Plus Size": "Modelagens maiores, com o mesmo cuidado no caimento.",
-    Camisetas: "Camisetas leves de treino, de secagem rápida.",
-  };
-  const FAIXAS = [
-    { id: "ate25", nome: "Até R$ 25", ok: (v) => v <= 25 },
-    { id: "25a35", nome: "R$ 25 a R$ 35", ok: (v) => v > 25 && v <= 35 },
-    { id: "acima35", nome: "Acima de R$ 35", ok: (v) => v > 35 },
-  ];
+  const APELIDO = { "Macaquinhos e Macacões": "Macaquinhos", "Leggings e Shorts": "Leggings e shorts", "Coleção Brasil": "Brasil" };
   const cats = ORDEM_CATS.filter((c) => L.produtos.some((p) => p.categoria === c));
   L.produtos.forEach((p) => !cats.includes(p.categoria) && cats.push(p.categoria));
+  const FAIXAS = { ate30: (v) => v <= 30, "30mais": (v) => v > 30 };
 
-  const estado = { cat: "Todos", faixa: null, busca: "", ordem: "destaque" };
+  const estado = { cat: "Tudo", ordem: "destaque", faixa: null, busca: "" };
 
   /* ------------------------------------------------------------------------
-     Marca, links e avisos
+     Links fixos
      ------------------------------------------------------------------------ */
-  document.title = `${L.marca} | Moda Fitness Feminina`;
-  $$("[data-marca]").forEach((el) => (el.textContent = L.marca));
-  $$("[data-whats-link]").forEach((el) => {
-    el.href = whatsUrl(`Olá! Vim pelo site da ${L.marca} e gostaria de tirar uma dúvida.`);
-    el.target = "_blank";
-    el.rel = "noopener";
+  $$("[data-whats-link]").forEach((a) => {
+    a.href = whatsUrl(`Olá! Vim pelo site da ${L.marca} e queria tirar uma dúvida.`);
+    a.target = "_blank";
+    a.rel = "noopener";
   });
-  $$("[data-insta-link]").forEach((el) => (el.href = `https://instagram.com/${L.instagram}`));
+  $$("[data-insta-link]").forEach((a) => {
+    a.href = `https://instagram.com/${L.instagram}`;
+    a.target = "_blank";
+    a.rel = "noopener";
+  });
+  $$("[data-insta-nome]").forEach((s) => (s.textContent = "@" + L.instagram));
+  $$("[data-minimo]").forEach((s) => (s.textContent = brl(MIN).replace(",00", "")));
+  $("[data-minimo-faq]").textContent = MIN
+    ? `${brl(MIN)} em peças. Pode misturar modelos, cores e tamanhos para chegar no valor.`
+    : "Não há pedido mínimo.";
   $("#ano").textContent = new Date().getFullYear();
 
-  const avisos = [];
-  if (L.pedidoMinimo > 0) avisos.push(`Pedido mínimo de ${brl(L.pedidoMinimo)}`);
-  if (L.freteGratisAcimaDe > 0) avisos.push(`Frete grátis acima de ${brl(L.freteGratisAcimaDe)}`);
-  if (L.parcelas > 1) avisos.push(`Pix ou cartão em até ${L.parcelas}x sem juros`);
-  avisos.push("Enviamos para todo o Brasil");
-  let aviso = 0;
-  const trocarAviso = () => ($("#avisos").innerHTML = `<span>${esc(avisos[aviso++ % avisos.length])}</span>`);
-  trocarAviso();
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) setInterval(trocarAviso, 4000);
-
-  const minimoFaq = $("[data-minimo-faq]");
-  if (L.pedidoMinimo > 0) {
-    minimoFaq.textContent = `Sim, ${brl(L.pedidoMinimo)}. Dá para misturar modelos, cores e tamanhos para chegar no valor.`;
-    $("[data-minimo-nota]").textContent = `Pedido mínimo de ${brl(L.pedidoMinimo)} · finalização pelo WhatsApp`;
-  } else {
-    minimoFaq.closest("details").remove();
-  }
-
   /* ------------------------------------------------------------------------
-     Navegação por categoria (atalhos, vitrine, menu, filtro)
+     Destaques (categorias)
      ------------------------------------------------------------------------ */
-  const todas = ["Todos", ...cats];
-  $("#atalhos").innerHTML = todas.map((c) => `<button data-cat="${esc(c)}">${esc(c === "Todos" ? "Novidades" : c)}</button>`).join("");
-  $("#vitrine").innerHTML = cats
-    .map((c) => {
-      const capa = L.produtos.find((p) => p.categoria === c).fotos[0];
-      return `<li><button data-cat="${esc(c)}"><img src="${capa}" alt="" loading="lazy"><span>${esc(c)}</span></button></li>`;
-    })
+  const capa = (c) => (c === "Tudo" ? "img/icone.svg" : L.produtos.find((p) => p.categoria === c).fotos[0]);
+  $("#destaques").innerHTML = ["Tudo", ...cats]
+    .map(
+      (c) => `<li><button class="destaque" data-cat="${esc(c)}">
+        <span class="destaque__foto"><img src="${capa(c)}" alt="" loading="lazy"></span>
+        <span class="destaque__nome">${esc(APELIDO[c] || c)}</span>
+      </button></li>`
+    )
     .join("");
-  $("#menuCats").innerHTML = todas.map((c) => `<li><button data-cat="${esc(c)}" data-fechar>${esc(c === "Todos" ? "Ver todos" : c)}</button></li>`).join("");
-
-  function desenharFiltroChips() {
-    $("#filtroCats").innerHTML = todas
-      .map((c) => `<button class="chip" data-cat="${esc(c)}" aria-pressed="${c === estado.cat}">${esc(c)}</button>`)
-      .join("");
-    $("#filtroPreco").innerHTML = FAIXAS.map((f) => `<button class="chip" data-faixa="${f.id}" aria-pressed="${f.id === estado.faixa}">${f.nome}</button>`).join("");
-  }
 
   document.addEventListener("click", (e) => {
-    const c = e.target.closest("[data-cat], [data-cat-link]");
+    const c = e.target.closest("[data-cat]");
     if (c) {
-      e.preventDefault();
-      estado.cat = c.dataset.cat || c.dataset.catLink;
-      atualizar();
-      if (!c.closest("#filtro")) $("#barra").scrollIntoView({ block: "start" });
+      estado.cat = c.dataset.cat;
+      desenhar();
+      rolarParaLista();
+      return;
+    }
+    const o = e.target.closest("[data-ordem]");
+    if (o) {
+      estado.ordem = o.dataset.ordem;
+      desenhar();
+      return;
     }
     const f = e.target.closest("[data-faixa]");
     if (f) {
       estado.faixa = estado.faixa === f.dataset.faixa ? null : f.dataset.faixa;
-      atualizar();
+      desenhar();
     }
   });
-  $("#ordem").addEventListener("change", (e) => {
-    estado.ordem = e.target.value;
-    desenharGrade();
-  });
-  const limpar = () => {
-    Object.assign(estado, { cat: "Todos", faixa: null, busca: "" });
+  function rolarParaLista() {
+    const y = $("#controles").getBoundingClientRect().top + scrollY - 60;
+    if (scrollY > y + 4 || scrollY < y - 400) scrollTo({ top: y, behavior: "smooth" });
+  }
+  $("#limpar").addEventListener("click", () => {
+    Object.assign(estado, { cat: "Tudo", faixa: null, busca: "" });
     $("#campoBusca").value = "";
-    atualizar();
-  };
-  $("#limparFiltro").addEventListener("click", limpar);
-  $("#limparTudo").addEventListener("click", limpar);
+    $("#busca").hidden = true;
+    desenhar();
+  });
 
   /* ------------------------------------------------------------------------
      Busca
@@ -121,141 +97,127 @@
     $("#busca").hidden = true;
     estado.busca = "";
     $("#campoBusca").value = "";
-    atualizar();
+    desenhar();
   });
   $("#campoBusca").addEventListener("input", (e) => {
     estado.busca = e.target.value;
-    atualizar();
+    desenhar();
   });
   $("#busca").addEventListener("submit", (e) => {
     e.preventDefault();
     $("#campoBusca").blur();
-    $("#barra").scrollIntoView({ block: "start" });
+    rolarParaLista();
   });
 
   /* ------------------------------------------------------------------------
-     Grade
+     Vitrine
      ------------------------------------------------------------------------ */
-  const parcelaTxt = (v) => (L.parcelas > 1 ? `${L.parcelas}x de ${brl(v / L.parcelas)} sem juros` : "");
-  const ICONE_ADD = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8h13l-1 12h-11l-1-12Z"/><path d="M9 8V7a3 3 0 0 1 6 0v1M12 11.5v5M9.5 14h5"/></svg>`;
+  const ICONE_MAIS = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>`;
+  const ICONE_OK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`;
 
-  function filtrados() {
+  function lista() {
     const q = normal(estado.busca.trim());
-    const faixa = FAIXAS.find((f) => f.id === estado.faixa);
-    const lista = L.produtos.filter(
+    const r = L.produtos.filter(
       (p) =>
-        (estado.cat === "Todos" || p.categoria === estado.cat) &&
-        (!faixa || (p.preco != null && faixa.ok(p.preco))) &&
-        (!q || normal(p.nome + " " + p.categoria).includes(q))
+        (estado.cat === "Tudo" || p.categoria === estado.cat) &&
+        (!estado.faixa || (p.preco != null && FAIXAS[estado.faixa](p.preco))) &&
+        (!q || normal(`${p.nome} ${p.categoria}`).includes(q))
     );
-    const ordens = {
-      menor: (a, b) => a.preco - b.preco,
-      maior: (a, b) => b.preco - a.preco,
-      az: (a, b) => a.nome.localeCompare(b.nome, "pt-BR"),
-    };
-    return ordens[estado.ordem] ? lista.sort(ordens[estado.ordem]) : lista;
+    if (estado.ordem === "menor") r.sort((a, b) => a.preco - b.preco);
+    if (estado.ordem === "maior") r.sort((a, b) => b.preco - a.preco);
+    return r;
   }
 
-  function desenharGrade() {
-    const lista = filtrados();
-    $("#totalProdutos").textContent = `${lista.length} ${lista.length === 1 ? "produto" : "produtos"}`;
-    $("#vazio").hidden = lista.length > 0;
-    $("#grade").innerHTML = lista
-      .map((p) => {
-        const [f1, f2] = p.fotos;
-        return `<li class="card">
-          <div class="card__foto">
-            ${p.selo ? `<span class="selo">${esc(p.selo)}</span>` : ""}
-            <img src="${f1}" alt="${esc(p.nome)}" loading="lazy" width="1000" height="1250">
-            ${f2 ? `<img src="${f2}" alt="" loading="lazy" width="1000" height="1250">` : ""}
-            <button class="card__abrir" data-abrir="${p.id}" aria-label="Ver ${esc(p.nome)}"></button>
-            <button class="card__add" data-abrir="${p.id}" aria-label="Adicionar ${esc(p.nome)} à sacola">${ICONE_ADD}</button>
+  function desenhar() {
+    const r = lista();
+    const buscando = estado.busca.trim();
+    $("#titulo").textContent = buscando ? `“${buscando}”` : estado.cat;
+    $("#total").textContent = `${r.length} ${r.length === 1 ? "peça" : "peças"}`;
+    $$(".destaque").forEach((b) => b.setAttribute("aria-current", b.dataset.cat === estado.cat));
+    $$("[data-ordem]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.ordem === estado.ordem));
+    $$("[data-faixa]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.faixa === estado.faixa));
+    $("#vazio").hidden = r.length > 0;
+
+    const noLook = new Set(sacola.map((i) => i.id));
+    // Uma peça em destaque (2 colunas) a cada 7, só em listas grandes e sem busca.
+    const grande = (i) => !buscando && r.length > 6 && i % 7 === 0;
+    $("#vitrine").innerHTML = r
+      .map((p, i) => {
+        const tem = noLook.has(p.id);
+        return `<li class="peca${grande(i) ? " peca--grande" : ""}">
+          <div class="peca__foto">
+            ${p.selo ? `<span class="peca__selo">${esc(p.selo)}</span>` : ""}
+            <img src="${p.fotos[0]}" alt="${esc(p.nome)}" loading="${i < 4 ? "eager" : "lazy"}" width="1000" height="1250">
+            <button class="peca__abrir" data-abrir="${p.id}" aria-label="Ver ${esc(p.nome)}"></button>
+            <button class="peca__add${tem ? " tem" : ""}" data-abrir="${p.id}" aria-label="${tem ? "Já está no seu look. Adicionar outro" : "Adicionar ao look"}: ${esc(p.nome)}">${tem ? ICONE_OK : ICONE_MAIS}</button>
           </div>
-          <div class="card__info">
-            <p class="ref">${p.ref}</p>
-            <button class="card__nome" data-abrir="${p.id}">${esc(p.nome)}</button>
-            <p class="preco">${p.preco == null ? "Consulte" : brl(p.preco)}</p>
-            ${p.preco != null && L.parcelas > 1 ? `<p class="parcela">${parcelaTxt(p.preco)}</p>` : ""}
-            <div class="tams">${p.tamanhos.map((t) => `<button class="tam" data-abrir="${p.id}" data-tam="${esc(t)}" aria-label="Tamanho ${esc(t)}">${esc(t)}</button>`).join("")}</div>
+          <div class="peca__info">
+            <span class="peca__preco">${p.preco == null ? "Consulte" : brl(p.preco)}</span>
+            <span class="peca__nome">${esc(p.nome)}</span>
           </div>
         </li>`;
       })
       .join("");
   }
-
-  function atualizar() {
-    const titulo = estado.busca.trim() ? `Busca: “${estado.busca.trim()}”` : estado.cat === "Todos" ? "Todos os produtos" : estado.cat;
-    $("#tituloColecao").textContent = titulo;
-    $("#trilhaAtual").textContent = titulo;
-    $("#descColecao").textContent = estado.busca.trim() ? "" : DESCRICAO[estado.cat] || "";
-    $$("#atalhos button, #vitrine button").forEach((b) => b.setAttribute("aria-current", b.dataset.cat === estado.cat));
-    const n = (estado.cat !== "Todos") + !!estado.faixa;
-    $("#nFiltros").hidden = !n;
-    $("#nFiltros").textContent = n;
-    desenharFiltroChips();
-    desenharGrade();
-  }
-
-  $("#grade").addEventListener("click", (e) => {
+  $("#vitrine").addEventListener("click", (e) => {
     const b = e.target.closest("[data-abrir]");
-    if (b) abrirProduto(b.dataset.abrir, b.dataset.tam);
+    if (b) abrirProduto(b.dataset.abrir, b);
   });
 
+  // Linha sob os controles só quando eles grudam no topo
+  const sentinela = document.createElement("div");
+  $("#controles").before(sentinela);
+  new IntersectionObserver(([en]) => $("#controles").classList.toggle("colado", !en.isIntersecting), { rootMargin: "-61px 0px 0px 0px" }).observe(sentinela);
+
   /* ------------------------------------------------------------------------
-     Gavetas
+     Folhas (produto, sacola)
      ------------------------------------------------------------------------ */
-  const veu = $("#veu");
   let aberta = null;
-  function abrir(id) {
-    fechar(true);
+  let voltarFoco = null;
+  function abrir(id, origem) {
+    if (aberta) fechar(true);
     aberta = $("#" + id);
+    voltarFoco = origem || document.activeElement;
+    $("#toast").classList.remove("visivel");
     aberta.hidden = false;
-    veu.hidden = false;
     document.body.classList.add("travado");
     requestAnimationFrame(() => requestAnimationFrame(() => aberta && aberta.classList.add("aberta")));
   }
   function fechar(imediato) {
     if (!aberta) return;
-    const g = aberta;
+    const f = aberta;
     aberta = null;
-    g.classList.remove("aberta");
-    veu.hidden = true;
+    f.classList.remove("aberta");
     document.body.classList.remove("travado");
-    if (imediato === true) g.hidden = true;
-    else setTimeout(() => !g.classList.contains("aberta") && (g.hidden = true), 300);
+    const sumir = () => !f.classList.contains("aberta") && (f.hidden = true);
+    imediato === true ? sumir() : setTimeout(sumir, 300);
+    if (voltarFoco && imediato !== true) voltarFoco.focus({ preventScroll: true });
   }
-  veu.addEventListener("click", fechar);
+  $$(".folha").forEach((f) => f.addEventListener("click", (e) => (e.target === f || e.target.closest("[data-fechar]")) && fechar()));
   document.addEventListener("keydown", (e) => e.key === "Escape" && fechar());
-  document.addEventListener("click", (e) => e.target.closest("[data-fechar]") && fechar());
-  $("#abrirMenu").addEventListener("click", () => abrir("menu"));
-  $("#abrirFiltro").addEventListener("click", () => abrir("filtro"));
-  $("#abrirSacola").addEventListener("click", () => abrir("sacola"));
 
   /* ------------------------------------------------------------------------
      Produto
      ------------------------------------------------------------------------ */
   let atual = null;
-  let tamEscolhido = null;
-
-  function abrirProduto(id, tam) {
+  let tam = null;
+  function abrirProduto(id, origem) {
     const p = (atual = porId(id));
-    tamEscolhido = tam || null;
-    $("#pRef").textContent = `${p.ref} · ${p.categoria}`;
+    tam = null;
+    $("#pCat").textContent = `${p.categoria} · ${p.ref}`;
     $("#pNome").textContent = p.nome;
     $("#pPreco").textContent = p.preco == null ? "Consulte o preço" : brl(p.preco);
-    $("#pParcela").textContent = p.preco == null ? "" : parcelaTxt(p.preco);
-    $("#pFotos").innerHTML = p.fotos.map((f, i) => `<img src="${f}" alt="${i ? "" : esc(p.nome)}">`).join("");
-    $("#pFotos").scrollLeft = 0;
+    $("#pFotos").innerHTML = p.fotos.map((f, i) => `<img src="${f}" alt="${i ? `${esc(p.nome)}, foto ${i + 1}` : esc(p.nome)}">`).join("");
     $("#pPontos").innerHTML = p.fotos.length > 1 ? p.fotos.map((_, i) => `<span aria-current="${i === 0}"></span>`).join("") : "";
-    $("#pTams").innerHTML = p.tamanhos
-      .map((t) => `<button type="button" class="tam" data-tam="${esc(t)}" aria-pressed="${t === tamEscolhido}">${esc(t)}</button>`)
-      .join("");
-    $("#pCor").value = "";
+    $("#pTams").innerHTML = p.tamanhos.map((t) => `<button type="button" class="tam" data-tam="${esc(t)}" aria-pressed="false">${esc(t)}</button>`).join("");
+    const ultimaCor = (sacola.filter((i) => i.id === id).pop() || {}).cor || "";
+    $("#pCor").value = ultimaCor;
+    $("#pCor").removeAttribute("aria-invalid");
     $("#pErro").textContent = "";
-    abrir("produto");
-    $("#produto").scrollTop = 0;
+    abrir("produto", origem);
+    $("#produto .folha__painel").scrollTop = 0;
+    $("#pFotos").scrollLeft = 0;
   }
-
   $("#pFotos").addEventListener("scroll", (e) => {
     const i = Math.round(e.target.scrollLeft / e.target.clientWidth);
     $$("#pPontos span").forEach((s, j) => s.setAttribute("aria-current", i === j));
@@ -263,109 +225,133 @@
   $("#pTams").addEventListener("click", (e) => {
     const b = e.target.closest("[data-tam]");
     if (!b) return;
-    tamEscolhido = b.dataset.tam;
+    tam = b.dataset.tam;
     $$("#pTams .tam").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    if ($("#pErro").textContent.includes("tamanho")) $("#pErro").textContent = "";
+  });
+  $("#pCor").addEventListener("input", () => {
+    $("#pCor").removeAttribute("aria-invalid");
+    if ($("#pErro").textContent.includes("cor")) $("#pErro").textContent = "";
   });
   $("#pForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const cor = $("#pCor").value.trim();
-    if (!cor) return void ($("#pErro").textContent = "Escreva a cor que você quer.");
-    if (!tamEscolhido) return void ($("#pErro").textContent = "Escolha um tamanho.");
-    adicionar(atual.id, cor, tamEscolhido);
+    if (!cor) {
+      $("#pCor").setAttribute("aria-invalid", "true");
+      $("#pErro").textContent = "Escreva a cor que você quer, como aparece na foto.";
+      $("#pCor").focus();
+      return;
+    }
+    if (!tam) {
+      $("#pErro").textContent = "Escolha um tamanho.";
+      return;
+    }
+    const antes = total();
+    adicionar(atual.id, cor, tam);
     fechar();
-    toast(`${atual.nome} na sacola`);
+    const depois = total();
+    if (MIN && antes < MIN && depois >= MIN) {
+      toast("Pedido mínimo atingido. Já pode enviar.");
+      $("#look").classList.remove("pulso");
+      void $("#look").offsetWidth;
+      $("#look").classList.add("pulso");
+    } else {
+      toast(MIN && depois < MIN ? `Adicionado. Faltam ${brl(MIN - depois)} para o mínimo.` : "Adicionado ao look.");
+    }
   });
 
   /* ------------------------------------------------------------------------
-     Sacola (localStorage; se falhar, vale só nesta visita)
+     Sacola ("Seu look")
      ------------------------------------------------------------------------ */
-  const CHAVE = "sacola-v1";
+  const CHAVE = "lookfit-sacola";
   let sacola = [];
   try {
-    sacola = (JSON.parse(localStorage.getItem(CHAVE)) || []).filter((i) => porId(i.id));
+    sacola = (JSON.parse(localStorage.getItem(CHAVE) || localStorage.getItem("sacola-v1")) || []).filter((i) => porId(i.id));
   } catch (_) {}
   const salvar = () => {
     try {
       localStorage.setItem(CHAVE, JSON.stringify(sacola));
     } catch (_) {}
   };
-
-  function adicionar(id, cor, tam) {
-    const igual = sacola.find((i) => i.id === id && i.cor.toLowerCase() === cor.toLowerCase() && i.tam === tam);
-    if (igual) igual.qtd++;
-    else sacola.push({ id, cor, tam, qtd: 1 });
+  function adicionar(id, cor, t) {
+    const igual = sacola.find((i) => i.id === id && i.cor.toLowerCase() === cor.toLowerCase() && i.tam === t);
+    igual ? igual.qtd++ : sacola.push({ id, cor, tam: t, qtd: 1 });
     salvar();
-    desenharSacola();
+    atualizarSacola();
+  }
+  const total = () => sacola.reduce((s, i) => s + (porId(i.id).preco || 0) * i.qtd, 0);
+  const pecas = () => sacola.reduce((s, i) => s + i.qtd, 0);
+  const valor = (p, q) => (p.preco == null ? "a consultar" : brl(p.preco * q));
+
+  function mensagem() {
+    const linhas = sacola.map((i) => {
+      const p = porId(i.id);
+      return `• ${i.qtd}x ${p.nome} (${p.ref}) — cor ${i.cor}, tam. ${i.tam} — ${valor(p, i.qtd)}`;
+    });
+    return [`Olá! Quero fazer este pedido na ${L.marca}:`, "", ...linhas, "", `Total das peças: ${brl(total())}`, "", "Pode me passar o frete e as formas de pagamento?"].join("\n");
   }
 
-  const valor = (p, q) => (p.preco == null ? "a consultar" : brl(p.preco * q));
-  const total = () => sacola.reduce((s, i) => s + (porId(i.id).preco || 0) * i.qtd, 0);
-  const temSemPreco = () => sacola.some((i) => porId(i.id).preco == null);
+  function atualizarSacola() {
+    const n = pecas();
+    const t = total();
+    const falta = Math.max(0, MIN - t);
+    const pronto = n > 0 && falta === 0;
 
-  function desenharSacola() {
-    const qtd = sacola.reduce((s, i) => s + i.qtd, 0);
-    $("#qtdSacola").textContent = qtd;
-    $("#qtdSacola").toggleAttribute("data-zero", qtd === 0);
-    $("#sacolaQtd").textContent = qtd ? `(${qtd})` : "";
-    $("#totalSacola").textContent = brl(total()) + (temSemPreco() ? " + a consultar" : "");
+    // Barra fixa: dois elos que enchem até o mínimo (cada elo = metade)
+    const prog = MIN ? Math.min(1, t / MIN) : n ? 1 : 0;
+    $("#elo1").style.strokeDasharray = `${Math.min(1, prog * 2) * 100} 100`;
+    $("#elo2").style.strokeDasharray = `${Math.max(0, prog * 2 - 1) * 100} 100`;
+    $("#look").dataset.estado = n === 0 ? "vazio" : pronto ? "pronto" : "parcial";
+    $("#lookRotulo").textContent = n === 0 ? "Seu look" : `${n} ${n === 1 ? "peça" : "peças"} · ${brl(t)}`;
+    $("#lookInfo").textContent = n === 0 ? (MIN ? `Pedido mínimo ${brl(MIN)}` : "Escolha suas peças") : pronto ? "Pedido liberado" : `Faltam ${brl(falta)} para o mínimo`;
+    $("#lookAcao").textContent = pronto ? "Enviar" : "Ver";
 
-    // Pedido mínimo: com item sem preço, libera e confere no WhatsApp.
-    const falta = L.pedidoMinimo > 0 ? L.pedidoMinimo - total() : 0;
-    const travado = qtd === 0 || (falta > 0 && !temSemPreco());
-    $("#finalizar").setAttribute("aria-disabled", travado);
-    if (travado) $("#finalizar").removeAttribute("href");
-    else $("#finalizar").href = whatsUrl(mensagemPedido());
-    $("#minimo").hidden = !(qtd > 0 && falta > 0);
-    if (qtd > 0 && falta > 0) {
-      $("#minimoTexto").textContent = temSemPreco()
-        ? `Pedido mínimo de ${brl(L.pedidoMinimo)}, conferido no WhatsApp.`
-        : `Faltam ${brl(falta)} para o pedido mínimo de ${brl(L.pedidoMinimo)}.`;
-      $("#minimoBarra").style.width = `${Math.min(100, (total() / L.pedidoMinimo) * 100)}%`;
-    }
+    // Folha da sacola
+    $("#sTitulo").textContent = n ? `Seu look (${n})` : "Seu look";
+    $("#sTotal").textContent = brl(t);
+    $("#meta").hidden = !MIN || n === 0;
+    $("#meta").classList.toggle("ok", pronto);
+    $("#metaBarra").style.width = `${prog * 100}%`;
+    $("#metaTxt").textContent = pronto ? "Pedido mínimo atingido." : `Faltam ${brl(falta)} para o pedido mínimo de ${brl(MIN)}.`;
+    const env = $("#enviar");
+    env.setAttribute("aria-disabled", !pronto);
+    if (pronto) env.href = whatsUrl(mensagem());
+    else env.removeAttribute("href");
 
-    $("#itensSacola").innerHTML = qtd
+    $("#itens").innerHTML = n
       ? sacola
-          .map((i, n) => {
+          .map((i, k) => {
             const p = porId(i.id);
             return `<li class="item">
               <img src="${p.fotos[0]}" alt="">
               <div>
-                <p class="item__nome">${esc(p.nome)}</p>
-                <p class="item__var">Cor: ${esc(i.cor)} · Tam.: ${esc(i.tam)}</p>
-                <div class="item__linha">
-                  <div class="qtd"><button data-menos="${n}" aria-label="Diminuir">−</button><span>${i.qtd}</span><button data-mais="${n}" aria-label="Aumentar">+</button></div>
-                  <span class="item__preco">${valor(p, i.qtd)}</span>
+                <div class="item__topo"><p class="item__nome">${esc(p.nome)}</p><span class="item__preco">${valor(p, i.qtd)}</span></div>
+                <p class="item__var">Cor ${esc(i.cor)} · Tam. ${esc(i.tam)}</p>
+                <div class="item__acoes">
+                  <div class="qtd"><button data-menos="${k}" aria-label="Tirar uma">−</button><span>${i.qtd}</span><button data-mais="${k}" aria-label="Mais uma">+</button></div>
+                  <button class="remover" data-remover="${k}">Remover</button>
                 </div>
-                <button class="remover" data-remover="${n}">Remover</button>
               </div>
             </li>`;
           })
           .join("")
-      : `<li class="vazio">Sua sacola está vazia.</li>`;
+      : `<li class="vazio"><p>Seu look está vazio.</p><button class="btn btn--claro" data-fechar>Escolher peças</button></li>`;
+
+    if (!aberta || aberta.id !== "produto") desenhar();
   }
 
-  $("#itensSacola").addEventListener("click", (e) => {
-    const b = e.target.closest("button");
+  $("#itens").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-mais],[data-menos],[data-remover]");
     if (!b) return;
     const { mais, menos, remover } = b.dataset;
     if (mais !== undefined) sacola[mais].qtd++;
     if (menos !== undefined && --sacola[menos].qtd === 0) sacola.splice(menos, 1);
     if (remover !== undefined) sacola.splice(remover, 1);
     salvar();
-    desenharSacola();
+    atualizarSacola();
   });
-
-  // O botão é um link comum para o WhatsApp (abre em nova aba em qualquer lugar,
-  // inclusive dentro de páginas que bloqueiam window.open).
-  function mensagemPedido() {
-    const linhas = sacola.map((i) => {
-      const p = porId(i.id);
-      return `• ${i.qtd}x ${p.nome} (${p.ref}) — cor ${i.cor}, tam. ${i.tam} — ${valor(p, i.qtd)}`;
-    });
-    const sub = `Subtotal: ${brl(total())}${temSemPreco() ? " (+ itens a consultar)" : ""}`;
-    return [`Olá! Quero fazer este pedido na ${L.marca}:`, "", ...linhas, "", sub, "", "Pode me passar o frete e as formas de pagamento?"].join("\n");
-  }
-  $("#finalizar").addEventListener("click", (e) => {
+  $("#abrirSacola").addEventListener("click", (e) => abrir("sacola", e.currentTarget));
+  $("#enviar").addEventListener("click", (e) => {
     if (e.currentTarget.getAttribute("aria-disabled") === "true") e.preventDefault();
   });
 
@@ -376,9 +362,8 @@
     el.textContent = txt;
     el.classList.add("visivel");
     clearTimeout(timer);
-    timer = setTimeout(() => el.classList.remove("visivel"), 2200);
+    timer = setTimeout(() => el.classList.remove("visivel"), 2600);
   }
 
-  atualizar();
-  desenharSacola();
+  atualizarSacola();
 })();

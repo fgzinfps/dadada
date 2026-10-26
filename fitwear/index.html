@@ -4,90 +4,72 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>LookFit</title>
-  <meta name="description" content="Moda fitness feminina: conjuntos, macaquinhos, macacões e leggings. Peça pelo WhatsApp.">
+  <meta name="description" content="LookFit · moda fitness feminina. Monte seu look e peça pelo WhatsApp.">
   <meta name="theme-color" content="#ffffff">
-  <meta property="og:type" content="website">
   <meta property="og:title" content="LookFit · Moda Fitness Feminina">
   <meta property="og:image" content="img/conjunto-corta-vento-short-saia-1.webp">
+  <link rel="icon" href="img/icone.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <a class="pular" href="#grade">Pular para os produtos</a>
-
-  <!-- Faixa de avisos (mensagens alternam sozinhas) -->
-  <div class="avisos" id="avisos" aria-live="off"></div>
-
-  <!-- Atalhos de categoria -->
-  <nav class="atalhos" id="atalhos" aria-label="Categorias"></nav>
+  <a class="pular" href="#vitrine">Pular para os produtos</a>
 
   <header class="topo">
-    <div class="topo__esq">
-      <button class="icone" id="abrirMenu" aria-label="Abrir menu">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
-      </button>
-      <button class="icone" id="abrirBusca" aria-label="Buscar">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
-      </button>
-    </div>
-    <a href="#" class="marca" data-marca></a>
-    <div class="topo__dir">
-      <a class="icone" data-whats-link aria-label="Falar no WhatsApp">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19l1.2-3.6A7.5 7.5 0 1 1 9 18.3L5 19Z"/></svg>
-      </a>
-      <button class="icone sacola-btn" id="abrirSacola" aria-label="Abrir sacola">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8h13l-1 12h-11l-1-12Z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></svg>
-        <span class="sacola-btn__qtd" id="qtdSacola" data-zero>0</span>
-      </button>
-    </div>
-    <form class="busca" id="busca" role="search" hidden>
+    <a href="#" class="topo__logo" aria-label="LookFit, início"><img src="img/logo.svg" alt="LookFit" width="510" height="100"></a>
+    <button class="icone" id="abrirBusca" aria-label="Buscar produtos">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
-      <input type="search" id="campoBusca" placeholder="O que você procura?" aria-label="Buscar produtos" autocomplete="off">
-      <button type="button" class="busca__fechar" id="fecharBusca">Cancelar</button>
+    </button>
+    <a class="icone" data-insta-link aria-label="Instagram da LookFit">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.8" cy="7.2" r=".6" fill="currentColor"/></svg>
+    </a>
+    <form class="busca" id="busca" role="search" hidden>
+      <input type="search" id="campoBusca" placeholder="Buscar: macaquinho, legging, Brasil…" aria-label="Buscar produtos" autocomplete="off">
+      <button type="button" class="busca__fechar" id="fecharBusca">Fechar</button>
     </form>
   </header>
 
   <main>
-    <section class="colecao">
-      <h1 id="tituloColecao">Todos os produtos</h1>
-      <p id="descColecao"></p>
-    </section>
-
-    <nav class="trilha" aria-label="Você está em">
-      <a href="#" data-cat-link="Todos">Início</a>
-      <span aria-hidden="true">›</span>
-      <span id="trilhaAtual">Todos os produtos</span>
+    <!-- Categorias no formato dos destaques do Instagram -->
+    <nav class="destaques" aria-label="Categorias">
+      <ul id="destaques"></ul>
     </nav>
 
-    <section class="vitrine" aria-label="Comprar por categoria">
-      <ul class="vitrine__lista" id="vitrine"></ul>
+    <section class="chamada" aria-labelledby="chamadaTitulo">
+      <h1 id="chamadaTitulo">Monte seu look</h1>
+      <ol class="passos">
+        <li><b>1</b> Escolha as peças</li>
+        <li><b>2</b> Chegue a <span data-minimo>R$ 100</span></li>
+        <li><b>3</b> Envie pelo WhatsApp</li>
+      </ol>
     </section>
 
-    <div class="barra" id="barra">
-      <button class="barra__filtro" id="abrirFiltro">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
-        Filtrar <span class="barra__n" id="nFiltros" hidden></span>
-      </button>
-      <span class="barra__total" id="totalProdutos"></span>
-      <label class="barra__ordem">
-        <span>Classificar</span>
-        <select id="ordem">
-          <option value="destaque">Destaques</option>
-          <option value="menor">Menor preço</option>
-          <option value="maior">Maior preço</option>
-          <option value="az">A–Z</option>
-        </select>
-      </label>
+    <div class="controles" id="controles">
+      <div class="controles__linha">
+        <h2 class="controles__titulo" id="titulo">Tudo</h2>
+        <span class="controles__n" id="total"></span>
+      </div>
+      <div class="pilulas" role="group" aria-label="Ordenar e filtrar">
+        <button class="pilula" data-ordem="destaque" aria-pressed="true">Destaques</button>
+        <button class="pilula" data-ordem="menor" aria-pressed="false">Menor preço</button>
+        <button class="pilula" data-ordem="maior" aria-pressed="false">Maior preço</button>
+        <span class="pilulas__div" aria-hidden="true"></span>
+        <button class="pilula" data-faixa="ate30" aria-pressed="false">Até R$ 30</button>
+        <button class="pilula" data-faixa="30mais" aria-pressed="false">Acima de R$ 30</button>
+      </div>
     </div>
 
-    <ul class="grade" id="grade"></ul>
-    <p class="vazio" id="vazio" hidden>Nenhum produto encontrado. <button class="link" id="limparTudo">Limpar filtros</button></p>
+    <ul class="vitrine" id="vitrine"></ul>
+    <div class="vazio" id="vazio" hidden>
+      <p>Nada encontrado com esses filtros.</p>
+      <button class="btn btn--claro" id="limpar">Ver todos os produtos</button>
+    </div>
 
     <section class="bloco" id="medidas">
       <h2>Tabela de medidas</h2>
-      <p class="sub">Medidas do corpo, em centímetros. Entre dois tamanhos, escolha o menor para mais compressão.</p>
+      <p class="bloco__sub">Medidas do corpo, em centímetros. Entre dois tamanhos, escolha o menor para mais compressão.</p>
       <!-- TODO: confirmar com a modelagem do fornecedor -->
       <div class="tabela-wrap">
         <table class="tabela">
@@ -104,127 +86,94 @@
 
     <section class="bloco" id="duvidas">
       <h2>Dúvidas</h2>
-      <details>
-        <summary>Tem pedido mínimo?</summary>
-        <p data-minimo-faq></p>
-      </details>
-      <details>
-        <summary>Como faço meu pedido?</summary>
-        <p>Escolha cor e tamanho, coloque na sacola e toque em “Finalizar pelo WhatsApp”. A conversa abre com o pedido já escrito; a gente confirma estoque, frete e pagamento.</p>
-      </details>
-      <details>
-        <summary>Quais as formas de pagamento?</summary>
-        <p>Pix e cartão de crédito. Os detalhes são passados no atendimento.</p>
-      </details>
-      <details>
-        <summary>Qual o prazo de entrega?</summary>
-        <p>Postamos em até 2 dias úteis depois do pagamento. O prazo dos Correios ou da transportadora depende do seu CEP.</p>
-      </details>
-      <details>
-        <summary>Posso trocar?</summary>
-        <p>Sim. Você tem 7 dias corridos após o recebimento para pedir troca ou devolução (Código de Defesa do Consumidor, art. 49). A peça precisa estar sem uso e com etiqueta.</p>
-      </details>
+      <details><summary>Qual o pedido mínimo?</summary><p data-minimo-faq></p></details>
+      <details><summary>Como funciona o pedido?</summary><p>Você monta o look aqui e toca em “Enviar pelo WhatsApp”. A conversa abre com tudo escrito: peças, cores, tamanhos e valor. A gente confirma estoque, frete e pagamento por lá.</p></details>
+      <details><summary>Formas de pagamento</summary><p>Pix e cartão de crédito.</p></details>
+      <details><summary>Prazo de entrega</summary><p>Postamos em até 2 dias úteis depois do pagamento. O prazo do transporte depende do seu CEP.</p></details>
+      <details><summary>Trocas</summary><p>Você tem 7 dias corridos após receber para pedir troca ou devolução (Código de Defesa do Consumidor, art. 49). A peça precisa estar sem uso e com etiqueta.</p></details>
     </section>
   </main>
 
   <footer class="rodape">
-    <p class="marca marca--rodape" data-marca></p>
+    <img src="img/logo-branca.svg" alt="LookFit" width="510" height="100" class="rodape__logo">
+    <p class="rodape__frase">Moda fitness feminina</p>
     <ul class="rodape__links">
       <li><a data-whats-link>WhatsApp</a></li>
-      <li><a data-insta-link target="_blank" rel="noopener">Instagram</a></li>
-      <li><a href="#medidas">Tabela de medidas</a></li>
-      <li><a href="#duvidas">Trocas e dúvidas</a></li>
+      <li><a data-insta-link>Instagram <span data-insta-nome></span></a></li>
+      <li><a href="#medidas">Medidas</a></li>
+      <li><a href="#duvidas">Dúvidas</a></li>
     </ul>
-    <p class="rodape__copy">© <span id="ano"></span> <span data-marca></span></p>
+    <p class="rodape__copy">© <span id="ano"></span> LookFit</p>
   </footer>
 
-  <!-- Menu lateral -->
-  <aside class="gaveta gaveta--esq" id="menu" aria-label="Menu" hidden>
-    <div class="gaveta__cab">
-      <span class="marca" data-marca></span>
-      <button class="icone" data-fechar aria-label="Fechar menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
-    </div>
-    <div class="menu">
-      <p class="menu__titulo">Categorias</p>
-      <ul id="menuCats"></ul>
-      <p class="menu__titulo">Atendimento</p>
-      <ul>
-        <li><a data-whats-link>WhatsApp</a></li>
-        <li><a href="#medidas" data-fechar>Tabela de medidas</a></li>
-        <li><a href="#duvidas" data-fechar>Trocas e dúvidas</a></li>
-      </ul>
-    </div>
-  </aside>
-
-  <!-- Filtros -->
-  <aside class="gaveta gaveta--baixo" id="filtro" aria-label="Filtros" hidden>
-    <div class="gaveta__cab">
-      <span class="gaveta__titulo">Filtrar</span>
-      <button class="icone" data-fechar aria-label="Fechar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
-    </div>
-    <div class="filtro">
-      <fieldset>
-        <legend>Categoria</legend>
-        <div class="chips" id="filtroCats"></div>
-      </fieldset>
-      <fieldset>
-        <legend>Preço</legend>
-        <div class="chips" id="filtroPreco"></div>
-      </fieldset>
-    </div>
-    <div class="gaveta__rodape filtro__acoes">
-      <button class="btn btn--linha" id="limparFiltro">Limpar</button>
-      <button class="btn" data-fechar id="verResultados">Ver produtos</button>
-    </div>
-  </aside>
+  <!-- Barra "Seu look": progresso até o pedido mínimo, sempre à mão -->
+  <div class="look" id="look" data-estado="vazio">
+    <button class="look__btn" id="abrirSacola" aria-label="Abrir seu look">
+      <svg class="elos" viewBox="0 0 64 40" aria-hidden="true">
+        <circle class="elos__trilho" cx="20" cy="20" r="15"/><circle class="elos__trilho" cx="44" cy="20" r="15"/>
+        <circle class="elos__fill" id="elo1" cx="20" cy="20" r="15" pathLength="100"/>
+        <circle class="elos__fill" id="elo2" cx="44" cy="20" r="15" pathLength="100"/>
+      </svg>
+      <span class="look__txt">
+        <span class="look__rotulo" id="lookRotulo">Seu look</span>
+        <span class="look__info" id="lookInfo"></span>
+      </span>
+      <span class="look__acao" id="lookAcao">Ver</span>
+    </button>
+  </div>
 
   <!-- Produto -->
-  <aside class="gaveta gaveta--produto" id="produto" aria-labelledby="pNome" hidden>
-    <button class="icone produto__fechar" data-fechar aria-label="Fechar produto"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
-    <div class="produto">
-      <div class="produto__fotos">
-        <div class="carrossel" id="pFotos"></div>
-        <div class="pontos" id="pPontos"></div>
-      </div>
-      <form class="produto__info" id="pForm">
-        <p class="ref" id="pRef"></p>
-        <h2 id="pNome"></h2>
-        <p class="preco preco--grande" id="pPreco"></p>
-        <p class="parcela" id="pParcela"></p>
-        <label class="campo">
-          <span class="rotulo">Cor</span>
-          <input type="text" name="cor" id="pCor" placeholder="Qual cor da foto? Ex.: rosa" autocomplete="off" maxlength="40">
-        </label>
-        <div class="campo">
-          <span class="rotulo">Tamanho <a href="#medidas" class="link" data-fechar>Tabela de medidas</a></span>
-          <div class="tams" id="pTams"></div>
+  <div class="folha" id="produto" role="dialog" aria-modal="true" aria-labelledby="pNome" hidden>
+    <div class="folha__painel">
+      <button class="folha__fechar" data-fechar aria-label="Fechar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+      <div class="produto">
+        <div class="produto__fotos">
+          <div class="carrossel" id="pFotos"></div>
+          <div class="pontos" id="pPontos"></div>
         </div>
-        <p class="erro" id="pErro" role="alert"></p>
-        <button class="btn btn--largo" type="submit">Adicionar à sacola</button>
-        <p class="nota" data-minimo-nota></p>
-      </form>
-    </div>
-  </aside>
-
-  <!-- Sacola -->
-  <aside class="gaveta gaveta--dir" id="sacola" aria-label="Sacola" hidden>
-    <div class="gaveta__cab">
-      <span class="gaveta__titulo">Sacola <span id="sacolaQtd"></span></span>
-      <button class="icone" data-fechar aria-label="Fechar sacola"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
-    </div>
-    <ul class="itens" id="itensSacola"></ul>
-    <div class="gaveta__rodape">
-      <div class="minimo" id="minimo" hidden>
-        <p id="minimoTexto"></p>
-        <div class="minimo__barra"><span id="minimoBarra"></span></div>
+        <form class="produto__info" id="pForm" novalidate>
+          <p class="produto__cat" id="pCat"></p>
+          <h2 class="produto__nome" id="pNome"></h2>
+          <p class="produto__preco" id="pPreco"></p>
+          <label class="campo" for="pCor">
+            <span class="campo__rotulo">Cor</span>
+            <input type="text" id="pCor" placeholder="A cor que você viu na foto" autocomplete="off" maxlength="40">
+          </label>
+          <fieldset class="campo">
+            <legend class="campo__rotulo">Tamanho <a href="#medidas" data-fechar>ver medidas</a></legend>
+            <div class="tams" id="pTams"></div>
+          </fieldset>
+          <p class="erro" id="pErro" role="alert"></p>
+          <button class="btn btn--largo" type="submit" id="pAdd">Adicionar ao look</button>
+        </form>
       </div>
-      <p class="total"><span>Subtotal</span><strong id="totalSacola">R$ 0,00</strong></p>
-      <a class="btn btn--largo" id="finalizar" target="_blank" rel="noopener" aria-disabled="true">Finalizar pelo WhatsApp</a>
-      <p class="nota">Frete e pagamento são combinados no WhatsApp.</p>
     </div>
-  </aside>
+  </div>
 
-  <div class="veu" id="veu" hidden></div>
+  <!-- Seu look (sacola) -->
+  <div class="folha" id="sacola" role="dialog" aria-modal="true" aria-labelledby="sTitulo" hidden>
+    <div class="folha__painel folha__painel--sacola">
+      <div class="sacola__cab">
+        <h2 id="sTitulo">Seu look</h2>
+        <button class="folha__fechar folha__fechar--estatico" data-fechar aria-label="Fechar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <ul class="itens" id="itens"></ul>
+      <div class="sacola__rodape">
+        <div class="meta" id="meta">
+          <div class="meta__barra"><span id="metaBarra"></span></div>
+          <p id="metaTxt"></p>
+        </div>
+        <p class="sacola__total"><span>Total das peças</span><strong id="sTotal">R$ 0,00</strong></p>
+        <a class="btn btn--largo btn--whats" id="enviar" target="_blank" rel="noopener" aria-disabled="true">Enviar pelo WhatsApp</a>
+        <p class="sacola__nota">Frete e pagamento são combinados na conversa.</p>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="js/produtos.js"></script>
