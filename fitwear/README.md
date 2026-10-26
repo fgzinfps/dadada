@@ -1,16 +1,16 @@
-# Site — Moda Fitness Feminina
+# LookFit — loja
 
-Site estático (HTML/CSS/JS puro, sem build). Abra `index.html` ou publique a pasta `fitwear/` em qualquer hospedagem estática (Vercel, Netlify, GitHub Pages).
+Site estático (HTML/CSS/JS, sem build). Pedidos finalizados pelo WhatsApp.
 
-## Antes de publicar
-- `js/config.js`: `marca`, `whatsapp`, `instagram`, `email`, `freteGratisAcimaDe`, `parcelas`
-- `js/produtos.js`: catálogo (63 produtos). `preco: null` aparece como "Consulte o preço";
-  troque por um número (ex.: `39.9`). Confirme os tamanhos de cada peça.
+## Publicar na Netlify
+1. Acesse https://app.netlify.com/drop
+2. Arraste esta pasta inteira (a que tem o `index.html`).
+3. Pronto: a Netlify gera o link. Para atualizar depois, arraste a pasta de novo em
+   Site > Deploys.
 
-Também revise em `index.html`: tabela de medidas e textos de prazo/pagamento do FAQ.
-
-## Adicionar produto
-Coloque as fotos em `img/` (WebP, retrato 4:5 de preferência) e copie uma linha em `js/produtos.js`. Os filtros por categoria aparecem sozinhos quando houver 2+ categorias.
-
-## Como o pedido funciona
-A cliente monta a sacola e clica em "Finalizar pelo WhatsApp": abre uma conversa com o pedido já escrito (itens, cor, tamanho, subtotal). Não há pagamento online.
+## Onde mexer
+- `js/config.js`: nome, WhatsApp, Instagram, pedido mínimo e cores padrão.
+- `js/produtos.js`: uma peça por linha — `preco`, `estoque` (0 = esgotado), `tamanhos`
+  e, se quiser, `cores` próprias. Não apague vírgulas nem aspas.
+- `privacidade.html`: política de privacidade (exigida pelo Pixel da Meta / LGPD).
+- `logo/`: arquivos da logo para Instagram e gráfica.

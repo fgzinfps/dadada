@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Privacidade | LookFit</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="img/icone.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { padding-bottom: 0; }
+    .texto { max-width: 680px; margin: 0 auto; padding: 32px max(16px, env(safe-area-inset-left, 0px)) 56px; }
+    .texto h1 { font-stretch: 125%; font-weight: 800; text-transform: uppercase; font-size: 28px; line-height: 1.05; margin-bottom: 8px; }
+    .texto h2 { font-size: 17px; font-weight: 800; margin: 28px 0 8px; }
+    .texto p, .texto li { color: var(--ink-2); font-size: 15px; line-height: 1.6; }
+    .texto ul { list-style: disc; padding-left: 20px; display: grid; gap: 6px; }
+    .texto a { text-decoration: underline; text-underline-offset: 3px; }
+    .data { font-size: 13px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header class="topo">
+    <a href="index.html" class="topo__logo" aria-label="LookFit, voltar à loja"><img src="img/logo.svg" alt="LookFit" width="510" height="100"></a>
+    <a href="index.html" class="btn btn--claro" style="min-height:40px;padding:0 16px;font-size:14px">Voltar à loja</a>
+  </header>
+  <main class="texto">
+    <h1>Política de privacidade</h1>
+    <p class="data">Atualizada em 26 de outubro de 2026</p>
+
+    <h2>Quem somos</h2>
+    <p>A LookFit vende moda fitness feminina. Os pedidos são feitos por este site e finalizados pelo WhatsApp.</p>
+
+    <h2>O que coletamos</h2>
+    <ul>
+      <li><b>Sua sacola:</b> as peças que você escolhe ficam guardadas só no seu navegador, para não se perderem se você fechar a página. Não recebemos esses dados até você enviar o pedido.</li>
+      <li><b>Seu pedido:</b> quando você toca em “Enviar pelo WhatsApp”, a mensagem com as peças vai para a nossa conversa. A partir daí usamos seu nome, telefone e endereço só para confirmar, cobrar e entregar o pedido.</li>
+      <li><b>Navegação:</b> usamos o Pixel da Meta (Facebook e Instagram) para entender quais peças são vistas e adicionadas ao look e para mostrar anúncios a quem já visitou a loja. A Meta pode usar cookies e identificadores do seu aparelho. Saiba mais na <a href="https://www.facebook.com/privacy/policy" target="_blank" rel="noopener">política de privacidade da Meta</a>.</li>
+    </ul>
+
+    <h2>O que não fazemos</h2>
+    <p>Não vendemos seus dados e não pedimos senha nem dados de cartão por este site.</p>
+
+    <h2>Seus direitos</h2>
+    <p>Pela Lei Geral de Proteção de Dados (Lei 13.709/2018), você pode pedir para ver, corrigir ou apagar seus dados. Fale com a gente pelo <a data-whats-link>WhatsApp</a>. Para limitar os anúncios, ajuste as preferências em “Configurações de anúncios” no Facebook ou Instagram, ou use um bloqueador no navegador.</p>
+  </main>
+  <script src="js/produtos.js"></script>
+  <script src="js/config.js"></script>
+  <script>
+    document.querySelectorAll("[data-whats-link]").forEach(function (a) {
+      a.href = "https://wa.me/" + window.LOJA.whatsapp; a.target = "_blank"; a.rel = "noopener";
+    });
+  </script>
+</body>
+</html>

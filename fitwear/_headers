@@ -1,0 +1,7 @@
+# Netlify: fotos e logo quase nunca mudam; CSS/JS revalidam para preço e estoque novos aparecerem na hora
+/img/*
+  Cache-Control: public, max-age=2592000
+/css/*
+  Cache-Control: public, max-age=0, must-revalidate
+/js/*
+  Cache-Control: public, max-age=0, must-revalidate
