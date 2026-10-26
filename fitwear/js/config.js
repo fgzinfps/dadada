@@ -7,7 +7,7 @@
 window.LOJA = {
   marca: "LookFit",
   slogan: "Feita para treinar. Pensada para você.",
-  whatsapp: "5521984508660",         // DDI + DDD + número, só dígitos
+  whatsapp: "5511976809626",         // DDI + DDD + número, só dígitos
   instagram: "lookfit.sm",           // @ do Instagram, sem o @
   email: "contato@suamarca.com.br",  // TODO
   pedidoMinimo: 100,                 // valor mínimo do pedido em reais (0 = sem mínimo)
