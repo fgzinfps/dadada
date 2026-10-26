@@ -8,6 +8,12 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const whatsUrl = (msg) => `https://wa.me/${L.whatsapp}${msg ? "?text=" + encodeURIComponent(msg) : ""}`;
   const MIN = L.pedidoMinimo > 0 ? L.pedidoMinimo : 0;
+  // Meta Pixel: só dispara se o script carregou (bloqueadores de anúncio não quebram a loja).
+  const pixel = (evento, dados) => {
+    try {
+      if (typeof window.fbq === "function") window.fbq("track", evento, { currency: "BRL", ...dados });
+    } catch (_) {}
+  };
 
   // Referência por produto, usada na mensagem do pedido para facilitar a separação.
   L.produtos.forEach((p, i) => (p.ref = "REF " + String(i + 1).padStart(3, "0")));
@@ -252,6 +258,7 @@
     desenharQtd();
     $("#pErro").textContent = "";
     abrir("produto", origem);
+    pixel("ViewContent", { content_ids: [p.id], content_name: p.nome, content_type: "product", value: p.preco || 0 });
     $("#produto .folha__painel").scrollTop = 0;
     $("#pFotos").scrollLeft = 0;
   }
@@ -296,6 +303,7 @@
     const antes = total();
     const n = Math.min(qtd, disponivel(atual));
     adicionar(atual.id, cor, tam, n);
+    pixel("AddToCart", { content_ids: [atual.id], content_name: atual.nome, content_type: "product", value: (atual.preco || 0) * n, num_items: n });
     fechar();
     const depois = total();
     if (MIN && antes < MIN && depois >= MIN) {
@@ -400,8 +408,11 @@
     atualizarSacola();
   });
   $("#abrirSacola").addEventListener("click", (e) => abrir("sacola", e.currentTarget));
+  $$("[data-whats-link]").forEach((a) => a.addEventListener("click", () => pixel("Contact", {})));
   $("#enviar").addEventListener("click", (e) => {
-    if (e.currentTarget.getAttribute("aria-disabled") === "true") e.preventDefault();
+    if (e.currentTarget.getAttribute("aria-disabled") === "true") return e.preventDefault();
+    // O pedido termina no WhatsApp; o envio da mensagem é o mais perto de uma compra que o site enxerga.
+    pixel("InitiateCheckout", { content_ids: sacola.map((i) => i.id), content_type: "product", value: total(), num_items: pecas() });
   });
 
   /* ------------------------------------------------------------------------ */
