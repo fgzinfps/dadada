@@ -145,6 +145,14 @@
             <legend class="campo__rotulo">Tamanho <a href="#medidas" data-fechar>ver medidas</a></legend>
             <div class="tams" id="pTams"></div>
           </fieldset>
+          <div class="campo">
+            <span class="campo__rotulo" id="pQtdRotulo">Quantidade</span>
+            <div class="qtd qtd--grande" role="group" aria-labelledby="pQtdRotulo">
+              <button type="button" id="pMenos" aria-label="Diminuir quantidade">−</button>
+              <span id="pQtd" aria-live="polite">1</span>
+              <button type="button" id="pMais" aria-label="Aumentar quantidade">+</button>
+            </div>
+          </div>
           <p class="erro" id="pErro" role="alert"></p>
           <button class="btn btn--largo" type="submit" id="pAdd">Adicionar ao look</button>
         </form>

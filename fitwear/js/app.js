@@ -212,6 +212,16 @@
   let atual = null;
   let tam = null;
   let cor = null;
+  let qtd = 1;
+  function desenharQtd() {
+    const p = atual;
+    const d = Math.max(0, disponivel(p));
+    qtd = Math.max(1, Math.min(qtd, d || 1));
+    $("#pQtd").textContent = qtd;
+    $("#pMenos").disabled = qtd <= 1;
+    $("#pMais").disabled = qtd >= d;
+    if (d > 0) $("#pAdd").textContent = p.preco == null ? `Adicionar ${qtd} ao look` : `Adicionar ${qtd} ao look · ${brl(p.preco * qtd)}`;
+  }
   function desenharEstoque() {
     const p = atual;
     const d = disponivel(p);
@@ -237,7 +247,9 @@
       .map((c) => `<button type="button" class="cor" style="--c:${c.hex}" data-cor="${esc(c.nome)}" aria-pressed="false" aria-label="${esc(c.nome)}" title="${esc(c.nome)}"></button>`)
       .join("");
     $("#pCorNome").textContent = "escolha";
+    qtd = 1;
     desenharEstoque();
+    desenharQtd();
     $("#pErro").textContent = "";
     abrir("produto", origem);
     $("#produto .folha__painel").scrollTop = 0;
@@ -253,6 +265,14 @@
     tam = b.dataset.tam;
     $$("#pTams .tam").forEach((x) => x.setAttribute("aria-pressed", x === b));
     if ($("#pErro").textContent.includes("tamanho")) $("#pErro").textContent = "";
+  });
+  $("#pMenos").addEventListener("click", () => {
+    qtd--;
+    desenharQtd();
+  });
+  $("#pMais").addEventListener("click", () => {
+    qtd++;
+    desenharQtd();
   });
   $("#pCores").addEventListener("click", (e) => {
     const b = e.target.closest("[data-cor]");
@@ -274,7 +294,8 @@
       return;
     }
     const antes = total();
-    adicionar(atual.id, cor, tam);
+    const n = Math.min(qtd, disponivel(atual));
+    adicionar(atual.id, cor, tam, n);
     fechar();
     const depois = total();
     if (MIN && antes < MIN && depois >= MIN) {
@@ -283,7 +304,8 @@
       void $("#look").offsetWidth;
       $("#look").classList.add("pulso");
     } else {
-      toast(MIN && depois < MIN ? `Adicionado. Faltam ${brl(MIN - depois)} para o mínimo.` : "Adicionado ao look.");
+      const ad = n > 1 ? `${n} peças adicionadas` : "Adicionado";
+      toast(MIN && depois < MIN ? `${ad}. Faltam ${brl(MIN - depois)} para o mínimo.` : `${ad} ao look.`);
     }
   });
 
@@ -300,9 +322,9 @@
       localStorage.setItem(CHAVE, JSON.stringify(sacola));
     } catch (_) {}
   };
-  function adicionar(id, cor, t) {
+  function adicionar(id, cor, t, n = 1) {
     const igual = sacola.find((i) => i.id === id && i.cor.toLowerCase() === cor.toLowerCase() && i.tam === t);
-    igual ? igual.qtd++ : sacola.push({ id, cor, tam: t, qtd: 1 });
+    igual ? (igual.qtd += n) : sacola.push({ id, cor, tam: t, qtd: n });
     salvar();
     atualizarSacola();
   }
