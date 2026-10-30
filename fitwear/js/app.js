@@ -76,6 +76,7 @@
   function desenharBlack() {
     const f = fase();
     $("#black").hidden = f === "fora";
+    $("#letreiro").hidden = f === "fora";
     $("#chamada").hidden = f !== "fora";
     if (f === "fora") return;
     const maior = FAIXAS_BF.length ? FAIXAS_BF[FAIXAS_BF.length - 1].desconto : 0;
@@ -88,18 +89,46 @@
       $("#blackTag").textContent = "Black LookFit · em breve";
       $("#blackTitulo").textContent = maior ? `Até ${maior}% OFF montando seu look` : "Preços de Black em toda a loja";
       $("#blackTempoRot").textContent = "Começa em";
-      $("#blackTempo").textContent = tempoAte(BF.inicio);
       const vip = $("#blackVip");
       vip.hidden = false;
+      $("#blackCta").hidden = true;
       vip.href = whatsUrl(`Oi! Quero entrar na lista VIP da Black ${L.marca} e ser avisada quando começar.`);
     } else {
       $("#blackTag").textContent = "Black LookFit";
       $("#blackTitulo").textContent = maior ? "Quanto mais peças, menos você paga" : "Preços de Black em toda a loja";
       $("#blackTempoRot").textContent = "Acaba em";
-      $("#blackTempo").textContent = tempoAte(BF.fim);
       $("#blackVip").hidden = true;
+      $("#blackCta").hidden = false;
     }
+    letreiro(f);
+    contar();
   }
+  // Contagem com segundos: o movimento é o que prende o olho na entrada.
+  function contar() {
+    const f = fase();
+    if (f === "fora") return;
+    const ms = Math.max(0, Date.parse(f === "antes" ? BF.inicio : BF.fim) - Date.now());
+    const dd = (n) => String(n).padStart(2, "0");
+    $("#cDias").textContent = dd(Math.floor(ms / 864e5));
+    $("#cHoras").textContent = dd(Math.floor((ms % 864e5) / 36e5));
+    $("#cMin").textContent = dd(Math.floor((ms % 36e5) / 6e4));
+    $("#cSeg").textContent = dd(Math.floor((ms % 6e4) / 1e3));
+  }
+  let letreiroFeito = null;
+  function letreiro(f) {
+    if (letreiroFeito === f) return;
+    letreiroFeito = f;
+    const frases = f === "antes"
+      ? [`Black ${L.marca} vem aí`, "Entre na lista VIP", "Avisamos primeiro no WhatsApp"]
+      : [`Black ${L.marca}`, "Preços de Black em toda a loja", "Envio para todo o Brasil", "Peça pelo WhatsApp"];
+    // duas cópias para o loop do letreiro não ter emenda
+    const um = frases.map((t) => `<span>${esc(t)}</span>`).join("");
+    $("#letreiroTrilho").innerHTML = um + um + um + um;
+  }
+  $("#blackCta").addEventListener("click", (e) => {
+    e.preventDefault();
+    rolarParaLista();
+  });
   $("#blackVip").addEventListener("click", () => pixel("Lead", { content_name: "Lista VIP Black" }));
 
   /* ------------------------------------------------------------------------
@@ -516,4 +545,5 @@
   atualizarSacola();
   desenharBlack();
   setInterval(desenharBlack, 30000);
+  setInterval(contar, 1000);
 })();

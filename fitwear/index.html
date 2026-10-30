@@ -34,6 +34,8 @@
 <body>
   <a class="pular" href="#vitrine">Pular para os produtos</a>
 
+  <div class="letreiro" id="letreiro" hidden aria-hidden="true"><div class="letreiro__trilho" id="letreiroTrilho"></div></div>
+
   <header class="topo">
     <a href="#" class="topo__logo" aria-label="LookFit, início"><img src="img/logo.svg" alt="LookFit" width="510" height="100"></a>
     <button class="icone" id="abrirBusca" aria-label="Buscar produtos">
@@ -49,19 +51,34 @@
   </header>
 
   <main>
+    <!-- Black Friday: capa de entrada, só no período configurado em js/config.js -->
+    <section class="black" id="black" aria-labelledby="blackGrande" hidden>
+      <div class="black__fotos" aria-hidden="true">
+        <img src="img/macacao-um-ombro-1.webp" alt="">
+        <img src="img/conjunto-corta-vento-short-saia-1.webp" alt="">
+        <img src="img/conjunto-plus-short-saia-1.webp" alt="">
+      </div>
+      <div class="black__texto">
+        <p class="black__tag"><span class="black__ponto" aria-hidden="true"></span><span id="blackTag">Black LookFit</span></p>
+        <h1 class="black__marca" id="blackGrande"><span>Black</span><span>LookFit</span></h1>
+        <p class="black__sub" id="blackTitulo">Preços de Black em toda a loja</p>
+        <ul class="black__faixas" id="blackFaixas"></ul>
+        <p class="black__rot" id="blackTempoRot">Acaba em</p>
+        <div class="contagem" id="contagem" role="timer" aria-live="off">
+          <div><b id="cDias">00</b><span>dias</span></div>
+          <div><b id="cHoras">00</b><span>horas</span></div>
+          <div><b id="cMin">00</b><span>min</span></div>
+          <div><b id="cSeg">00</b><span>seg</span></div>
+        </div>
+        <a class="btn btn--whats black__cta" id="blackCta" href="#controles">Ver preços de Black</a>
+        <a class="btn btn--whats black__cta" id="blackVip" hidden target="_blank" rel="noopener">Entrar na lista VIP</a>
+      </div>
+    </section>
+
     <!-- Categorias no formato dos destaques do Instagram -->
     <nav class="destaques" aria-label="Categorias">
       <ul id="destaques"></ul>
     </nav>
-
-    <!-- Black Friday: aparece só no período configurado em js/config.js -->
-    <section class="black" id="black" aria-labelledby="blackTitulo" hidden>
-      <p class="black__tag"><span class="black__ponto" aria-hidden="true"></span><span id="blackTag">Black LookFit</span></p>
-      <h1 class="black__titulo" id="blackTitulo">Preços de Black em toda a loja</h1>
-      <ul class="black__faixas" id="blackFaixas"></ul>
-      <p class="black__tempo" id="blackTempoLinha"><span id="blackTempoRot">Acaba em</span> <strong id="blackTempo"></strong></p>
-      <a class="btn btn--whats black__vip" id="blackVip" hidden target="_blank" rel="noopener">Entrar na lista VIP</a>
-    </section>
 
     <section class="chamada" id="chamada" aria-labelledby="chamadaTitulo">
       <h1 id="chamadaTitulo">Monte seu look</h1>

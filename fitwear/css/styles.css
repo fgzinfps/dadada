@@ -312,24 +312,56 @@ details p { padding-bottom: 16px; color: var(--ink-2); font-size: 14px; }
 .sacola__nota { font-size: 12px; color: var(--muted); text-align: center; }
 
 /* ==========================================================================
-   Black Friday
+   Black Friday — letreiro correndo + capa de entrada
    ========================================================================== */
+.letreiro { background: var(--rosa); color: #fff; overflow: hidden; white-space: nowrap; height: 34px; display: flex; align-items: center; }
+.letreiro__trilho { display: inline-flex; gap: 0; animation: correr 28s linear infinite; will-change: transform; }
+.letreiro__trilho span { font-weight: 800; font-stretch: 125%; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; padding-right: 28px; }
+.letreiro__trilho span::after { content: "✦"; margin-left: 28px; color: var(--ink); }
+@keyframes correr { to { transform: translateX(-50%); } }
+
 .black {
-  margin: 8px max(var(--gutter), env(safe-area-inset-left, 0px)) 4px; padding: 20px 18px 18px;
-  border-radius: 20px; background: var(--ink); color: #fff; display: grid; gap: 12px;
+  position: relative; overflow: hidden; background: var(--ink); color: #fff;
+  display: grid; padding: 0 0 24px;
 }
-@media (min-width: 1100px) { .black { max-width: 1256px; margin-inline: auto; } }
-.black__tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--rosa); }
-.black__ponto { width: 8px; height: 8px; border-radius: 50%; background: var(--rosa); animation: piscar 1.6s ease-in-out infinite; }
-@keyframes piscar { 50% { opacity: .25; } }
-.black__titulo { font-stretch: 125%; font-weight: 800; text-transform: uppercase; font-size: clamp(24px, 7.4vw, 44px); line-height: 1; letter-spacing: -.01em; text-wrap: balance; }
-.black__faixas { display: flex; flex-wrap: wrap; gap: 8px; }
+.black__fotos { position: relative; height: 230px; margin-bottom: -28px; }
+.black__fotos img {
+  position: absolute; top: 22px; width: 38%; max-width: 190px; aspect-ratio: 4 / 5; object-fit: cover; object-position: top;
+  border-radius: 14px; box-shadow: 0 14px 40px rgb(0 0 0 / .5); border: 3px solid #1d1d22;
+}
+.black__fotos img:nth-child(1) { left: 6%; transform: rotate(-9deg); }
+.black__fotos img:nth-child(2) { left: 31%; top: 6px; z-index: 2; transform: rotate(1deg); }
+.black__fotos img:nth-child(3) { right: 6%; transform: rotate(8deg); }
+.black__fotos::after { content: ""; position: absolute; inset: auto 0 0; height: 90px; background: linear-gradient(transparent, var(--ink)); z-index: 3; }
+.black__texto { min-width: 0; position: relative; z-index: 4; display: grid; justify-items: center; text-align: center; gap: 12px; padding: 0 max(var(--gutter), env(safe-area-inset-left, 0px)); }
+.black__tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--rosa); }
+.black__ponto { width: 8px; height: 8px; border-radius: 50%; background: var(--rosa); animation: piscar 1.4s ease-in-out infinite; }
+@keyframes piscar { 50% { opacity: .2; } }
+.black__marca { display: grid; line-height: .82; text-transform: uppercase; font-stretch: 125%; font-weight: 900; letter-spacing: -.02em; }
+.black__marca span:first-child { font-size: clamp(60px, 21vw, 168px); }
+.black__marca span:last-child { font-size: clamp(30px, 10vw, 66px); color: var(--rosa); letter-spacing: .02em; }
+.black__sub { font-size: 16px; color: #e4e4e7; font-weight: 600; max-width: 32ch; }
+.black__faixas { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .black__faixas li { display: grid; gap: 1px; padding: 8px 14px; border-radius: 14px; border: 1px solid #34343b; font-size: 12px; color: #c4c4cc; }
 .black__faixas b { font-size: 20px; font-stretch: 112%; font-weight: 800; color: #fff; }
 .black__faixas li.atingida { border-color: var(--rosa); background: rgb(255 45 122 / .14); }
-.black__tempo { font-size: 13px; color: #c4c4cc; }
-.black__tempo strong { color: #fff; font-variant-numeric: tabular-nums; font-weight: 800; font-stretch: 112%; font-size: 15px; margin-left: 2px; }
-.black__vip { justify-self: start; }
+.black__rot { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #a1a1aa; margin-top: 4px; }
+.contagem { display: grid; grid-template-columns: repeat(4, minmax(0, 72px)); gap: 8px; }
+.contagem div { display: grid; justify-items: center; gap: 2px; padding: 10px 0 8px; border-radius: 12px; background: #1d1d22; border: 1px solid #2c2c33; }
+.contagem b { font-size: 28px; font-weight: 900; font-stretch: 112%; font-variant-numeric: tabular-nums; line-height: 1; }
+.contagem span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #a1a1aa; }
+.contagem div:last-child b { color: var(--rosa); }
+.black__cta { margin-top: 6px; min-width: min(100%, 300px); font-size: 16px; box-shadow: 0 8px 24px rgb(255 45 122 / .35); }
+@media (min-width: 900px) {
+  .black { grid-template-columns: 1.1fr 1fr; align-items: center; padding: 40px max(32px, calc((100vw - 1256px) / 2)); }
+  .black__fotos { order: 2; height: 420px; margin: 0; }
+  .black__fotos img { width: 44%; max-width: 230px; top: 60px; }
+  .black__fotos img:nth-child(2) { left: 28%; top: 30px; }
+  .black__fotos::after { display: none; }
+  .black__texto { justify-items: start; text-align: left; padding: 0; }
+  .black__faixas { justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) { .letreiro__trilho, .black__ponto { animation: none; } }
 .peca__black {
   justify-self: start; display: inline-block; background: var(--ink); color: #fff; border-radius: 6px;
   padding: 2px 7px; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
