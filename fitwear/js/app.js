@@ -8,6 +8,23 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const whatsUrl = (msg) => `https://wa.me/${L.whatsapp}${msg ? "?text=" + encodeURIComponent(msg) : ""}`;
   const MIN = L.pedidoMinimo > 0 ? L.pedidoMinimo : 0;
+  // Black Friday: desconto progressivo sobre o total das peças, só dentro do período configurado.
+  const BF = L.blackFriday && L.blackFriday.ativo ? L.blackFriday : null;
+  const FAIXAS_BF = BF ? [...BF.faixas].sort((a, b) => a.acima - b.acima) : [];
+  const fase = () => {
+    if (!BF) return "fora";
+    const agora = Date.now();
+    if (agora < Date.parse(BF.inicio)) return "antes";
+    return agora > Date.parse(BF.fim) ? "fora" : "durante";
+  };
+  const descontoPct = (t) => (fase() === "durante" ? FAIXAS_BF.reduce((p, f) => (t >= f.acima ? f.desconto : p), 0) : 0);
+  const proximaFaixa = (t) => (fase() === "durante" ? FAIXAS_BF.find((f) => t < f.acima) : null);
+  const tempoAte = (iso) => {
+    const ms = Math.max(0, Date.parse(iso) - Date.now());
+    const d = Math.floor(ms / 864e5), h = Math.floor((ms % 864e5) / 36e5), m = Math.floor((ms % 36e5) / 6e4);
+    return d ? `${d}d ${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}min` : `${h}h ${String(m).padStart(2, "0")}min`;
+  };
+
   // Meta Pixel: só dispara se o script carregou (bloqueadores de anúncio não quebram a loja).
   const pixel = (evento, dados) => {
     try {
@@ -52,6 +69,37 @@
     ? `${brl(MIN)} em peças. Pode misturar modelos, cores e tamanhos para chegar no valor.`
     : "Não há pedido mínimo.";
   $("#ano").textContent = new Date().getFullYear();
+
+  /* ------------------------------------------------------------------------
+     Banner da Black Friday
+     ------------------------------------------------------------------------ */
+  function desenharBlack() {
+    const f = fase();
+    $("#black").hidden = f === "fora";
+    $("#chamada").hidden = f !== "fora";
+    if (f === "fora") return;
+    const maior = FAIXAS_BF.length ? FAIXAS_BF[FAIXAS_BF.length - 1].desconto : 0;
+    const t = typeof total === "function" ? total() : 0;
+    $("#blackFaixas").innerHTML = FAIXAS_BF.map(
+      (x) => `<li class="${f === "durante" && t >= x.acima ? "atingida" : ""}"><b>${x.desconto}% OFF</b>acima de ${brl(x.acima).replace(",00", "")}</li>`
+    ).join("");
+    if (f === "antes") {
+      $("#blackTag").textContent = "Black LookFit · em breve";
+      $("#blackTitulo").textContent = `Até ${maior}% OFF montando seu look`;
+      $("#blackTempoRot").textContent = "Começa em";
+      $("#blackTempo").textContent = tempoAte(BF.inicio);
+      const vip = $("#blackVip");
+      vip.hidden = false;
+      vip.href = whatsUrl(`Oi! Quero entrar na lista VIP da Black ${L.marca} e ser avisada quando começar.`);
+    } else {
+      $("#blackTag").textContent = "Black LookFit";
+      $("#blackTitulo").textContent = "Quanto mais peças, menos você paga";
+      $("#blackTempoRot").textContent = "Acaba em";
+      $("#blackTempo").textContent = tempoAte(BF.fim);
+      $("#blackVip").hidden = true;
+    }
+  }
+  $("#blackVip").addEventListener("click", () => pixel("Lead", { content_name: "Lista VIP Black" }));
 
   /* ------------------------------------------------------------------------
      Destaques (categorias)
@@ -301,12 +349,19 @@
       return;
     }
     const antes = total();
+    const pctAntes = descontoPct(antes);
     const n = Math.min(qtd, disponivel(atual));
     adicionar(atual.id, cor, tam, n);
     pixel("AddToCart", { content_ids: [atual.id], content_name: atual.nome, content_type: "product", value: (atual.preco || 0) * n, num_items: n });
     fechar();
     const depois = total();
-    if (MIN && antes < MIN && depois >= MIN) {
+    const pctDepois = descontoPct(depois);
+    if (pctDepois > pctAntes) {
+      toast(`Você ganhou ${pctDepois}% OFF de Black Friday!`);
+      $("#look").classList.remove("pulso");
+      void $("#look").offsetWidth;
+      $("#look").classList.add("pulso");
+    } else if (MIN && antes < MIN && depois >= MIN) {
       toast("Pedido mínimo atingido. Já pode enviar.");
       $("#look").classList.remove("pulso");
       void $("#look").offsetWidth;
@@ -338,6 +393,8 @@
   }
   const total = () => sacola.reduce((s, i) => s + (porId(i.id).preco || 0) * i.qtd, 0);
   const pecas = () => sacola.reduce((s, i) => s + i.qtd, 0);
+  const desconto = () => Math.round(total() * descontoPct(total())) / 100;
+  const totalFinal = () => total() - desconto();
   const valor = (p, q) => (p.preco == null ? "a consultar" : brl(p.preco * q));
 
   function mensagem() {
@@ -345,7 +402,11 @@
       const p = porId(i.id);
       return `• ${i.qtd}x ${p.nome} (${p.ref}) — cor ${i.cor}, tam. ${i.tam} — ${valor(p, i.qtd)}`;
     });
-    return [`Olá! Quero fazer este pedido na ${L.marca}:`, "", ...linhas, "", `Total das peças: ${brl(total())}`, "", "Pode me passar o frete e as formas de pagamento?"].join("\n");
+    const pct = descontoPct(total());
+    const valores = pct
+      ? [`Subtotal: ${brl(total())}`, `Desconto Black Friday (${pct}%): -${brl(desconto())}`, `Total das peças: ${brl(totalFinal())}`]
+      : [`Total das peças: ${brl(total())}`];
+    return [`Olá! Quero fazer este pedido na ${L.marca}:`, "", ...linhas, "", ...valores, "", "Pode me passar o frete e as formas de pagamento?"].join("\n");
   }
 
   function atualizarSacola() {
@@ -359,17 +420,40 @@
     $("#elo1").style.strokeDasharray = `${Math.min(1, prog * 2) * 100} 100`;
     $("#elo2").style.strokeDasharray = `${Math.max(0, prog * 2 - 1) * 100} 100`;
     $("#look").dataset.estado = n === 0 ? "vazio" : pronto ? "pronto" : "parcial";
-    $("#lookRotulo").textContent = n === 0 ? "Seu look" : `${n} ${n === 1 ? "peça" : "peças"} · ${brl(t)}`;
-    $("#lookInfo").textContent = n === 0 ? (MIN ? `Pedido mínimo ${brl(MIN)}` : "Escolha suas peças") : pronto ? "Pedido liberado" : `Faltam ${brl(falta)} para o mínimo`;
+    const pct = descontoPct(t);
+    const prox = proximaFaixa(t);
+    $("#lookRotulo").textContent = n === 0 ? "Seu look" : `${n} ${n === 1 ? "peça" : "peças"} · ${brl(totalFinal())}`;
+    $("#lookInfo").textContent =
+      n === 0
+        ? fase() === "durante" && FAIXAS_BF.length
+          ? `Black: até ${FAIXAS_BF[FAIXAS_BF.length - 1].desconto}% OFF`
+          : MIN ? `Pedido mínimo ${brl(MIN)}` : "Escolha suas peças"
+        : !pronto
+          ? `Faltam ${brl(falta)} para o mínimo`
+          : prox
+            ? `Faltam ${brl(prox.acima - t)} para ${prox.desconto}% OFF`
+            : pct ? `${pct}% OFF aplicado` : "Pedido liberado";
     $("#lookAcao").textContent = pronto ? "Enviar" : "Ver";
 
     // Folha da sacola
     $("#sTitulo").textContent = n ? `Seu look (${n})` : "Seu look";
-    $("#sTotal").textContent = brl(t);
+    $("#sTotal").textContent = brl(totalFinal());
+    $("#sSubLinha").hidden = $("#sDescLinha").hidden = !pct;
+    $("#sSub").textContent = brl(t);
+    $("#sDescRot").textContent = `Desconto Black Friday (${pct}%)`;
+    $("#sDesc").textContent = `−${brl(desconto())}`;
     $("#meta").hidden = !MIN || n === 0;
     $("#meta").classList.toggle("ok", pronto);
-    $("#metaBarra").style.width = `${prog * 100}%`;
-    $("#metaTxt").textContent = pronto ? "Pedido mínimo atingido." : `Faltam ${brl(falta)} para o pedido mínimo de ${brl(MIN)}.`;
+    // Depois do mínimo, a barra passa a mirar a próxima faixa de desconto
+    if (pronto && prox) {
+      $("#meta").hidden = false;
+      $("#meta").classList.remove("ok");
+      $("#metaBarra").style.width = `${Math.min(100, (t / prox.acima) * 100)}%`;
+      $("#metaTxt").textContent = `Faltam ${brl(prox.acima - t)} para ganhar ${prox.desconto}% OFF.`;
+    } else {
+      $("#metaBarra").style.width = `${prog * 100}%`;
+      $("#metaTxt").textContent = pronto ? (pct ? `Você ganhou ${pct}% OFF de Black Friday.` : "Pedido mínimo atingido.") : `Faltam ${brl(falta)} para o pedido mínimo de ${brl(MIN)}.`;
+    }
     const env = $("#enviar");
     env.setAttribute("aria-disabled", !pronto);
     if (pronto) env.href = whatsUrl(mensagem());
@@ -395,6 +479,7 @@
       : `<li class="vazio"><p>Seu look está vazio.</p><button class="btn btn--claro" data-fechar>Escolher peças</button></li>`;
 
     if (!aberta || aberta.id !== "produto") desenhar();
+    desenharBlack();
   }
 
   $("#itens").addEventListener("click", (e) => {
@@ -412,7 +497,7 @@
   $("#enviar").addEventListener("click", (e) => {
     if (e.currentTarget.getAttribute("aria-disabled") === "true") return e.preventDefault();
     // O pedido termina no WhatsApp; o envio da mensagem é o mais perto de uma compra que o site enxerga.
-    pixel("InitiateCheckout", { content_ids: sacola.map((i) => i.id), content_type: "product", value: total(), num_items: pecas() });
+    pixel("InitiateCheckout", { content_ids: sacola.map((i) => i.id), content_type: "product", value: totalFinal(), num_items: pecas() });
   });
 
   /* ------------------------------------------------------------------------ */
@@ -426,4 +511,6 @@
   }
 
   atualizarSacola();
+  desenharBlack();
+  setInterval(desenharBlack, 30000);
 })();

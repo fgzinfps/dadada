@@ -54,7 +54,16 @@
       <ul id="destaques"></ul>
     </nav>
 
-    <section class="chamada" aria-labelledby="chamadaTitulo">
+    <!-- Black Friday: aparece só no período configurado em js/config.js -->
+    <section class="black" id="black" aria-labelledby="blackTitulo" hidden>
+      <p class="black__tag"><span class="black__ponto" aria-hidden="true"></span><span id="blackTag">Black LookFit</span></p>
+      <h1 class="black__titulo" id="blackTitulo">Quanto mais peças, menos você paga</h1>
+      <ul class="black__faixas" id="blackFaixas"></ul>
+      <p class="black__tempo" id="blackTempoLinha"><span id="blackTempoRot">Acaba em</span> <strong id="blackTempo"></strong></p>
+      <a class="btn btn--whats black__vip" id="blackVip" hidden target="_blank" rel="noopener">Entrar na lista VIP</a>
+    </section>
+
+    <section class="chamada" id="chamada" aria-labelledby="chamadaTitulo">
       <h1 id="chamadaTitulo">Monte seu look</h1>
       <ol class="passos">
         <li><b>1</b> Escolha as peças</li>
@@ -193,6 +202,8 @@
           <div class="meta__barra"><span id="metaBarra"></span></div>
           <p id="metaTxt"></p>
         </div>
+        <p class="sacola__linha" id="sSubLinha" hidden><span>Subtotal</span><span id="sSub"></span></p>
+        <p class="sacola__linha sacola__linha--desc" id="sDescLinha" hidden><span id="sDescRot"></span><span id="sDesc"></span></p>
         <p class="sacola__total"><span>Total das peças</span><strong id="sTotal">R$ 0,00</strong></p>
         <a class="btn btn--largo btn--whats" id="enviar" target="_blank" rel="noopener" aria-disabled="true">Enviar pelo WhatsApp</a>
         <p class="sacola__nota">Frete e pagamento são combinados na conversa.</p>

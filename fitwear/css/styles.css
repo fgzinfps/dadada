@@ -311,6 +311,28 @@ details p { padding-bottom: 16px; color: var(--ink-2); font-size: 14px; }
 .sacola__total strong { font-size: 22px; font-weight: 800; font-stretch: 112%; font-variant-numeric: tabular-nums; }
 .sacola__nota { font-size: 12px; color: var(--muted); text-align: center; }
 
+/* ==========================================================================
+   Black Friday
+   ========================================================================== */
+.black {
+  margin: 8px max(var(--gutter), env(safe-area-inset-left, 0px)) 4px; padding: 20px 18px 18px;
+  border-radius: 20px; background: var(--ink); color: #fff; display: grid; gap: 12px;
+}
+@media (min-width: 1100px) { .black { max-width: 1256px; margin-inline: auto; } }
+.black__tag { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--rosa); }
+.black__ponto { width: 8px; height: 8px; border-radius: 50%; background: var(--rosa); animation: piscar 1.6s ease-in-out infinite; }
+@keyframes piscar { 50% { opacity: .25; } }
+.black__titulo { font-stretch: 125%; font-weight: 800; text-transform: uppercase; font-size: clamp(24px, 7.4vw, 44px); line-height: 1; letter-spacing: -.01em; text-wrap: balance; }
+.black__faixas { display: flex; flex-wrap: wrap; gap: 8px; }
+.black__faixas li { display: grid; gap: 1px; padding: 8px 14px; border-radius: 14px; border: 1px solid #34343b; font-size: 12px; color: #c4c4cc; }
+.black__faixas b { font-size: 20px; font-stretch: 112%; font-weight: 800; color: #fff; }
+.black__faixas li.atingida { border-color: var(--rosa); background: rgb(255 45 122 / .14); }
+.black__tempo { font-size: 13px; color: #c4c4cc; }
+.black__tempo strong { color: #fff; font-variant-numeric: tabular-nums; font-weight: 800; font-stretch: 112%; font-size: 15px; margin-left: 2px; }
+.black__vip { justify-self: start; }
+.sacola__linha { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.sacola__linha--desc { color: var(--rosa-escuro); font-weight: 700; }
+
 .toast {
   position: fixed; left: 50%; z-index: 60; bottom: calc(var(--barra) + 24px + env(safe-area-inset-bottom, 0px));
   transform: translate(-50%, 8px); opacity: 0; pointer-events: none; max-width: calc(100% - 32px);
