@@ -18,11 +18,6 @@
   };
   const descontoPct = (t) => (fase() === "durante" ? FAIXAS_BF.reduce((p, f) => (t >= f.acima ? f.desconto : p), 0) : 0);
   const proximaFaixa = (t) => (fase() === "durante" ? FAIXAS_BF.find((f) => t < f.acima) : null);
-  const tempoAte = (iso) => {
-    const ms = Math.max(0, Date.parse(iso) - Date.now());
-    const d = Math.floor(ms / 864e5), h = Math.floor((ms % 864e5) / 36e5), m = Math.floor((ms % 36e5) / 6e4);
-    return d ? `${d}d ${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}min` : `${h}h ${String(m).padStart(2, "0")}min`;
-  };
 
   // Meta Pixel: só dispara se o script carregou (bloqueadores de anúncio não quebram a loja).
   const pixel = (evento, dados) => {
@@ -88,21 +83,8 @@
     ).join("");
     $("#blackTag").textContent = "Black LookFit";
     $("#blackTitulo").textContent = maior ? "Quanto mais peças, menos você paga" : "Preços de Black em toda a loja";
-    $("#blackTempoRot").textContent = "Acaba em";
     $("#blackCta").hidden = false;
     letreiro(f);
-    contar();
-  }
-  // Contagem com segundos: o movimento é o que prende o olho na entrada.
-  function contar() {
-    const f = fase();
-    if (f === "fora") return;
-    const ms = Math.max(0, Date.parse(BF.fim) - Date.now());
-    const dd = (n) => String(n).padStart(2, "0");
-    $("#cDias").textContent = dd(Math.floor(ms / 864e5));
-    $("#cHoras").textContent = dd(Math.floor((ms % 864e5) / 36e5));
-    $("#cMin").textContent = dd(Math.floor((ms % 36e5) / 6e4));
-    $("#cSeg").textContent = dd(Math.floor((ms % 6e4) / 1e3));
   }
   let letreiroFeito = null;
   function letreiro(f) {
@@ -533,5 +515,4 @@
   atualizarSacola();
   desenharBlack();
   setInterval(desenharBlack, 30000);
-  setInterval(contar, 1000);
 })();

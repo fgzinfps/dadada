@@ -345,12 +345,6 @@ details p { padding-bottom: 16px; color: var(--ink-2); font-size: 14px; }
 .black__faixas li { display: grid; gap: 1px; padding: 8px 14px; border-radius: 14px; border: 1px solid #34343b; font-size: 12px; color: #c4c4cc; }
 .black__faixas b { font-size: 20px; font-stretch: 112%; font-weight: 800; color: #fff; }
 .black__faixas li.atingida { border-color: var(--rosa); background: rgb(255 45 122 / .14); }
-.black__rot { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #a1a1aa; margin-top: 4px; }
-.contagem { display: grid; grid-template-columns: repeat(4, minmax(0, 72px)); gap: 8px; }
-.contagem div { display: grid; justify-items: center; gap: 2px; padding: 10px 0 8px; border-radius: 12px; background: #1d1d22; border: 1px solid #2c2c33; }
-.contagem b { font-size: 28px; font-weight: 900; font-stretch: 112%; font-variant-numeric: tabular-nums; line-height: 1; }
-.contagem span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #a1a1aa; }
-.contagem div:last-child b { color: var(--rosa); }
 .black__cta { margin-top: 6px; min-width: min(100%, 300px); font-size: 16px; box-shadow: 0 8px 24px rgb(255 45 122 / .35); }
 @media (min-width: 900px) {
   .black { grid-template-columns: 1.1fr 1fr; align-items: center; padding: 40px max(32px, calc((100vw - 1256px) / 2)); }
