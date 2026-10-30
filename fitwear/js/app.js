@@ -35,6 +35,8 @@
   // Referência por produto, usada na mensagem do pedido para facilitar a separação.
   L.produtos.forEach((p, i) => (p.ref = "REF " + String(i + 1).padStart(3, "0")));
   const porId = (id) => L.produtos.find((p) => p.id === id);
+  // "De/por" só quando a peça tem um preço anterior real cadastrado (precoAntigo).
+  const off = (p) => (p.precoAntigo && p.preco && p.precoAntigo > p.preco ? Math.round((1 - p.preco / p.precoAntigo) * 100) : 0);
   const coresDe = (p) => p.cores || L.cores || [];
   const hexDe = (p, nome) => (coresDe(p).find((c) => c.nome === nome) || {}).hex || "#ddd";
   // Estoque da peça somando todas as cores/tamanhos; sem o campo, não limita.
@@ -240,13 +242,14 @@
           <div class="peca__foto">
             ${p.selo ? `<span class="peca__selo">${esc(p.selo)}</span>` : ""}
             ${esgotado ? `<span class="peca__esgotado">Esgotado</span>` : ""}
+            ${off(p) ? `<span class="peca__off">-${off(p)}%</span>` : ""}
             <img src="${p.fotos[0]}" alt="${esc(p.nome)}" loading="${i < 4 ? "eager" : "lazy"}" width="1000" height="1250">
             <button class="peca__abrir" data-abrir="${p.id}" aria-label="Ver ${esc(p.nome)}"></button>
             <button class="peca__add${tem ? " tem" : ""}" data-abrir="${p.id}" aria-label="${tem ? "Já está no seu look. Adicionar outro" : "Adicionar ao look"}: ${esc(p.nome)}">${tem ? ICONE_OK : ICONE_MAIS}</button>
           </div>
           <div class="peca__info">
             ${fase() === "durante" && p.preco != null ? `<span class="peca__black">Preço Black</span>` : ""}
-            <span class="peca__preco">${p.preco == null ? "Consulte" : brl(p.preco)}</span>
+            <span class="peca__preco">${off(p) ? `<s class="peca__de">${brl(p.precoAntigo)}</s>` : ""}${p.preco == null ? "Consulte" : brl(p.preco)}</span>
             <span class="peca__nome">${esc(p.nome)}</span>
             ${cs.length ? `<span class="peca__cores" aria-label="${cs.length} cores">${cs.slice(0, 6).map((c) => `<i style="--c:${c.hex}"></i>`).join("")}${cs.length > 6 ? `<span>+${cs.length - 6}</span>` : ""}</span>` : ""}
           </div>
@@ -323,7 +326,7 @@
     tam = null;
     $("#pCat").textContent = `${p.categoria} · ${p.ref}`;
     $("#pNome").textContent = p.nome;
-    $("#pPreco").textContent = p.preco == null ? "Consulte o preço" : brl(p.preco);
+    $("#pPreco").innerHTML = p.preco == null ? "Consulte o preço" : `${off(p) ? `<s class="peca__de">${brl(p.precoAntigo)}</s> ` : ""}${brl(p.preco)}${off(p) ? ` <span class="produto__off">-${off(p)}%</span>` : ""}`;
     $("#pBlack").hidden = !(fase() === "durante" && p.preco != null);
     $("#pFotos").innerHTML = p.fotos.map((f, i) => `<img src="${f}" alt="${i ? `${esc(p.nome)}, foto ${i + 1}` : esc(p.nome)}">`).join("");
     $("#pPontos").innerHTML = p.fotos.length > 1 ? p.fotos.map((_, i) => `<span aria-current="${i === 0}"></span>`).join("") : "";

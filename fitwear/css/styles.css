@@ -362,6 +362,9 @@ details p { padding-bottom: 16px; color: var(--ink-2); font-size: 14px; }
   .black__faixas { justify-content: flex-start; }
 }
 @media (prefers-reduced-motion: reduce) { .letreiro__trilho, .black__ponto { animation: none; } }
+.peca__de { font-size: .72em; font-weight: 500; color: var(--muted); margin-right: 6px; }
+.peca__off { position: absolute; top: 10px; right: 10px; z-index: 2; background: var(--rosa); color: #fff; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 800; font-stretch: 112%; }
+.produto__off { display: inline-block; vertical-align: middle; background: var(--rosa); color: #fff; border-radius: 999px; padding: 3px 9px; font-size: 13px; font-weight: 800; }
 .peca__black {
   justify-self: start; display: inline-block; background: var(--ink); color: #fff; border-radius: 6px;
   padding: 2px 7px; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
