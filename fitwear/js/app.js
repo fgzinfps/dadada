@@ -14,8 +14,7 @@
   const fase = () => {
     if (!BF) return "fora";
     const agora = Date.now();
-    if (agora < Date.parse(BF.inicio)) return "antes";
-    return agora > Date.parse(BF.fim) ? "fora" : "durante";
+    return agora < Date.parse(BF.inicio) || agora > Date.parse(BF.fim) ? "fora" : "durante";
   };
   const descontoPct = (t) => (fase() === "durante" ? FAIXAS_BF.reduce((p, f) => (t >= f.acima ? f.desconto : p), 0) : 0);
   const proximaFaixa = (t) => (fase() === "durante" ? FAIXAS_BF.find((f) => t < f.acima) : null);
@@ -87,21 +86,10 @@
     $("#blackFaixas").innerHTML = FAIXAS_BF.map(
       (x) => `<li class="${f === "durante" && t >= x.acima ? "atingida" : ""}"><b>${x.desconto}% OFF</b>acima de ${brl(x.acima).replace(",00", "")}</li>`
     ).join("");
-    if (f === "antes") {
-      $("#blackTag").textContent = "Black LookFit · em breve";
-      $("#blackTitulo").textContent = maior ? `Até ${maior}% OFF montando seu look` : "Preços de Black em toda a loja";
-      $("#blackTempoRot").textContent = "Começa em";
-      const vip = $("#blackVip");
-      vip.hidden = false;
-      $("#blackCta").hidden = true;
-      vip.href = whatsUrl(`Oi! Quero entrar na lista VIP da Black ${L.marca} e ser avisada quando começar.`);
-    } else {
-      $("#blackTag").textContent = "Black LookFit";
-      $("#blackTitulo").textContent = maior ? "Quanto mais peças, menos você paga" : "Preços de Black em toda a loja";
-      $("#blackTempoRot").textContent = "Acaba em";
-      $("#blackVip").hidden = true;
-      $("#blackCta").hidden = false;
-    }
+    $("#blackTag").textContent = "Black LookFit";
+    $("#blackTitulo").textContent = maior ? "Quanto mais peças, menos você paga" : "Preços de Black em toda a loja";
+    $("#blackTempoRot").textContent = "Acaba em";
+    $("#blackCta").hidden = false;
     letreiro(f);
     contar();
   }
@@ -109,7 +97,7 @@
   function contar() {
     const f = fase();
     if (f === "fora") return;
-    const ms = Math.max(0, Date.parse(f === "antes" ? BF.inicio : BF.fim) - Date.now());
+    const ms = Math.max(0, Date.parse(BF.fim) - Date.now());
     const dd = (n) => String(n).padStart(2, "0");
     $("#cDias").textContent = dd(Math.floor(ms / 864e5));
     $("#cHoras").textContent = dd(Math.floor((ms % 864e5) / 36e5));
@@ -120,9 +108,7 @@
   function letreiro(f) {
     if (letreiroFeito === f) return;
     letreiroFeito = f;
-    const frases = f === "antes"
-      ? [`Black ${L.marca} vem aí`, "Entre na lista VIP", "Avisamos primeiro no WhatsApp"]
-      : [`Black ${L.marca}`, "Preços de Black em toda a loja", "Envio para todo o Brasil", "Peça pelo WhatsApp"];
+    const frases = [`Black ${L.marca}`, "Preços de Black em toda a loja", "Envio para todo o Brasil", "Peça pelo WhatsApp"];
     // duas cópias para o loop do letreiro não ter emenda
     const um = frases.map((t) => `<span>${esc(t)}</span>`).join("");
     $("#letreiroTrilho").innerHTML = um + um + um + um;
@@ -131,7 +117,6 @@
     e.preventDefault();
     rolarParaLista();
   });
-  $("#blackVip").addEventListener("click", () => pixel("Lead", { content_name: "Lista VIP Black" }));
 
   /* ------------------------------------------------------------------------
      Destaques (categorias)

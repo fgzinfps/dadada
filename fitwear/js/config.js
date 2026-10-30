@@ -15,11 +15,11 @@ window.LOJA = {
   parcelas: 3,                       // TODO: parcelas sem juros exibidas no card
 
   // Black Friday: os preços de produtos.js já são os preços da Black ("Preço Black" no site).
-  // Antes de "inicio" o site mostra a lista VIP; depois de "fim" o selo e o banner somem sozinhos.
+  // Fora do período entre "inicio" e "fim", o banner e o selo não aparecem.
   // "faixas" é opcional: deixe vazio para não dar desconto extra no pedido.
   blackFriday: {
     ativo: true,
-    inicio: "2026-10-30T00:00:00-03:00",
+    inicio: "2026-10-01T00:00:00-03:00",
     fim: "2026-11-30T23:59:59-03:00",
     faixas: [],  // ex.: [{ acima: 250, desconto: 5 }] daria 5% a mais em pedidos de R$ 250+
   },
