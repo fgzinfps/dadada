@@ -79,13 +79,14 @@
     $("#chamada").hidden = f !== "fora";
     if (f === "fora") return;
     const maior = FAIXAS_BF.length ? FAIXAS_BF[FAIXAS_BF.length - 1].desconto : 0;
+    $("#blackFaixas").hidden = !FAIXAS_BF.length;
     const t = typeof total === "function" ? total() : 0;
     $("#blackFaixas").innerHTML = FAIXAS_BF.map(
       (x) => `<li class="${f === "durante" && t >= x.acima ? "atingida" : ""}"><b>${x.desconto}% OFF</b>acima de ${brl(x.acima).replace(",00", "")}</li>`
     ).join("");
     if (f === "antes") {
       $("#blackTag").textContent = "Black LookFit · em breve";
-      $("#blackTitulo").textContent = `Até ${maior}% OFF montando seu look`;
+      $("#blackTitulo").textContent = maior ? `Até ${maior}% OFF montando seu look` : "Preços de Black em toda a loja";
       $("#blackTempoRot").textContent = "Começa em";
       $("#blackTempo").textContent = tempoAte(BF.inicio);
       const vip = $("#blackVip");
@@ -93,7 +94,7 @@
       vip.href = whatsUrl(`Oi! Quero entrar na lista VIP da Black ${L.marca} e ser avisada quando começar.`);
     } else {
       $("#blackTag").textContent = "Black LookFit";
-      $("#blackTitulo").textContent = "Quanto mais peças, menos você paga";
+      $("#blackTitulo").textContent = maior ? "Quanto mais peças, menos você paga" : "Preços de Black em toda a loja";
       $("#blackTempoRot").textContent = "Acaba em";
       $("#blackTempo").textContent = tempoAte(BF.fim);
       $("#blackVip").hidden = true;
@@ -215,6 +216,7 @@
             <button class="peca__add${tem ? " tem" : ""}" data-abrir="${p.id}" aria-label="${tem ? "Já está no seu look. Adicionar outro" : "Adicionar ao look"}: ${esc(p.nome)}">${tem ? ICONE_OK : ICONE_MAIS}</button>
           </div>
           <div class="peca__info">
+            ${fase() === "durante" && p.preco != null ? `<span class="peca__black">Preço Black</span>` : ""}
             <span class="peca__preco">${p.preco == null ? "Consulte" : brl(p.preco)}</span>
             <span class="peca__nome">${esc(p.nome)}</span>
             ${cs.length ? `<span class="peca__cores" aria-label="${cs.length} cores">${cs.slice(0, 6).map((c) => `<i style="--c:${c.hex}"></i>`).join("")}${cs.length > 6 ? `<span>+${cs.length - 6}</span>` : ""}</span>` : ""}
@@ -293,6 +295,7 @@
     $("#pCat").textContent = `${p.categoria} · ${p.ref}`;
     $("#pNome").textContent = p.nome;
     $("#pPreco").textContent = p.preco == null ? "Consulte o preço" : brl(p.preco);
+    $("#pBlack").hidden = !(fase() === "durante" && p.preco != null);
     $("#pFotos").innerHTML = p.fotos.map((f, i) => `<img src="${f}" alt="${i ? `${esc(p.nome)}, foto ${i + 1}` : esc(p.nome)}">`).join("");
     $("#pPontos").innerHTML = p.fotos.length > 1 ? p.fotos.map((_, i) => `<span aria-current="${i === 0}"></span>`).join("") : "";
     $("#pTams").innerHTML = p.tamanhos.map((t) => `<button type="button" class="tam" data-tam="${esc(t)}" aria-pressed="false">${esc(t)}</button>`).join("");

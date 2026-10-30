@@ -57,7 +57,7 @@
     <!-- Black Friday: aparece só no período configurado em js/config.js -->
     <section class="black" id="black" aria-labelledby="blackTitulo" hidden>
       <p class="black__tag"><span class="black__ponto" aria-hidden="true"></span><span id="blackTag">Black LookFit</span></p>
-      <h1 class="black__titulo" id="blackTitulo">Quanto mais peças, menos você paga</h1>
+      <h1 class="black__titulo" id="blackTitulo">Preços de Black em toda a loja</h1>
       <ul class="black__faixas" id="blackFaixas"></ul>
       <p class="black__tempo" id="blackTempoLinha"><span id="blackTempoRot">Acaba em</span> <strong id="blackTempo"></strong></p>
       <a class="btn btn--whats black__vip" id="blackVip" hidden target="_blank" rel="noopener">Entrar na lista VIP</a>
@@ -162,6 +162,7 @@
         <form class="produto__info" id="pForm" novalidate>
           <p class="produto__cat" id="pCat"></p>
           <h2 class="produto__nome" id="pNome"></h2>
+          <span class="peca__black produto__black" id="pBlack" hidden>Preço Black</span>
           <p class="produto__preco" id="pPreco"></p>
           <p class="estoque" id="pEstoque"></p>
           <fieldset class="campo">

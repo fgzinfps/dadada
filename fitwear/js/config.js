@@ -14,16 +14,14 @@ window.LOJA = {
   freteGratisAcimaDe: 0,             // TODO: valor em reais para frete grátis (0 = não mostra)
   parcelas: 3,                       // TODO: parcelas sem juros exibidas no card
 
-  // Black Friday: desconto progressivo de verdade sobre os preços normais.
-  // Antes de "inicio" o site mostra a lista VIP; depois de "fim" tudo volta ao normal sozinho.
+  // Black Friday: os preços de produtos.js já são os preços da Black ("Preço Black" no site).
+  // Antes de "inicio" o site mostra a lista VIP; depois de "fim" o selo e o banner somem sozinhos.
+  // "faixas" é opcional: deixe vazio para não dar desconto extra no pedido.
   blackFriday: {
     ativo: true,
     inicio: "2026-10-30T00:00:00-03:00",
     fim: "2026-11-30T23:59:59-03:00",
-    faixas: [
-      { acima: 150, desconto: 5 },   // pedidos a partir de R$ 150: 5% OFF
-      { acima: 250, desconto: 10 },  // pedidos a partir de R$ 250: 10% OFF
-    ],
+    faixas: [],  // ex.: [{ acima: 250, desconto: 5 }] daria 5% a mais em pedidos de R$ 250+
   },
 
   // Cores padrão oferecidas em todas as peças (cada peça pode ter "cores" próprias em produtos.js)

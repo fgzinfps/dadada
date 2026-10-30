@@ -330,6 +330,12 @@ details p { padding-bottom: 16px; color: var(--ink-2); font-size: 14px; }
 .black__tempo { font-size: 13px; color: #c4c4cc; }
 .black__tempo strong { color: #fff; font-variant-numeric: tabular-nums; font-weight: 800; font-stretch: 112%; font-size: 15px; margin-left: 2px; }
 .black__vip { justify-self: start; }
+.peca__black {
+  justify-self: start; display: inline-block; background: var(--ink); color: #fff; border-radius: 6px;
+  padding: 2px 7px; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+}
+.peca__black::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--rosa); margin-right: 5px; vertical-align: 1px; }
+.produto__black { margin-top: 4px; }
 .sacola__linha { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .sacola__linha--desc { color: var(--rosa-escuro); font-weight: 700; }
 
