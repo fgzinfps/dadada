@@ -1,0 +1,8 @@
+{
+  "redirects": [
+    { "source": "/", "destination": "/arvore/", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/arvore/api/:path*", "destination": "/api/:path*" }
+  ]
+}

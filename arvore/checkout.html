@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout seguro · Pagamento via PIX</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#7d1717">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+</head>
+<body>
+
+  <div class="topbar">🔒 Ambiente seguro · <strong>Frete grátis</strong> · Pagamento via PIX</div>
+  <header class="header">
+    <div class="container">
+      <a class="logo" href="index.html">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l4 6h-2l4 6h-2l4 6H4l4-6H6l4-6H8z"/><rect x="11" y="20" width="2" height="3"/></svg>
+        <span data-store="name"></span>
+      </a>
+      <span class="header-secure">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        Checkout seguro
+      </span>
+    </div>
+  </header>
+
+  <!-- SVG reutilizado do kit de enfeites (não há foto do kit; troque por <img> quando tiver) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="ornaments" viewBox="0 0 80 80">
+      <defs>
+        <radialGradient id="g1" cx=".35" cy=".35" r=".7"><stop offset="0" stop-color="#fff3c4"/><stop offset=".45" stop-color="#e3b84f"/><stop offset="1" stop-color="#8a6416"/></radialGradient>
+      </defs>
+      <path d="M40 6l3.2 7.4 8 .7-6 5.3 1.8 7.8L40 23.1l-7 4.1 1.8-7.8-6-5.3 8-.7z" fill="#f2cf63" stroke="#a57a1c" stroke-width="1"/>
+      <line x1="22" y1="30" x2="22" y2="40" stroke="#e8cf8f"/><circle cx="22" cy="50" r="11" fill="url(#g1)"/>
+      <line x1="57" y1="28" x2="57" y2="36" stroke="#e8cf8f"/><circle cx="57" cy="47" r="12" fill="url(#g1)"/>
+      <line x1="40" y1="44" x2="40" y2="52" stroke="#e8cf8f"/><circle cx="40" cy="63" r="12" fill="url(#g1)"/>
+    </symbol>
+  </svg>
+
+  <main class="container co-wrap">
+
+    <!-- =============== FORMULÁRIO =============== -->
+    <div id="checkoutView" class="co-grid">
+      <form id="form" novalidate>
+
+        <div class="card">
+          <div class="card-title"><span class="step">1</span> Seus dados</div>
+          <div class="fields">
+            <div class="field">
+              <label for="nome">Nome completo</label>
+              <input id="nome" name="nome" autocomplete="name" required>
+              <span class="msg">Informe seu nome e sobrenome.</span>
+            </div>
+            <div class="field span-3">
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required>
+              <span class="msg">E-mail inválido.</span>
+            </div>
+            <div class="field span-3">
+              <label for="telefone">WhatsApp</label>
+              <input id="telefone" name="telefone" type="tel" autocomplete="tel-national" inputmode="numeric" placeholder="(00) 00000-0000" required>
+              <span class="msg">Telefone inválido.</span>
+            </div>
+            <div class="field">
+              <label for="cpf">CPF</label>
+              <input id="cpf" name="cpf" inputmode="numeric" placeholder="000.000.000-00" required>
+              <span class="hint">Exigido pelo banco para emitir o PIX e pela nota fiscal.</span>
+              <span class="msg">CPF inválido.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="step">2</span> Entrega</div>
+          <div class="fields">
+            <div class="field span-3">
+              <label for="cep">CEP</label>
+              <div class="cep-row">
+                <input id="cep" name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" required>
+                <a href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank" rel="noopener">Não sei meu CEP</a>
+              </div>
+              <span class="hint" id="cepHint"></span>
+              <span class="msg" id="cepMsg">CEP inválido.</span>
+            </div>
+          </div>
+          <div class="fields addr-rest" id="addrRest" hidden style="margin-top:12px">
+            <div class="field span-4">
+              <label for="rua">Rua / Avenida</label>
+              <input id="rua" name="rua" autocomplete="address-line1" required>
+              <span class="msg">Informe a rua.</span>
+            </div>
+            <div class="field span-2">
+              <label for="numero">Número</label>
+              <input id="numero" name="numero" inputmode="numeric" required>
+              <span class="msg">Informe o número (ou S/N).</span>
+            </div>
+            <div class="field span-3">
+              <label for="complemento">Complemento <span style="font-weight:400">(opcional)</span></label>
+              <input id="complemento" name="complemento" autocomplete="address-line2" placeholder="Apto, bloco, casa…">
+            </div>
+            <div class="field span-3">
+              <label for="bairro">Bairro</label>
+              <input id="bairro" name="bairro" required>
+              <span class="msg">Informe o bairro.</span>
+            </div>
+            <div class="field span-4">
+              <label for="cidade">Cidade</label>
+              <input id="cidade" name="cidade" autocomplete="address-level2" required>
+              <span class="msg">Informe a cidade.</span>
+            </div>
+            <div class="field span-2">
+              <label for="uf">UF</label>
+              <select id="uf" name="uf" required>
+                <option value="">--</option>
+              </select>
+              <span class="msg">UF.</span>
+            </div>
+          </div>
+          <div class="sum-line free" style="margin-top:14px"><span>Frete</span><span>GRÁTIS · <span data-store="deliveryText"></span></span></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="step">3</span> Pagamento</div>
+          <div class="pay-method">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><g fill="#32bcad"><path d="M23.6 23.2a4 4 0 0 1-2.8-1.2l-4-4a.8.8 0 0 0-1.1 0l-4.1 4.1a4 4 0 0 1-2.8 1.2h-.8l5.2 5.2a4.2 4.2 0 0 0 5.9 0l5.2-5.3z"/><path d="M8.8 8.8a4 4 0 0 1 2.8 1.2l4.1 4.1a.8.8 0 0 0 1.1 0l4-4a4 4 0 0 1 2.8-1.2h.5L19 3.6a4.2 4.2 0 0 0-5.9 0L8 8.8z"/><path d="M28.4 13l-3.1-3.1h-1.7a2.8 2.8 0 0 0-2 .8l-4 4a2 2 0 0 1-2.8 0l-4.1-4.1a2.8 2.8 0 0 0-2-.8H6.8L3.6 13a4.2 4.2 0 0 0 0 5.9l3.2 3.2h1.9a2.8 2.8 0 0 0 2-.8l4.1-4.1a2 2 0 0 1 2.8 0l4 4a2.8 2.8 0 0 0 2 .8h1.7l3.1-3.1a4.2 4.2 0 0 0 0-5.9z"/></g></svg>
+            <div><b>PIX</b><span>Aprovação imediata · único meio de pagamento</span></div>
+          </div>
+          <ol class="pay-steps">
+            <li>Clique em <b>Gerar PIX</b> abaixo.</li>
+            <li>Pague pelo app do seu banco (QR Code ou copia e cola).</li>
+            <li>Pronto! A confirmação aparece aqui em segundos.</li>
+          </ol>
+
+          <!-- ORDER BUMP -->
+          <label class="bump" id="bump">
+            <span class="bump-tag">Oferta única</span>
+            <span class="bump-head">
+              <input type="checkbox" id="bumpCheck">
+              <span>SIM! Quero adicionar os enfeites</span>
+            </span>
+            <span class="bump-body">
+              <span class="bump-img"><svg><use href="#ornaments"/></svg></span>
+              <span>
+                <span class="bp"><b data-b="shortTitle"></b> — sua árvore já chega pronta para decorar. A árvore não vem com enfeites; esta é a forma mais barata de completar o visual.</span>
+                <span class="bp bump-price">Adicione por apenas <strong data-b="price"></strong></span>
+              </span>
+            </span>
+          </label>
+
+          <button class="btn btn-buy" id="submitBtn" type="submit" style="margin-top:20px">
+            GERAR PIX · <span data-total></span>
+          </button>
+          <div class="form-error" id="formError"></div>
+          <div class="secure-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            Seus dados são usados só para emitir o pagamento e entregar o pedido.
+          </div>
+        </div>
+      </form>
+
+      <!-- =============== RESUMO =============== -->
+      <aside class="summary">
+        <div class="card">
+          <div class="card-title">Resumo do pedido</div>
+          <div class="sum-item">
+            <img src="assets/img/arvore-principal.jpg" alt="">
+            <div class="t"><span data-p="shortTitle"></span><small>Qtd: <span id="sumQty">1</span></small></div>
+            <div class="v" id="sumProd"></div>
+          </div>
+          <div class="sum-item" id="sumBump" hidden>
+            <span class="bump-img"><svg><use href="#ornaments"/></svg></span>
+            <div class="t"><span data-b="shortTitle"></span><small>Qtd: 1</small></div>
+            <div class="v" data-b="price"></div>
+          </div>
+          <div style="margin-top:10px">
+            <div class="sum-line"><span>Subtotal</span><span data-total></span></div>
+            <div class="sum-line free"><span>Frete</span><span>Grátis</span></div>
+          </div>
+          <div class="sum-total"><span>Total no PIX</span><strong data-total></strong></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- =============== TELA DO PIX =============== -->
+    <div id="pixView" class="pix-screen" hidden>
+      <div class="card">
+        <div class="demo-banner" id="demoBanner" hidden>
+          <b>Modo demonstração:</b> este QR Code é falso. Nada será cobrado.
+        </div>
+        <h1>Falta pouco!</h1>
+        <p style="color:var(--muted)">Pague o PIX abaixo para confirmar seu pedido</p>
+        <div class="pix-amount" id="pixAmount"></div>
+        <div class="pix-timer">Este código expira em <span id="pixTimer">--:--</span></div>
+        <div class="pix-qr" id="pixQr"></div>
+        <textarea class="pix-code" id="pixCode" readonly aria-label="Código PIX copia e cola"></textarea>
+        <button class="btn btn-buy" id="copyBtn" type="button" style="margin-top:12px">COPIAR CÓDIGO PIX</button>
+        <ol class="pix-howto">
+          <li>Abra o app do seu banco e escolha <b>PIX › Copia e cola</b> (ou leia o QR Code).</li>
+          <li>Cole o código e confira o valor.</li>
+          <li>Confirme o pagamento. Esta página atualiza sozinha.</li>
+        </ol>
+        <div class="pix-status"><span class="spinner"></span> Aguardando pagamento…</div>
+        <button class="btn btn-ghost" id="simulateBtn" type="button" style="margin-top:14px" hidden>Simular pagamento aprovado (demo)</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer" style="padding-bottom:28px">
+    <div class="container">
+      <p><b data-store="name"></b> · CNPJ <span data-store="cnpj"></span> · <span data-store="email"></span></p>
+    </div>
+  </footer>
+
+<script src="assets/checkout.js"></script>
+</body>
+</html>
