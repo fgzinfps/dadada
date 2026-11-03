@@ -185,8 +185,8 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(order)
     }).then(function (r) {
-      return r.json().then(function (j) {
-        if (!r.ok) throw new Error(j.error || "Não foi possível gerar o PIX.");
+      return r.json().catch(function () { return { error: "Erro no servidor (HTTP " + r.status + ")." }; }).then(function (j) {
+        if (!r.ok) throw new Error((j.error || "Não foi possível gerar o PIX.") + (j.code ? " (código: " + j.code + ")" : ""));
         return j;
       });
     });

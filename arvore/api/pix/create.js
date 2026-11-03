@@ -109,6 +109,10 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error("Erro VulcanoPay", err.status, err.code, err.message, JSON.stringify(err.issues || null));
     if (SHOW_TO_CUSTOMER.has(err.code)) return res.status(422).json({ error: err.message });
-    return res.status(502).json({ error: "Não foi possível gerar o PIX agora. Tente novamente em instantes." });
+    // Código do erro (nunca a chave) para diagnóstico: aparece no fim da mensagem
+    return res.status(502).json({
+      error: "Não foi possível gerar o PIX agora. Tente novamente em instantes.",
+      code: err.code === "config" ? "sem_PIX_API_KEY" : `${err.code || "erro"}_${err.status || ""}`
+    });
   }
 };
