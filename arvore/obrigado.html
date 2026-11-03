@@ -63,7 +63,7 @@
 
   var o = {};
   try { o = JSON.parse(localStorage.getItem("lastOrder") || "{}"); } catch (e) {}
-  var id = new URLSearchParams(location.search).get("pedido") || o.id || "";
+  var id = new URLSearchParams(location.search).get("pedido") || o.orderId || o.id || "";
   window.ORDER = o;
 
   document.getElementById("oid").textContent = "#" + id;

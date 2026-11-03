@@ -1,28 +1,20 @@
 /* ==========================================================================
-   GET /api/pix/status?id=...  ->  { status: "pending" | "paid" | "expired" }
-   O checkout consulta isto a cada 5 s. O ideal é o gateway avisar via
-   webhook e você gravar "paid" no banco; aqui só lemos esse status.
+   GET /api/pix/status?id=<id da cobrança>  ->  { status }
+   O checkout consulta a cada 5 s. Devolve só o status (nada de dados pessoais).
    ========================================================================== */
+const { getCharge } = require("../_lib/vulcano");
+
 module.exports = async function handler(req, res) {
-  const id = req.query && req.query.id;
-  if (!id) return res.status(400).json({ error: "id obrigatório" });
+  res.setHeader("Cache-Control", "no-store");
+  const id = String((req.query && req.query.id) || "");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return res.status(400).json({ error: "id inválido" });
 
   try {
-    const status = await getStatusFromGateway(id);
-    res.setHeader("Cache-Control", "no-store");
-    return res.status(200).json({ status });
+    const charge = await getCharge(id);
+    return res.status(200).json({ status: charge.status }); // pending | paid | expired | refunded
   } catch (err) {
-    console.error(err);
+    if (err.status === 404) return res.status(404).json({ status: "not_found" });
+    console.error("Erro status VulcanoPay", err.status, err.code, err.message);
     return res.status(502).json({ status: "unknown" });
   }
 };
-
-// TODO: substituir pela chamada real (ou leitura do banco atualizado pelo webhook)
-async function getStatusFromGateway(id) {
-  // const r = await fetch(`https://api.SEU-GATEWAY.com/v1/pix/${id}`, {
-  //   headers: { Authorization: `Bearer ${process.env.PIX_API_KEY}` }
-  // });
-  // const j = await r.json();
-  // return j.status === "PAID" ? "paid" : j.status === "EXPIRED" ? "expired" : "pending";
-  return "pending";
-}

@@ -10,10 +10,10 @@ window.STORE = {
   whatsapp: "5500000000000",        // só números, com DDI 55
   deliveryText: "Entrega em 7 a 15 dias úteis", // TODO: confirme com seu fornecedor
 
-  // true = simula o PIX (QR falso + botão "simular pagamento"). Mude para
-  // false quando a API real estiver ligada em api/pix/create.js e status.js.
-  demoMode: true,
-  api: { create: "api/pix/create", status: "api/pix/status" },
+  // false = usa a VulcanoPay de verdade (precisa estar publicado na Vercel com
+  // PIX_API_KEY configurada). true = simula tudo no navegador, sem servidor.
+  demoMode: false,
+  api: { create: "api/pix/create", status: "api/pix/status", simulate: "api/pix/simulate" },
 
   product: {
     id: "arvore-210",
@@ -23,7 +23,7 @@ window.STORE = {
     rating: 4.8,
     sold: "+1000 vendidos",
     stock: 561,
-    maxQty: 5,
+    maxQty: 4,   // 4 árvores + kit = R$ 449,50 (limite por cobrança da rota: confira em GET /balance)
     images: [
       "assets/img/arvore-principal.jpg",
       "assets/img/arvore-montagem.jpg",

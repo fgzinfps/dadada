@@ -163,14 +163,16 @@
     };
   }
 
-  // Resposta esperada de api/pix/create:
-  // { id, amount (centavos), copiaECola, qrCodeBase64? , expiresAt (ISO) }
+  // Resposta de api/pix/create:
+  // { id (cobrança VulcanoPay), orderId, amount (centavos), copiaECola, qrCodeBase64 (data URL), expiresAt, sandbox }
   function createPix(order) {
     if (S.demoMode) {
       return new Promise(function (res) {
         setTimeout(function () {
           res({
             id: "DEMO-" + Date.now().toString(36).toUpperCase(),
+            orderId: "DEMO",
+            sandbox: true,
             amount: total(),
             copiaECola: "00020126580014BR.GOV.BCB.PIX0136DEMO-NAO-PAGUE-ESTE-CODIGO-0000000000005204000053039865405" + (total() / 100).toFixed(2) + "5802BR5913LOJA DEMO6009SAO PAULO62070503***6304ABCD",
             expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString()
@@ -201,7 +203,7 @@
     // Guarda o pedido para a página de obrigado (sem CPF)
     try {
       localStorage.setItem("lastOrder", JSON.stringify({
-        id: pix.id, amount: pix.amount, items: order.items,
+        id: pix.id, orderId: pix.orderId, amount: pix.amount, items: order.items,
         name: order.customer.name, email: order.customer.email, phone: order.customer.phone,
         address: order.address, createdAt: new Date().toISOString()
       }));
@@ -226,23 +228,30 @@
       qr.textContent = "Use o código copia e cola abaixo.";
     }
 
-    if (S.demoMode) { $("demoBanner").hidden = false; $("simulateBtn").hidden = false; }
+    if (S.demoMode) $("demoBanner").hidden = false;
+    if (pix.sandbox) $("simulateBtn").hidden = false; // só com chave vk_test_ ou demoMode
 
     // Contagem regressiva real (vem do gateway)
     var exp = new Date(pix.expiresAt).getTime();
     function tick() {
       var s = Math.max(0, Math.round((exp - Date.now()) / 1000));
-      $("pixTimer").textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
-      if (s === 0) {
-        clearInterval(clockTimer); clearInterval(pollTimer);
-        document.querySelector(".pix-status").innerHTML = 'PIX expirado. <a href="">Gerar um novo</a>';
-      }
+      var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), pad = function (n) { return String(n).padStart(2, "0"); };
+      $("pixTimer").textContent = (h ? h + "h " : "") + pad(m) + ":" + pad(s % 60);
+      if (s === 0) expired();
     }
     tick(); clockTimer = setInterval(tick, 1000);
 
     pollTimer = setInterval(function () {
-      checkStatus(pix.id).then(function (r) { if (r && r.status === "paid") paid(pix.id); }).catch(function () {});
+      checkStatus(pix.id).then(function (r) {
+        if (r && r.status === "paid") paid(pix.orderId);
+        else if (r && r.status === "expired") expired();
+      }).catch(function () {});
     }, 5000);
+  }
+
+  function expired() {
+    clearInterval(clockTimer); clearInterval(pollTimer);
+    document.querySelector(".pix-status").innerHTML = 'PIX expirado. <a href="">Gerar um novo</a>';
   }
 
   function paid(id) {
@@ -258,8 +267,12 @@
   });
 
   $("simulateBtn").addEventListener("click", function () {
-    var o = JSON.parse(localStorage.getItem("lastOrder") || "{}");
-    paid(o.id || "DEMO");
+    var o = {};
+    try { o = JSON.parse(localStorage.getItem("lastOrder") || "{}"); } catch (e) {}
+    if (S.demoMode) return paid(o.orderId || "DEMO");
+    // Sandbox VulcanoPay: marca como paga; o polling detecta e redireciona
+    this.disabled = true; this.textContent = "Simulando…";
+    fetch(S.api.simulate + "?id=" + encodeURIComponent(o.id), { method: "POST" });
   });
 
   $("form").addEventListener("submit", function (e) {
