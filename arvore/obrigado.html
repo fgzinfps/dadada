@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedido confirmado</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#7d1717">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/config.js"></script>
+  <!-- Evento de conversão "Purchase" do Pixel/Ads vai aqui (use window.ORDER.amount) -->
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a class="logo" href="index.html">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l4 6h-2l4 6h-2l4 6H4l4-6H6l4-6H8z"/><rect x="11" y="20" width="2" height="3"/></svg>
+        <span data-store="name"></span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container co-wrap">
+    <div class="thanks">
+      <div class="card">
+        <svg class="ok-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+        <h1>Pagamento confirmado!</h1>
+        <p style="color:var(--muted)">Obrigado, <b id="fn">cliente</b>. Seu pedido <b id="oid"></b> foi aprovado.</p>
+
+        <div style="text-align:left;margin-top:20px" id="items"></div>
+        <div class="sum-total"><span>Total pago</span><strong id="amt"></strong></div>
+
+        <div style="text-align:left;margin-top:20px;font-size:14px">
+          <b>Endereço de entrega</b>
+          <p id="addr" style="color:var(--muted)"></p>
+        </div>
+      </div>
+
+      <div class="card" style="text-align:left">
+        <div class="card-title">Acompanhe sua entrega</div>
+        <div class="timeline">
+          <div class="tl done"><span class="dot">✓</span><div><b>Pagamento aprovado</b><span>Recebemos seu PIX.</span></div></div>
+          <div class="tl"><span class="dot">2</span><div><b>Separação e envio</b><span>Seu pedido é embalado e despachado.</span></div></div>
+          <div class="tl"><span class="dot">3</span><div><b>Código de rastreio</b><span>Enviado para <strong id="em"></strong> e para seu WhatsApp.</span></div></div>
+          <div class="tl"><span class="dot">4</span><div><b>Entrega</b><span><span data-store="deliveryText"></span>.</span></div></div>
+        </div>
+        <a class="btn btn-buy" id="wa" target="_blank" rel="noopener" style="margin-top:8px">FALAR NO WHATSAPP</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer" style="padding-bottom:28px">
+    <div class="container"><p><b data-store="name"></b> · CNPJ <span data-store="cnpj"></span> · <span data-store="email"></span></p></div>
+  </footer>
+
+<script>
+(function () {
+  var S = window.STORE;
+  document.querySelectorAll("[data-store]").forEach(function (el) { el.textContent = S[el.dataset.store]; });
+
+  var o = {};
+  try { o = JSON.parse(localStorage.getItem("lastOrder") || "{}"); } catch (e) {}
+  var id = new URLSearchParams(location.search).get("pedido") || o.id || "";
+  window.ORDER = o;
+
+  document.getElementById("oid").textContent = "#" + id;
+  if (o.name) document.getElementById("fn").textContent = o.name.split(" ")[0];
+  if (o.email) document.getElementById("em").textContent = o.email;
+  if (o.amount) document.getElementById("amt").textContent = fmtBRL(o.amount);
+
+  var catalog = {}; catalog[S.product.id] = S.product; catalog[S.bump.id] = S.bump;
+  var box = document.getElementById("items");
+  (o.items || []).forEach(function (it) {
+    var p = catalog[it.id]; if (!p) return;
+    var row = document.createElement("div");
+    row.className = "sum-line";
+    row.innerHTML = "<span></span><span></span>";
+    row.children[0].textContent = it.qty + "× " + p.shortTitle;
+    row.children[1].textContent = fmtBRL(p.price * it.qty);
+    box.appendChild(row);
+  });
+
+  var a = o.address;
+  if (a) {
+    document.getElementById("addr").textContent =
+      a.street + ", " + a.number + (a.complement ? " - " + a.complement : "") + " · " +
+      a.district + " · " + a.city + "/" + a.state + " · CEP " + a.cep.replace(/(\d{5})(\d{3})/, "$1-$2");
+  }
+
+  document.getElementById("wa").href = "https://wa.me/" + S.whatsapp + "?text=" +
+    encodeURIComponent("Olá! Acabei de comprar. Pedido #" + id);
+})();
+</script>
+</body>
+</html>
