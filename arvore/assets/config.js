@@ -7,9 +7,9 @@ window.STORE = {
   name: "Natal Total",
   legalName: "NATAL TOTAL COMERCIO DE ARTIGOS NATALINOS E PRESENTES LTDA - ME",
   cnpj: "11.003.477/0001-47",
-  email: "",                        // TODO: e-mail de contato (vazio = escondido no site)
+  email: "contato@suaarvorefeliz.com",
   whatsapp: "",                     // TODO: só números, com DDI 55 (vazio = botão escondido)
-  metaPixelId: "2187127921872491",  // Meta Pixel (vazio = desligado)
+  metaPixelId: "1829995411297791",  // Meta Pixel (vazio = desligado)
   deliveryText: "Entrega em 7 a 15 dias úteis", // TODO: confirme com seu fornecedor
 
   // false = usa a VulcanoPay de verdade (precisa estar publicado na Vercel com
