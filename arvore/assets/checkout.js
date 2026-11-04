@@ -18,7 +18,8 @@
   function total() { return P.price * state.qty + (state.bump ? B.price : 0); }
 
   // ---------------- Render ----------------
-  document.querySelectorAll("[data-store]").forEach(function (el) { el.textContent = S[el.dataset.store]; });
+  document.querySelectorAll("[data-store]").forEach(function (el) { el.textContent = S[el.dataset.store] || ""; });
+  if (!S.email) document.querySelectorAll(".js-email").forEach(function (el) { el.remove(); });
   document.querySelectorAll("[data-p]").forEach(function (el) { el.textContent = P[el.dataset.p]; });
   document.querySelectorAll("[data-b]").forEach(function (el) {
     var k = el.dataset.b; el.textContent = k === "price" ? fmtBRL(B.price) : B[k];

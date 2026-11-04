@@ -4,10 +4,11 @@
    catálogo e é ele que define o valor cobrado. Se mudar preço aqui, mude lá.
    ========================================================================== */
 window.STORE = {
-  name: "Natal em Casa",            // TODO: nome real da loja
-  cnpj: "00.000.000/0001-00",       // TODO: obrigatório por lei (Decreto 7.962/2013)
-  email: "contato@seudominio.com.br",
-  whatsapp: "5500000000000",        // só números, com DDI 55
+  name: "Natal Total",
+  legalName: "NATAL TOTAL COMERCIO DE ARTIGOS NATALINOS E PRESENTES LTDA - ME",
+  cnpj: "11.003.477/0001-47",
+  email: "",                        // TODO: e-mail de contato (vazio = escondido no site)
+  whatsapp: "",                     // TODO: só números, com DDI 55 (vazio = botão escondido)
   metaPixelId: "2187127921872491",  // Meta Pixel (vazio = desligado)
   deliveryText: "Entrega em 7 a 15 dias úteis", // TODO: confirme com seu fornecedor
 

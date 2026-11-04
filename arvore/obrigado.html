@@ -54,13 +54,14 @@
   </main>
 
   <footer class="footer" style="padding-bottom:28px">
-    <div class="container"><p><b data-store="name"></b> · CNPJ <span data-store="cnpj"></span> · <span data-store="email"></span></p></div>
+    <div class="container"><p><b data-store="legalName"></b> · CNPJ <span data-store="cnpj"></span><span class="js-email"> · <span data-store="email"></span></span></p></div>
   </footer>
 
 <script>
 (function () {
   var S = window.STORE;
-  document.querySelectorAll("[data-store]").forEach(function (el) { el.textContent = S[el.dataset.store]; });
+  document.querySelectorAll("[data-store]").forEach(function (el) { el.textContent = S[el.dataset.store] || ""; });
+  if (!S.email) document.querySelectorAll(".js-email").forEach(function (el) { el.remove(); });
 
   var o = {};
   try { o = JSON.parse(localStorage.getItem("lastOrder") || "{}"); } catch (e) {}
@@ -105,7 +106,8 @@
       a.district + " · " + a.city + "/" + a.state + " · CEP " + a.cep.replace(/(\d{5})(\d{3})/, "$1-$2");
   }
 
-  document.getElementById("wa").href = "https://wa.me/" + S.whatsapp + "?text=" +
+  if (!S.whatsapp) document.getElementById("wa").remove();
+  else document.getElementById("wa").href = "https://wa.me/" + S.whatsapp + "?text=" +
     encodeURIComponent("Olá! Acabei de comprar. Pedido #" + id);
 })();
 </script>
