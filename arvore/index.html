@@ -13,9 +13,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/config.js"></script>
-  <!-- Coloque aqui o Pixel da Meta / tag do Google Ads / TikTok Pixel -->
+  <script src="assets/pixel.js"></script>
 </head>
 <body>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=2187127921872491&ev=PageView&noscript=1"></noscript>
 
   <div class="topbar">🎄 <strong>FRETE GRÁTIS</strong> para todo o Brasil · Pagamento rápido via PIX</div>
 
@@ -266,6 +267,8 @@
   document.querySelectorAll("[data-p]").forEach(function (el) { el.textContent = pMap[el.dataset.p]; });
   document.querySelectorAll("[data-store]").forEach(function (el) { el.textContent = S[el.dataset.store]; });
   document.getElementById("yr").textContent = new Date().getFullYear();
+
+  track("ViewContent", { content_ids: [P.id], content_name: P.shortTitle, content_type: "product", value: P.price / 100, currency: "BRL" });
 
   // Galeria
   var main = document.getElementById("mainImg"), thumbs = document.getElementById("thumbs");

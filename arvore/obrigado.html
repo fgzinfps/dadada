@@ -11,9 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/config.js"></script>
-  <!-- Evento de conversão "Purchase" do Pixel/Ads vai aqui (use window.ORDER.amount) -->
+  <script src="assets/pixel.js"></script>
 </head>
 <body>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=2187127921872491&ev=PageView&noscript=1"></noscript>
   <header class="header">
     <div class="container">
       <a class="logo" href="index.html">
@@ -70,6 +71,20 @@
   if (o.name) document.getElementById("fn").textContent = o.name.split(" ")[0];
   if (o.email) document.getElementById("em").textContent = o.email;
   if (o.amount) document.getElementById("amt").textContent = fmtBRL(o.amount);
+
+  // Purchase: dispara 1 vez por pedido (recarregar a página não duplica a venda)
+  if (o.amount && id) {
+    var key = "px_purchase_" + id, sent = false;
+    try { sent = localStorage.getItem(key) === "1"; } catch (e) {}
+    if (!sent) {
+      track("Purchase", {
+        value: o.amount / 100, currency: "BRL", content_type: "product",
+        content_ids: (o.items || []).map(function (it) { return it.id; }),
+        num_items: (o.items || []).reduce(function (n, it) { return n + it.qty; }, 0)
+      }, { eventID: "purchase-" + id });
+      try { localStorage.setItem(key, "1"); } catch (e) {}
+    }
+  }
 
   var catalog = {}; catalog[S.product.id] = S.product; catalog[S.bump.id] = S.bump;
   var box = document.getElementById("items");

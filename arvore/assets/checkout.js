@@ -32,8 +32,12 @@
     document.querySelectorAll("[data-total]").forEach(function (el) { el.textContent = fmtBRL(total()); });
   }
 
-  $("bumpCheck").addEventListener("change", function (e) { state.bump = e.target.checked; render(); });
+  $("bumpCheck").addEventListener("change", function (e) {
+    state.bump = e.target.checked; render();
+    if (state.bump) track("AddToCart", { content_ids: [B.id], content_name: B.shortTitle, content_type: "product", value: B.price / 100, currency: "BRL" });
+  });
   render();
+  track("InitiateCheckout", { content_ids: [P.id], content_type: "product", num_items: state.qty, value: total() / 100, currency: "BRL" });
 
   // ---------------- UFs ----------------
   "AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split(" ").forEach(function (uf) {
@@ -208,6 +212,8 @@
         address: order.address, createdAt: new Date().toISOString()
       }));
     } catch (e) {}
+
+    track("AddPaymentInfo", { value: pix.amount / 100, currency: "BRL" });
 
     $("checkoutView").hidden = true;
     $("pixView").hidden = false;

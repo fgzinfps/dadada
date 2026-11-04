@@ -8,6 +8,7 @@ window.STORE = {
   cnpj: "00.000.000/0001-00",       // TODO: obrigatório por lei (Decreto 7.962/2013)
   email: "contato@seudominio.com.br",
   whatsapp: "5500000000000",        // só números, com DDI 55
+  metaPixelId: "2187127921872491",  // Meta Pixel (vazio = desligado)
   deliveryText: "Entrega em 7 a 15 dias úteis", // TODO: confirme com seu fornecedor
 
   // false = usa a VulcanoPay de verdade (precisa estar publicado na Vercel com
