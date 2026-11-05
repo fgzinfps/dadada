@@ -30,7 +30,7 @@
   $$("[data-money]").forEach((el) => (el.textContent = brl(S[el.dataset.money])));
   $$("[data-pix-pct]").forEach((el) => (el.textContent = `${Math.round(S.pixDiscount * 100)}%`));
   $$("[data-pix-pct-off]").forEach((el) => (el.textContent = `-${Math.round(S.pixDiscount * 100)}%`));
-  $("#topbar-msg").textContent = `${Math.round(S.pixDiscount * 100)}% off no Pix · Frete grátis acima de ${brl(S.freeShippingFrom).replace(",00", "")}`;
+  $("#topbar-msg").textContent = `Frete grátis acima de ${brl(S.freeShippingFrom).replace(",00", "")} · ${S.deliveryText}`;
   $("#year").textContent = new Date().getFullYear();
   $("#footer-wa").href = waLink(); $("#footer-wa-num").textContent = waPretty;
   $("#wa-float").href = waLink(`Olá! Vim pelo site da ${S.name}.`);
@@ -94,7 +94,7 @@
     <div class="price ${p.oldPrice ? "price--sale" : ""} ${lg ? "price--lg" : ""}">
       ${p.oldPrice ? `<span class="price__old">${brl(p.oldPrice)}</span>` : p.fromPrice ? `<span class="price__from">a partir de</span>` : ""}
       <span class="price__now">${brl(pixPrice(p.price))}</span>
-      <span class="price__pix">${pixTag} <span>${Math.round(S.pixDiscount * 100)}% off já aplicado</span></span>
+      <span class="price__pix">${pixTag}</span>
     </div>` : `<div class="price price--ask ${lg ? "price--lg" : ""}"><span class="price__now">Preço no WhatsApp</span><span class="price__inst">Disponível · consulte o valor</span></div>`;
 
   function card(p) {
@@ -178,12 +178,11 @@
     const b = $("#open-cart"); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump");
   }
   function totals() {
-    const sub = cart.reduce((a, l) => a + findP(l.id).price * l.qty, 0);
+    // O preço exibido (pixPrice) já é o preço final: nada de "desconto Pix" no resumo.
+    const sub = cart.reduce((a, l) => a + pixPrice(findP(l.id).price) * l.qty, 0);
     const cDisc = coupon ? Math.round(sub * S.coupons[coupon]) : 0;
-    const after = sub - cDisc;
-    const pDisc = Math.round(after * S.pixDiscount);
     const ship = sub === 0 || sub >= S.freeShippingFrom ? 0 : S.shippingFlat;
-    return { sub, cDisc, pDisc, ship, total: after - pDisc + ship };
+    return { sub, cDisc, ship, total: sub - cDisc + ship };
   }
   function renderCart() {
     $("#cart-count").textContent = cart.reduce((a, l) => a + l.qty, 0);
@@ -197,7 +196,7 @@
       : cart.map((l, i) => { const p = findP(l.id); return `
         <div class="line">
           <div class="line__art">${img(p)}</div>
-          <div><b>${esc(p.brand)} ${esc(p.name)}</b>${isSingle(p) ? "" : `<small>${esc(l.flavor)}</small>`}<small>${brl(pixPrice(p.price))} un. no Pix</small></div>
+          <div><b>${esc(p.brand)} ${esc(p.name)}</b>${isSingle(p) ? "" : `<small>${esc(l.flavor)}</small>`}<small>${brl(pixPrice(p.price))} un.</small></div>
           <div class="line__right">
             <div class="qty qty--sm"><button data-dec="${i}" aria-label="Diminuir">−</button><span>${l.qty}</span><button data-inc="${i}" aria-label="Aumentar">+</button></div>
             <button class="line__rm" data-rm="${i}">remover</button>
@@ -206,7 +205,6 @@
     $("#totals").innerHTML = `
       <dt>Subtotal</dt><dd>${brl(t.sub)}</dd>
       ${t.cDisc ? `<dt>Cupom ${esc(coupon)}</dt><dd class="disc">−${brl(t.cDisc)}</dd>` : ""}
-      ${t.pDisc ? `<dt>Desconto Pix (${Math.round(S.pixDiscount * 100)}%)</dt><dd class="disc">−${brl(t.pDisc)}</dd>` : ""}
       <dt>Frete</dt><dd>${t.ship ? brl(t.ship) : "Grátis"}</dd>
       <dt class="grand">Total</dt><dd class="grand">${brl(t.total)}</dd>
 `;
@@ -259,7 +257,6 @@
       `Olá! Quero fazer este pedido na ${S.name}:`, "", ...lines, "",
       `Subtotal: ${brl(t.sub)}`,
       t.cDisc ? `Cupom ${coupon}: -${brl(t.cDisc)}` : null,
-      t.pDisc ? `Desconto Pix: -${brl(t.pDisc)}` : null,
       `Frete: ${t.ship ? brl(t.ship) : "Grátis"}`,
       `*Total: ${brl(t.total)}*`,
       "Pagamento: Pix", "",

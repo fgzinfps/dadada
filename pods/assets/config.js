@@ -113,7 +113,7 @@ window.STORE = {
   faq: [
     ["Os produtos são originais?", "Sim. Trabalhamos só com lotes lacrados e com código de verificação do fabricante na embalagem."],
     ["Como funciona a compra?", "Monte seu carrinho, informe o CEP e finalize. O pedido chega pronto no nosso WhatsApp, onde confirmamos o frete e o pagamento."],
-    ["Quais formas de pagamento?", "Somente Pix, com 6% de desconto já aplicado nos preços do site. A chave Pix é enviada no WhatsApp quando confirmamos o pedido."],
+    ["Quais formas de pagamento?", "Somente Pix. A chave Pix é enviada no WhatsApp quando confirmamos o pedido."],
     ["Quanto tempo demora a entrega?", "Despachamos em até 24h úteis após a confirmação do pagamento. O prazo dos Correios/transportadora depende do seu CEP."],
     ["E se o pod chegar com defeito?", "Troca garantida em até 7 dias após o recebimento, mediante vídeo de abertura da embalagem."],
     ["Vocês vendem para menores?", "Não. Venda exclusiva para maiores de 18 anos. Podemos pedir documento na entrega."],
