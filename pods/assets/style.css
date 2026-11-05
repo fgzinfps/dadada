@@ -256,3 +256,16 @@ img { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
 @media (max-width: 720px) { .wa-float { width: 50px; height: 50px; } .wa-float svg { width: 26px; } }
 @media (min-width: 721px) { .brands, .tabs { margin-inline: 0; padding-inline: 0; } .brands { flex-wrap: wrap; overflow: visible; } }
+
+/* ---------- Pix ---------- */
+.pix-ic { width: 1em; height: 1em; flex: none; }
+.price__pix { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); margin-top: 3px; }
+.pix-tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px 2px 5px; border-radius: 5px; background: #e6f7f5; color: #1f8f84; font-weight: 800; font-size: 12px; }
+.pix-tag .pix-ic { width: 13px; height: 13px; }
+.price--lg .price__pix, .price--lg .pix-tag { font-size: 13px; }
+.pay-pix { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1.5px solid #32bcad; border-radius: 10px; background: #f0faf9; }
+.pay-pix__ic { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 8px; background: #32bcad; color: #fff; }
+.pay-pix__ic .pix-ic { width: 20px; height: 20px; }
+.pay-pix b { display: block; font-size: 15px; }
+.pay-pix small { display: block; font-size: 12.5px; color: var(--ink-2); line-height: 1.35; }
+@media (max-width: 720px) { .card .price__pix > span:last-child { display: none; } }

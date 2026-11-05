@@ -16,15 +16,17 @@
   const pixPrice = (c) => Math.round(c * (1 - S.pixDiscount));
   const pctOff = (p) => (p.oldPrice && p.price ? Math.round((1 - p.price / p.oldPrice) * 100) : 0);
   const perK = (p) => (p.price && p.puffs ? p.price / (p.puffs / 1000) : Infinity);
-  const instOf = (c) => Math.min(S.maxInstallments, ((S.installmentRules || []).find(([min]) => c >= min) || [0, S.maxInstallments])[1]);
-  const instText = (c) => { const n = instOf(c); return n > 1 ? `ou ${n}x de ${brl(Math.ceil(c / n))} sem juros` : `ou ${brl(c)} no cartão`; };
+  // Ícone do Pix (desenho simplificado na cor #32BCAD)
+  const PIX = `<svg class="pix-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8 22.2 12 12 22.2 1.8 12Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+  const pixTag = `<span class="pix-tag">${PIX}Pix</span>`;
   const findP = (id) => S.products.find((p) => p.id === id);
   const isSingle = (p) => p.flavors.length === 1 && p.flavors[0].name === "Padrão";
   const waLink = (text = "") => `https://wa.me/${S.whatsapp}${text ? "?text=" + encodeURIComponent(text) : ""}`;
   const waPretty = S.whatsapp.replace(/^55(\d{2})(\d{4,5})(\d{4})$/, "($1) $2-$3");
 
   /* ---------- textos da config ---------- */
-  $$("[data-store]").forEach((el) => { const k = el.dataset.store; el.textContent = k === "maxInstallments-x" ? `${S.maxInstallments}x` : S[k]; });
+  $$("[data-store]").forEach((el) => (el.textContent = S[el.dataset.store]));
+  $$("[data-pix-icon]").forEach((el) => (el.innerHTML = PIX));
   $$("[data-money]").forEach((el) => (el.textContent = brl(S[el.dataset.money])));
   $$("[data-pix-pct]").forEach((el) => (el.textContent = `${Math.round(S.pixDiscount * 100)}%`));
   $$("[data-pix-pct-off]").forEach((el) => (el.textContent = `-${Math.round(S.pixDiscount * 100)}%`));
@@ -91,8 +93,8 @@
   const priceBlock = (p, lg) => p.price ? `
     <div class="price ${p.oldPrice ? "price--sale" : ""} ${lg ? "price--lg" : ""}">
       ${p.oldPrice ? `<span class="price__old">${brl(p.oldPrice)}</span>` : p.fromPrice ? `<span class="price__from">a partir de</span>` : ""}
-      <span class="price__now">${brl(pixPrice(p.price))} <small>no Pix</small></span>
-      <span class="price__inst">${instText(p.price)}</span>
+      <span class="price__now">${brl(pixPrice(p.price))}</span>
+      <span class="price__pix">${pixTag} <span>${Math.round(S.pixDiscount * 100)}% off já aplicado</span></span>
     </div>` : `<div class="price price--ask ${lg ? "price--lg" : ""}"><span class="price__now">Preço no WhatsApp</span><span class="price__inst">Disponível · consulte o valor</span></div>`;
 
   function card(p) {
@@ -167,7 +169,6 @@
   let cart = store.get("pods-cart-v2", []).filter((l) => { const p = findP(l.id); return p && p.price && p.flavors.some((f) => f.name === l.flavor); });
   let coupon = store.get("pods-coupon", null);
   if (coupon && !S.coupons[coupon]) coupon = null;
-  let pay = "pix";
   const save = () => { store.set("pods-cart-v2", cart); store.set("pods-coupon", coupon); };
 
   function addToCart(id, flavor, qty) {
@@ -180,7 +181,7 @@
     const sub = cart.reduce((a, l) => a + findP(l.id).price * l.qty, 0);
     const cDisc = coupon ? Math.round(sub * S.coupons[coupon]) : 0;
     const after = sub - cDisc;
-    const pDisc = pay === "pix" ? Math.round(after * S.pixDiscount) : 0;
+    const pDisc = Math.round(after * S.pixDiscount);
     const ship = sub === 0 || sub >= S.freeShippingFrom ? 0 : S.shippingFlat;
     return { sub, cDisc, pDisc, ship, total: after - pDisc + ship };
   }
@@ -196,7 +197,7 @@
       : cart.map((l, i) => { const p = findP(l.id); return `
         <div class="line">
           <div class="line__art">${img(p)}</div>
-          <div><b>${esc(p.brand)} ${esc(p.name)}</b>${isSingle(p) ? "" : `<small>${esc(l.flavor)}</small>`}<small>${brl(p.price)} un.</small></div>
+          <div><b>${esc(p.brand)} ${esc(p.name)}</b>${isSingle(p) ? "" : `<small>${esc(l.flavor)}</small>`}<small>${brl(pixPrice(p.price))} un. no Pix</small></div>
           <div class="line__right">
             <div class="qty qty--sm"><button data-dec="${i}" aria-label="Diminuir">−</button><span>${l.qty}</span><button data-inc="${i}" aria-label="Aumentar">+</button></div>
             <button class="line__rm" data-rm="${i}">remover</button>
@@ -205,10 +206,10 @@
     $("#totals").innerHTML = `
       <dt>Subtotal</dt><dd>${brl(t.sub)}</dd>
       ${t.cDisc ? `<dt>Cupom ${esc(coupon)}</dt><dd class="disc">−${brl(t.cDisc)}</dd>` : ""}
-      ${t.pDisc ? `<dt>Desconto Pix</dt><dd class="disc">−${brl(t.pDisc)}</dd>` : ""}
+      ${t.pDisc ? `<dt>Desconto Pix (${Math.round(S.pixDiscount * 100)}%)</dt><dd class="disc">−${brl(t.pDisc)}</dd>` : ""}
       <dt>Frete</dt><dd>${t.ship ? brl(t.ship) : "Grátis"}</dd>
       <dt class="grand">Total</dt><dd class="grand">${brl(t.total)}</dd>
-      ${pay === "card" ? `<dt></dt><dd class="small">${instText(t.total).replace(/^ou /, "")}</dd>` : ""}`;
+`;
     $("#coupon").value = coupon || "";
   }
   $("#cart-items").onclick = (e) => {
@@ -224,7 +225,6 @@
     if (!c) { coupon = null; save(); renderCart(); return; }
     if (S.coupons[c]) { coupon = c; save(); renderCart(); toast(`Cupom ${c} aplicado: -${Math.round(S.coupons[c] * 100)}%`); } else toast("Cupom inválido");
   };
-  $$('input[name="pay"]').forEach((r) => (r.onchange = () => { pay = r.value; renderCart(); }));
 
   /* CEP (ViaCEP). Se o serviço cair, não trava a venda */
   const cepIn = $("#cep");
@@ -262,7 +262,7 @@
       t.pDisc ? `Desconto Pix: -${brl(t.pDisc)}` : null,
       `Frete: ${t.ship ? brl(t.ship) : "Grátis"}`,
       `*Total: ${brl(t.total)}*`,
-      `Pagamento: ${pay === "pix" ? "Pix" : `Cartão (até ${instOf(t.total)}x)`}`, "",
+      "Pagamento: Pix", "",
       `CEP: ${[address.cep, address.logradouro, address.bairro, address.localidade && `${address.localidade}/${address.uf}`].filter(Boolean).join(", ")}`,
       "Declaro ter 18 anos ou mais.",
     ].filter((x) => x !== null).join("\n");

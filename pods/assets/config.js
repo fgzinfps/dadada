@@ -15,9 +15,6 @@ window.STORE = {
   freeShippingFrom: 25000,     // frete grátis a partir de R$ 250
   shippingFlat: 1990,          // frete fixo abaixo do mínimo
   pixDiscount: 0.06,           // 6% no Pix (igual à Vitrine do Vapor)
-  maxInstallments: 3,          // máximo de parcelas sem juros
-  // parcelas por faixa de preço (mesma regra da Vitrine): >= R$150 → 3x, >= R$100 → 2x, abaixo → 1x
-  installmentRules: [[15000, 3], [10000, 2], [0, 1]],
   coupons: { BEMVINDO10: 0.10 }, // cupom: desconto (fração)
   deliveryText: "Envio em até 24h úteis",
 
@@ -31,7 +28,7 @@ window.STORE = {
   ],
 
   /* Cada produto: id, name, brand, type ("pod" | "refil" | "acessorio"), image,
-     puffs, price (cartão, centavos), oldPrice (opcional), badge (opcional),
+     puffs, price (cheio, centavos; o site mostra price - pixDiscount), oldPrice (opcional), badge (opcional),
      fromPrice (true = "a partir de"), flavors: [{ name, color }].
      Sem price = "Consultar no WhatsApp".  */
   products: [
@@ -116,7 +113,7 @@ window.STORE = {
   faq: [
     ["Os produtos são originais?", "Sim. Trabalhamos só com lotes lacrados e com código de verificação do fabricante na embalagem."],
     ["Como funciona a compra?", "Monte seu carrinho, informe o CEP e finalize. O pedido chega pronto no nosso WhatsApp, onde confirmamos o frete e o pagamento."],
-    ["Quais formas de pagamento?", "Pix (com desconto) ou cartão em até 3x sem juros."],
+    ["Quais formas de pagamento?", "Somente Pix, com 6% de desconto já aplicado nos preços do site. A chave Pix é enviada no WhatsApp quando confirmamos o pedido."],
     ["Quanto tempo demora a entrega?", "Despachamos em até 24h úteis após a confirmação do pagamento. O prazo dos Correios/transportadora depende do seu CEP."],
     ["E se o pod chegar com defeito?", "Troca garantida em até 7 dias após o recebimento, mediante vídeo de abertura da embalagem."],
     ["Vocês vendem para menores?", "Não. Venda exclusiva para maiores de 18 anos. Podemos pedir documento na entrega."],
