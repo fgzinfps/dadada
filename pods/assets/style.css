@@ -258,7 +258,7 @@ img { max-width: 100%; }
 @media (min-width: 721px) { .brands, .tabs { margin-inline: 0; padding-inline: 0; } .brands { flex-wrap: wrap; overflow: visible; } }
 
 /* ---------- Pix ---------- */
-.pix-ic { width: 1em; height: 1em; flex: none; }
+.pix-ic { display: inline-block; width: 1em; height: 1em; flex: none; background: currentColor; -webkit-mask: url("img/pix.png") center / contain no-repeat; mask: url("img/pix.png") center / contain no-repeat; }
 .price__pix { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); margin-top: 3px; }
 .pix-tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px 2px 5px; border-radius: 5px; background: #e6f7f5; color: #1f8f84; font-weight: 800; font-size: 12px; }
 .pix-tag .pix-ic { width: 13px; height: 13px; }

@@ -16,8 +16,8 @@
   const pixPrice = (c) => Math.round(c * (1 - S.pixDiscount));
   const pctOff = (p) => (p.oldPrice && p.price ? Math.round((1 - p.price / p.oldPrice) * 100) : 0);
   const perK = (p) => (p.price && p.puffs ? p.price / (p.puffs / 1000) : Infinity);
-  // Ícone do Pix (desenho simplificado na cor #32BCAD)
-  const PIX = `<svg class="pix-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8 22.2 12 12 22.2 1.8 12Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+  // Logo do Pix (assets/img/pix.png usado como máscara: herda a cor do texto)
+  const PIX = `<span class="pix-ic" aria-hidden="true"></span>`;
   const pixTag = `<span class="pix-tag">${PIX}Pix</span>`;
   const findP = (id) => S.products.find((p) => p.id === id);
   const isSingle = (p) => p.flavors.length === 1 && p.flavors[0].name === "Padrão";
