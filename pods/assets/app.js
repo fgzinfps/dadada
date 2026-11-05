@@ -1,5 +1,6 @@
 (() => {
   "use strict";
+  const track = window.track || (() => {});
   const S = window.STORE;
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -158,6 +159,7 @@
       ["Líquido", p.liquid],
     ].map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("");
     renderFlavors();
+    track("ViewContent", { content_ids: [p.id], content_name: p.name, content_type: "product", value: p.price / 100, currency: "BRL" });
     modal.hidden = false; document.body.classList.add("locked");
     $(".modal__card .close").focus();
   }
@@ -185,7 +187,9 @@
     const left = curFlavor ? curFlavor.stock - inCartQty(cur.id, curFlavor.name) : 0;
     if (curQty < left) { curQty++; renderFlavors(); } else toast("Limite de estoque deste sabor");
   };
-  $("#m-add").onclick = () => { addToCart(cur.id, curFlavor.name, curQty); closeModal(); toast(`${cur.name} · ${curFlavor.name} adicionado`); };
+  $("#m-add").onclick = () => {
+    track("AddToCart", { content_ids: [cur.id], content_name: `${cur.name} - ${curFlavor.name}`, content_type: "product", value: (cur.price * curQty) / 100, currency: "BRL" });
+    addToCart(cur.id, curFlavor.name, curQty); closeModal(); toast(`${cur.name} · ${curFlavor.name} adicionado`); };
   function closeModal() { modal.hidden = true; document.body.classList.remove("locked"); lastFocus && lastFocus.focus(); }
   modal.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closeModal(); });
 
@@ -273,13 +277,17 @@
     const out = $("#cep-out");
     if (v.length < 8) { out.textContent = ""; address = null; return; }
     out.textContent = "Buscando…";
+    let d;
     try {
       const r = await fetch(`https://viacep.com.br/ws/${v}/json/`);
-      const d = await r.json();
-      if (d.erro) throw 0;
-      address = { cep: cepIn.value, logradouro: d.logradouro, bairro: d.bairro, localidade: d.localidade, uf: d.uf };
-      out.textContent = `${d.localidade}/${d.uf}`; store.set("pods-addr", address);
-    } catch { out.textContent = "CEP não encontrado"; address = null; }
+      d = await r.json();
+    } catch {
+      // ViaCEP fora do ar: não trava a venda, o endereço é confirmado no WhatsApp
+      address = { cep: cepIn.value }; out.textContent = "Confirmamos no WhatsApp"; return;
+    }
+    if (d.erro) { out.textContent = "CEP não encontrado"; address = null; return; }
+    address = { cep: cepIn.value, logradouro: d.logradouro, bairro: d.bairro, localidade: d.localidade, uf: d.uf };
+    out.textContent = `${d.localidade}/${d.uf}`; store.set("pods-addr", address);
   });
 
   const drawer = $("#drawer");
@@ -301,9 +309,15 @@
       `Frete: ${t.ship ? brl(t.ship) : "Grátis"}`,
       `*Total: ${brl(t.total)}*`,
       `Pagamento: ${pay === "pix" ? "Pix" : `Cartão (até ${S.maxInstallments}x)`}`, "",
-      `CEP: ${address.cep} — ${[address.logradouro, address.bairro, `${address.localidade}/${address.uf}`].filter(Boolean).join(", ")}`,
+      `CEP: ${[address.cep, address.logradouro, address.bairro, address.localidade && `${address.localidade}/${address.uf}`].filter(Boolean).join(", ")}`,
       "Declaro ter 18 anos ou mais.",
     ].filter((x) => x !== null).join("\n");
+    // Sem pagamento online, o fechamento acontece no WhatsApp: o último evento que dá pra medir é este.
+    track("InitiateCheckout", {
+      content_ids: cart.map((l) => l.id), content_type: "product",
+      num_items: cart.reduce((a, l) => a + l.qty, 0), value: t.total / 100, currency: "BRL",
+    }, { eventID: "wa-" + Date.now() });
+    track("Contact");
     window.open(waLink(msg), "_blank", "noopener");
   };
 

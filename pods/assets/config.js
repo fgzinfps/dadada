@@ -9,6 +9,7 @@ window.STORE = {
   tagline: "Pods descartáveis originais",
   whatsapp: "5500000000000",   // TODO: só números, com DDI 55 + DDD
   instagram: "",               // TODO: @ sem o arroba (vazio = escondido)
+  metaPixelId: "1829995411297791", // Meta Pixel (o mesmo da loja de Natal). Vazio = desligado
   city: "",                    // TODO: cidade para entrega expressa (vazio = escondido)
   freeShippingFrom: 25000,     // frete grátis a partir de R$ 250
   shippingFlat: 1990,          // frete fixo abaixo do mínimo
