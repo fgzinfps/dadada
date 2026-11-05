@@ -2,11 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>CloudBox — Pods descartáveis</title>
-  <meta name="description" content="Pods descartáveis com estoque por sabor. Despacho em 24h úteis, desconto no Pix. Venda exclusiva para maiores de 18 anos.">
+  <meta name="description" content="Pods descartáveis Ignite, Elf Bar, Life Pod, Oxbar e mais. Envio em 24h, desconto no Pix. Venda exclusiva para maiores de 18 anos.">
   <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#f3f0e8">
+  <meta name="theme-color" content="#f4f2ec">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
@@ -18,90 +18,72 @@
   <!-- ===== Verificação de idade ===== -->
   <div class="age" id="age" role="dialog" aria-modal="true" aria-labelledby="age-title" hidden>
     <div class="age__card">
-      <p class="age__kicker">Acesso restrito</p>
+      <span class="logo" data-store="name"></span>
       <h2 id="age-title">Você tem 18 anos ou mais?</h2>
-      <p>Aqui tem produto com nicotina. Nicotina vicia. Venda proibida para menores de 18 anos.</p>
+      <p>Este site vende produtos com nicotina, que causa dependência. Venda proibida para menores de 18 anos.</p>
       <div class="age__actions">
-        <button class="btn btn--dark" id="age-yes">Tenho 18 ou mais</button>
-        <button class="btn btn--line" id="age-no">Sair</button>
+        <button class="btn btn--dark btn--lg" id="age-yes">Sim, tenho 18+</button>
+        <button class="btn btn--line btn--lg" id="age-no">Não</button>
       </div>
     </div>
   </div>
 
-  <div class="topbar">
-    <div class="wrap topbar__row">
-      <span data-store="deliveryText"></span>
-      <span>Frete grátis acima de <b data-money="freeShippingFrom"></b></span>
-      <span>1ª compra: cupom <b>BEMVINDO10</b></span>
-    </div>
-  </div>
+  <div class="topbar"><span id="topbar-msg"></span></div>
 
   <header class="header">
     <div class="wrap header__row">
       <a href="#" class="logo" aria-label="Início" data-store="name"></a>
-      <nav class="nav" aria-label="Seções">
-        <a href="#catalogo">Pods</a>
-        <a href="#catalogo" data-cat-link="refil">Refis</a>
-        <a href="#catalogo" data-cat-link="acessorio">Carregadores</a>
-        <a href="#faq">Ajuda</a>
-      </nav>
       <label class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 4a6.5 6.5 0 0 1 5.2 10.4l4.4 4.4-1.4 1.4-4.4-4.4A6.5 6.5 0 1 1 10.5 4Zm0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z"/></svg>
         <span class="sr-only">Buscar</span>
-        <input type="search" id="search" placeholder="Buscar marca ou sabor" autocomplete="off">
+        <input type="search" id="search" placeholder="Buscar modelo, marca ou sabor" autocomplete="off" enterkeyhint="search">
       </label>
       <button class="cart-btn" id="open-cart" aria-label="Abrir carrinho">
-        Carrinho <span class="cart-btn__count" id="cart-count">0</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.2l2.1 10.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 1.9-1.4L21 8H6.6"/><circle cx="9.5" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>
+        <span class="cart-btn__label">Carrinho</span>
+        <span class="cart-btn__count" id="cart-count">0</span>
       </button>
     </div>
   </header>
 
   <main>
-    <!-- ===== Abertura ===== -->
     <section class="intro wrap">
-      <div class="intro__text">
-        <h1>Descartáveis com estoque de verdade.</h1>
-        <p>O que aparece aqui está na prateleira, sabor por sabor. Escolheu, fechou o carrinho, a gente confirma no WhatsApp e despacha.</p>
-        <a href="#catalogo" class="btn btn--dark btn--lg">Ver o catálogo</a>
+      <h1>Pods descartáveis originais.</h1>
+      <p>Ignite, Elf Bar, Life Pod, Oxbar e mais. <b><span data-pix-pct></span> off no Pix</b>, envio em até 24h úteis e pedido fechado no WhatsApp.</p>
+      <div class="brands" id="brands" aria-label="Filtrar por marca"></div>
+    </section>
+
+    <section class="catalog wrap" id="catalogo">
+      <div class="tabs" id="chips" role="tablist" aria-label="Categorias"></div>
+      <div class="toolbar">
+        <span class="toolbar__count" id="count"></span>
+        <label class="select">
+          <span class="sr-only">Ordenar</span>
+          <select id="sort">
+            <option value="featured">Destaques</option>
+            <option value="price-asc">Menor preço</option>
+            <option value="price-desc">Maior preço</option>
+            <option value="puffs-desc">Mais puffs</option>
+            <option value="ppk">Menor custo por puff</option>
+          </select>
+        </label>
       </div>
-      <a class="feature" id="feature" href="#catalogo"></a>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" hidden>
+        <p>Nada encontrado.</p>
+        <button class="btn btn--line" id="clear-filters">Limpar busca e filtros</button>
+      </div>
     </section>
 
     <ul class="facts wrap">
-      <li><b>Despacho em 24h</b> úteis após o pagamento</li>
-      <li><b data-pix-pct></b> de desconto no Pix</li>
-      <li><b data-store="maxInstallments-x"></b> sem juros no cartão</li>
-      <li><b>Troca em 7 dias</b> por defeito de fábrica</li>
+      <li><b>Envio em 24h</b><span>úteis após o pagamento</span></li>
+      <li><b><span data-pix-pct></span> no Pix</b><span>ou até <span data-store="maxInstallments-x"></span> sem juros</span></li>
+      <li><b>Frete grátis</b><span>acima de <span data-money="freeShippingFrom"></span></span></li>
+      <li><b>Troca em 7 dias</b><span>por defeito de fábrica</span></li>
     </ul>
 
-    <!-- ===== Catálogo ===== -->
-    <section class="catalog wrap" id="catalogo">
-      <div class="catalog__head">
-        <h2>Catálogo <span class="catalog__count" id="count"></span></h2>
-        <div class="catalog__tools">
-          <label class="toggle"><input type="checkbox" id="instock"> Só com estoque</label>
-          <label class="select">
-            <span class="sr-only">Ordenar</span>
-            <select id="sort">
-              <option value="featured">Destaques</option>
-              <option value="price-asc">Menor preço</option>
-              <option value="price-desc">Maior preço</option>
-              <option value="puffs-desc">Mais puffs</option>
-              <option value="ppk">Menor custo por 1k puffs</option>
-            </select>
-          </label>
-        </div>
-      </div>
-      <div class="tabs" id="chips" role="tablist"></div>
-      <div class="grid" id="grid"></div>
-      <div class="empty" id="empty" hidden>
-        <p>Nada com esses filtros.</p>
-        <button class="btn btn--line" id="clear-filters">Limpar filtros</button>
-      </div>
-    </section>
-
-    <!-- ===== FAQ ===== -->
     <section class="faq wrap" id="faq">
-      <h2>Perguntas</h2>
+      <h2>Perguntas frequentes</h2>
       <div id="faq-list"></div>
     </section>
   </main>
@@ -114,7 +96,7 @@
         <div class="footer__links">
           <a href="#catalogo">Catálogo</a>
           <a href="#faq">Perguntas</a>
-          <a id="footer-wa" target="_blank" rel="noopener">WhatsApp</a>
+          <a id="footer-wa" target="_blank" rel="noopener">WhatsApp <span id="footer-wa-num"></span></a>
           <a id="footer-ig" target="_blank" rel="noopener" hidden>Instagram</a>
         </div>
       </div>
@@ -122,28 +104,34 @@
     </div>
   </footer>
 
-  <!-- ===== Modal de produto ===== -->
+  <a class="wa-float" id="wa-float" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.2c0-.1-.2-.2-.5-.3Z"/></svg>
+  </a>
+
+  <!-- ===== Produto ===== -->
   <div class="modal" id="modal" hidden>
     <div class="modal__backdrop" data-close></div>
     <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="m-title">
-      <button class="close" data-close aria-label="Fechar">Fechar</button>
+      <button class="close" data-close aria-label="Fechar">✕</button>
       <div class="modal__art" id="m-art"></div>
       <div class="modal__body">
         <span class="brand" id="m-brand"></span>
         <h3 id="m-title"></h3>
-        <div class="price" id="m-price"></div>
-        <h4>Sabor</h4>
-        <div class="flavors" id="m-flavors"></div>
-        <p class="stock-note" id="m-stock"></p>
-        <dl class="specs" id="m-specs"></dl>
-        <div class="modal__buy">
-          <div class="qty">
-            <button id="m-minus" aria-label="Diminuir">−</button>
-            <span id="m-qty">1</span>
-            <button id="m-plus" aria-label="Aumentar">+</button>
-          </div>
-          <button class="btn btn--dark btn--grow" id="m-add">Adicionar</button>
+        <p class="modal__meta" id="m-meta"></p>
+        <div class="price price--lg" id="m-price"></div>
+        <fieldset class="flavors" id="m-flavors-wrap">
+          <legend>Escolha o sabor</legend>
+          <div id="m-flavors"></div>
+        </fieldset>
+        <p class="ok-note"><span class="dot"></span> Disponível · <span data-store="deliveryText"></span></p>
+      </div>
+      <div class="modal__buy">
+        <div class="qty">
+          <button id="m-minus" aria-label="Diminuir">−</button>
+          <span id="m-qty">1</span>
+          <button id="m-plus" aria-label="Aumentar">+</button>
         </div>
+        <button class="btn btn--dark btn--grow btn--lg" id="m-add">Adicionar</button>
       </div>
     </div>
   </div>
@@ -153,8 +141,8 @@
     <div class="drawer__backdrop" data-close-cart></div>
     <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="cart-title">
       <div class="drawer__head">
-        <h3 id="cart-title">Carrinho</h3>
-        <button class="close" data-close-cart aria-label="Fechar">Fechar</button>
+        <h3 id="cart-title">Seu carrinho</h3>
+        <button class="close" data-close-cart aria-label="Fechar">✕</button>
       </div>
       <div class="ship-bar">
         <p id="ship-msg"></p>
@@ -163,20 +151,20 @@
       <div class="drawer__items" id="cart-items"></div>
       <div class="drawer__foot" id="cart-foot">
         <div class="row-input">
-          <input id="coupon" placeholder="Cupom" autocomplete="off">
+          <input id="coupon" placeholder="Cupom de desconto" autocomplete="off" autocapitalize="characters">
           <button class="btn btn--line" id="apply-coupon">Aplicar</button>
         </div>
         <div class="row-input">
-          <input id="cep" placeholder="CEP" inputmode="numeric" maxlength="9" autocomplete="postal-code">
+          <input id="cep" placeholder="Seu CEP" inputmode="numeric" maxlength="9" autocomplete="postal-code">
           <span class="cep-out" id="cep-out"></span>
         </div>
-        <div class="pay-toggle" role="radiogroup" aria-label="Pagamento">
-          <label><input type="radio" name="pay" value="pix" checked> Pix <small data-pix-pct-off></small></label>
-          <label><input type="radio" name="pay" value="card"> Cartão</label>
+        <div class="pay-toggle" role="radiogroup" aria-label="Forma de pagamento">
+          <label><input type="radio" name="pay" value="pix" checked><span>Pix <small data-pix-pct-off></small></span></label>
+          <label><input type="radio" name="pay" value="card"><span>Cartão</span></label>
         </div>
         <dl class="totals" id="totals"></dl>
-        <button class="btn btn--dark btn--lg btn--block" id="checkout">Enviar pedido no WhatsApp</button>
-        <p class="small center">Ao enviar, você declara ter 18 anos ou mais.</p>
+        <button class="btn btn--wa btn--lg btn--block" id="checkout">Finalizar no WhatsApp</button>
+        <p class="small center">Ao finalizar, você declara ter 18 anos ou mais.</p>
       </div>
     </aside>
   </div>
