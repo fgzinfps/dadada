@@ -275,3 +275,14 @@ button { cursor: pointer; }
 
 @keyframes slide { from { transform: translateX(100%); } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
+
+/* ---------- Fotos reais dos produtos ---------- */
+.card__art img, .modal__art img, .feature__art img, .line__art img {
+  width: 100%; height: 100%; object-fit: contain; display: block; mix-blend-mode: multiply;
+}
+.card__art img { padding: 8%; }
+.modal__art img { padding: 6%; max-height: 520px; }
+.feature__art img { padding: 6%; }
+.line__art img { padding: 3px; }
+.card.soldout .card__art img { filter: grayscale(1); opacity: .45; }
+.price__from { text-decoration: none; }

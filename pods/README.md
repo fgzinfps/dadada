@@ -4,7 +4,7 @@ Site estático, sem build e sem dependências: `index.html` + `assets/`.
 
 ## Editar
 Tudo fica em `assets/config.js`: nome da loja, WhatsApp, frete, desconto Pix, cupons,
-produtos, sabores e **estoque por sabor**. Os produtos que vêm no arquivo são **exemplos fictícios**.
+produtos, sabores e **estoque por sabor**. O catálogo veio do PDF da Vitrine do Vapor (76 itens, com fotos em `assets/img`). **Sabores e estoque são provisórios**: confira antes de vender.
 
 ## Fluxo de compra
 Catálogo → modal (sabor + quantidade) → carrinho (cupom, CEP via ViaCEP, Pix/cartão)

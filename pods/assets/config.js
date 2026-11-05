@@ -1,116 +1,116 @@
 /* ==========================================================================
    CONFIGURAÇÃO DA LOJA — edite aqui.
    Preços em CENTAVOS (ex.: 8990 = R$ 89,90) para evitar erro de arredondamento.
-   Os produtos abaixo são EXEMPLOS: troque nomes, sabores, preços e estoque
-   pelos que você realmente tem. Não anuncie o que não tem em mãos.
+   Catálogo copiado do PDF da Vitrine do Vapor (nov/2026). ATENÇÃO: os 5 sabores
+   de cada produto e o estoque (10 por sabor) são PROVISÓRIOS — o PDF não traz
+   sabores. Confira cada um antes de vender. Preço Pix = price - pixDiscount.
    ========================================================================== */
 window.STORE = {
   name: "CloudBox",
   tagline: "Pods descartáveis originais",
-  whatsapp: "5500000000000",   // TODO: só números, com DDI 55 + DDD
+  whatsapp: "595973239946",    // copiado do rodapé da Vitrine do Vapor (+595 97 323 9946). CONFIRME.
   instagram: "",               // TODO: @ sem o arroba (vazio = escondido)
   metaPixelId: "1829995411297791", // Meta Pixel (o mesmo da loja de Natal). Vazio = desligado
   city: "",                    // TODO: cidade para entrega expressa (vazio = escondido)
   freeShippingFrom: 25000,     // frete grátis a partir de R$ 250
   shippingFlat: 1990,          // frete fixo abaixo do mínimo
-  pixDiscount: 0.05,           // 5% no Pix
-  maxInstallments: 3,          // parcelas sem juros no cartão
+  pixDiscount: 0.06,           // 6% no Pix (igual à Vitrine do Vapor)
+  maxInstallments: 3,          // máximo de parcelas sem juros
+  // parcelas por faixa de preço (mesma regra da Vitrine): >= R$150 → 3x, >= R$100 → 2x, abaixo → 1x
+  installmentRules: [[15000, 3], [10000, 2], [0, 1]],
   coupons: { BEMVINDO10: 0.10 }, // cupom: desconto (fração)
   deliveryText: "Envio em até 24h úteis",
 
   categories: [
     { id: "all",   label: "Todos" },
-    { id: "lt10k", label: "Até 10k puffs" },
-    { id: "10k",   label: "10k – 20k" },
-    { id: "20k",   label: "20k+" },
-    { id: "kit",   label: "Kits" },
+    { id: "lt20k", label: "Até 20k puffs" },
+    { id: "20k",   label: "20k – 35k" },
+    { id: "35k",   label: "35k+" },
+    { id: "refil", label: "Refis e cartuchos" },
+    { id: "acessorio", label: "Carregadores" },
   ],
 
-  /* Cada produto: id, nome, marca, puffs, preço, preço antigo (opcional),
-     cor (gradiente do card), selo (opcional), estoque e sabores.
-     Sabor: { name, color, stock } — stock 0 = esgotado. */
+  /* Cada produto: id, name, brand, type ("pod" | "refil" | "acessorio"), image,
+     puffs, price (cartão, centavos), oldPrice (opcional), badge (opcional),
+     fromPrice (true = "a partir de"), flavors: [{ name, color, stock }].
+     Sem price = esgotado no site. stock 0 = sabor esgotado. */
   products: [
-    {
-      id: "nb-8k", name: "Nimbus 8K", brand: "Nimbus", puffs: 8000,
-      price: 7990, oldPrice: 9490, colors: ["#7c5cff", "#22d3ee"], badge: "Mais vendido",
-      nicotine: "5%", battery: "650 mAh recarregável (USB-C)", liquid: "16 ml",
-      flavors: [
-        { name: "Grape Ice", color: "#8b5cf6", stock: 14 },
-        { name: "Watermelon Ice", color: "#f43f5e", stock: 9 },
-        { name: "Mint", color: "#10b981", stock: 22 },
-        { name: "Blueberry Ice", color: "#3b82f6", stock: 0 },
-      ],
-    },
-    {
-      id: "vx-15k", name: "Vortex 15K", brand: "Vortex", puffs: 15000,
-      price: 10990, oldPrice: 12990, colors: ["#f97316", "#ef4444"], badge: "Lançamento",
-      nicotine: "5%", battery: "850 mAh recarregável (USB-C)", liquid: "22 ml",
-      display: true,
-      flavors: [
-        { name: "Strawberry Kiwi", color: "#ef4444", stock: 6 },
-        { name: "Peach Ice", color: "#fb923c", stock: 11 },
-        { name: "Cherry Cola", color: "#991b1b", stock: 3 },
-        { name: "Banana Ice", color: "#eab308", stock: 8 },
-      ],
-    },
-    {
-      id: "pf-25k", name: "Prism 25K", brand: "Prism", puffs: 25000,
-      price: 13990, colors: ["#ec4899", "#8b5cf6"], badge: "Tela digital",
-      nicotine: "5%", battery: "1000 mAh recarregável (USB-C)", liquid: "26 ml",
-      display: true,
-      flavors: [
-        { name: "Triple Berry", color: "#a21caf", stock: 7 },
-        { name: "Lime Mint", color: "#84cc16", stock: 5 },
-        { name: "Passion Fruit", color: "#f59e0b", stock: 4 },
-      ],
-    },
-    {
-      id: "nb-5k", name: "Nimbus Mini 5K", brand: "Nimbus", puffs: 5000,
-      price: 5490, colors: ["#06b6d4", "#3b82f6"],
-      nicotine: "5%", battery: "500 mAh recarregável (USB-C)", liquid: "12 ml",
-      flavors: [
-        { name: "Ice Mint", color: "#14b8a6", stock: 18 },
-        { name: "Lychee Ice", color: "#f472b6", stock: 10 },
-        { name: "Mango", color: "#f59e0b", stock: 12 },
-      ],
-    },
-    {
-      id: "vx-12k", name: "Vortex Slim 12K", brand: "Vortex", puffs: 12000,
-      price: 9490, oldPrice: 10490, colors: ["#22c55e", "#0ea5e9"],
-      nicotine: "5%", battery: "650 mAh recarregável (USB-C)", liquid: "18 ml",
-      flavors: [
-        { name: "Green Apple", color: "#22c55e", stock: 9 },
-        { name: "Blue Razz", color: "#2563eb", stock: 0 },
-        { name: "Pineapple Ice", color: "#facc15", stock: 6 },
-      ],
-    },
-    {
-      id: "pf-40k", name: "Prism Max 40K", brand: "Prism", puffs: 40000,
-      price: 17990, colors: ["#f43f5e", "#f59e0b"], badge: "Dual mesh",
-      nicotine: "5%", battery: "1200 mAh recarregável (USB-C)", liquid: "30 ml",
-      display: true,
-      flavors: [
-        { name: "Watermelon Bubblegum", color: "#fb7185", stock: 4 },
-        { name: "Grape Mint", color: "#7c3aed", stock: 3 },
-      ],
-    },
-    {
-      id: "kit-3", name: "Kit 3 Pods 8K", brand: "Nimbus", puffs: 8000, kit: 3,
-      price: 20990, oldPrice: 23970, colors: ["#0f172a", "#7c5cff"], badge: "Economize 12%",
-      nicotine: "5%", battery: "650 mAh cada", liquid: "16 ml cada",
-      flavors: [
-        { name: "Mix sortido", color: "#7c5cff", stock: 10 },
-        { name: "Só gelados", color: "#22d3ee", stock: 6 },
-      ],
-    },
-    {
-      id: "kit-5", name: "Kit 5 Pods 15K", brand: "Vortex", puffs: 15000, kit: 5,
-      price: 47990, oldPrice: 54950, colors: ["#111827", "#f97316"], badge: "Revenda",
-      nicotine: "5%", battery: "850 mAh cada", liquid: "22 ml cada",
-      flavors: [
-        { name: "Mix sortido", color: "#f97316", stock: 5 },
-      ],
-    },
+    {"id": "replay-20k", "name": "Replay 20000", "brand": "Chilly Beats", "type": "pod", "image": "assets/img/replay-20k.webp", "puffs": 20000, "price": 12960, "oldPrice": 13700, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "elf-bc10000", "name": "BC10000", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-bc10000.webp", "puffs": 10000, "price": 9950, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 10}, {"name": "Grape", "color": "#7c3aed", "stock": 10}, {"name": "Peach Ice", "color": "#fb923c", "stock": 10}]},
+    {"id": "ignite-v80", "name": "V80 NE", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v80.webp", "puffs": 8000, "price": 10200, "badge": "Mais vendido", "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "lifepod-eco-refil", "name": "Refil Life Pod Eco", "brand": "Life Pod", "type": "refil", "image": "assets/img/lifepod-eco-refil.webp", "puffs": 8000, "price": 6500, "oldPrice": 8900, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "lifepod-eco-carregador", "name": "Carregador do Pod Eco", "brand": "Life Pod", "type": "acessorio", "image": "assets/img/lifepod-eco-carregador.webp", "price": 4500, "flavors": [{"name": "Padrão", "color": "#141414", "stock": 10}]},
+    {"id": "blvk-unicorn-20k", "name": "Unicorn 20000", "brand": "BLVK", "type": "pod", "image": "assets/img/blvk-unicorn-20k.webp", "puffs": 20000, "price": 13990, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "elf-gh23000", "name": "GH23000", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-gh23000.webp", "puffs": 23000, "price": 12690, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 10}, {"name": "Grape", "color": "#7c3aed", "stock": 10}, {"name": "Peach Ice", "color": "#fb923c", "stock": 10}]},
+    {"id": "lifepod-eco2-refil", "name": "Refil Life Pod Eco 2", "brand": "Life Pod", "type": "refil", "image": "assets/img/lifepod-eco2-refil.webp", "puffs": 10000, "price": 9400, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "replay-36k", "name": "Replay 36000", "brand": "Chilly Beats", "type": "pod", "image": "assets/img/replay-36k.webp", "puffs": 36000, "price": 17900, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "replay-cart-12k", "name": "Cartucho Replay 12000", "brand": "Chilly Beats", "type": "refil", "image": "assets/img/replay-cart-12k.webp", "puffs": 12000, "price": 10400, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "oxbar-g30k", "name": "G30K Pro", "brand": "Oxbar", "type": "pod", "image": "assets/img/oxbar-g30k.webp", "puffs": 30000, "price": 12600, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "elf-te30000", "name": "TE30000", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-te30000.webp", "puffs": 30000, "price": 13790, "badge": "Top avaliado", "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 10}, {"name": "Grape", "color": "#7c3aed", "stock": 10}, {"name": "Peach Ice", "color": "#fb923c", "stock": 10}]},
+    {"id": "lifepod-sk", "name": "SK 10000", "brand": "Life Pod", "type": "pod", "image": "assets/img/lifepod-sk.webp", "puffs": 10000, "price": 14500, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "elf-iceking", "name": "Ice King 40000", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-iceking.webp", "puffs": 40000, "price": 15500, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 10}, {"name": "Grape", "color": "#7c3aed", "stock": 10}, {"name": "Peach Ice", "color": "#fb923c", "stock": 10}]},
+    {"id": "ignite-v250", "name": "V250", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v250.webp", "puffs": 25000, "price": 13300, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "ignite-p100", "name": "P100 Pro", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-p100.webp", "puffs": 10000, "price": 12900, "oldPrice": 15400, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "ignite-p100-cart", "name": "Cartucho P100 Pro", "brand": "Ignite", "type": "refil", "image": "assets/img/ignite-p100-cart.webp", "puffs": 10000, "price": 10500, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "nikbar-n10000", "name": "N10000", "brand": "Nikbar", "type": "pod", "image": "assets/img/nikbar-n10000.webp", "puffs": 10000, "price": 8900, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "oxbar-svopp-carregador", "name": "Carregador SVOPP", "brand": "Oxbar", "type": "acessorio", "image": "assets/img/oxbar-svopp-carregador.webp", "price": 10900, "flavors": [{"name": "Padrão", "color": "#141414", "stock": 10}]},
+    {"id": "ignite-v400", "name": "V400", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v400.webp", "puffs": 40000, "price": 16500, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "ignite-v300", "name": "V300", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v300.webp", "puffs": 30000, "price": 14700, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "blacksheep-dual-40k", "name": "Dual Flavor 40000", "brand": "Black Sheep", "type": "pod", "image": "assets/img/blacksheep-dual-40k.webp", "puffs": 40000, "price": 15800, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "elf-trio40k", "name": "Trio 40K", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-trio40k.webp", "puffs": 40000, "price": 14800, "fromPrice": true, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 10}, {"name": "Grape", "color": "#7c3aed", "stock": 10}, {"name": "Peach Ice", "color": "#fb923c", "stock": 10}]},
+    {"id": "lifepod-theone", "name": "The One 40K", "brand": "Life Pod", "type": "pod", "image": "assets/img/lifepod-theone.webp", "puffs": 40000, "price": 15700, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "ignite-vmix-v400", "name": "V-Mix V400", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-vmix-v400.webp", "puffs": 40000, "price": 16500, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "blvk-icenic-45k", "name": "Ice & Nic Control 45K", "brand": "BLVK x Just Juice", "type": "pod", "image": "assets/img/blvk-icenic-45k.webp", "puffs": 45000, "price": 15850, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "ignite-v400-sweet", "name": "V400 Sweet", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v400-sweet.webp", "puffs": 40000, "price": 17200, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "geekbar-z35", "name": "Z35", "brand": "Geek Bar", "type": "pod", "image": "assets/img/geekbar-z35.webp", "puffs": 35000, "price": 13900, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "lostmary-mt35000", "name": "MT35000", "brand": "Lost Mary", "type": "pod", "image": "assets/img/lostmary-mt35000.webp", "puffs": 35000, "price": 13900, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Triple Berry Ice", "color": "#a21caf", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "nikbar-30k", "name": "Nikbar 30000", "brand": "Nikbar", "type": "pod", "image": "assets/img/nikbar-30k.webp", "puffs": 30000, "price": 13500, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "blacksheep-dualtank-30k", "name": "Dual Tank 30K", "brand": "Black Sheep", "type": "pod", "image": "assets/img/blacksheep-dualtank-30k.webp", "puffs": 30000, "price": 15200, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "elf-bc15000", "name": "BC15000", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-bc15000.webp", "puffs": 15000, "price": 11900, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 10}, {"name": "Grape", "color": "#7c3aed", "stock": 10}, {"name": "Peach Ice", "color": "#fb923c", "stock": 10}]},
+    {"id": "ignite-p100-carregador", "name": "Carregador P100 Pro", "brand": "Ignite", "type": "acessorio", "image": "assets/img/ignite-p100-carregador.webp", "price": 7990, "flavors": [{"name": "Padrão", "color": "#141414", "stock": 10}]},
+    {"id": "blvk-barmini", "name": "Bar Mini 13000", "brand": "BLVK", "type": "pod", "image": "assets/img/blvk-barmini.webp", "puffs": 13000, "price": 11290, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "oxbar-invisible", "name": "Invisible Vapor 50000", "brand": "Oxbar", "type": "pod", "image": "assets/img/oxbar-invisible.webp", "puffs": 50000, "price": 15800, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "elf-iceking-summer", "name": "Ice King Summer Edition", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-iceking-summer.webp", "puffs": 40000, "price": 15500, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 10}, {"name": "Grape", "color": "#7c3aed", "stock": 10}, {"name": "Peach Ice", "color": "#fb923c", "stock": 10}]},
+    {"id": "ignite-v155", "name": "V155 Ultra Slim", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v155.webp", "puffs": 15500, "price": 13200, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "ignite-v55", "name": "V55 Ultra Thin", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v55.webp", "puffs": 5500, "price": 9400, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "dinnerlady-luma", "name": "LUMA 20000", "brand": "Dinner Lady", "type": "pod", "image": "assets/img/dinnerlady-luma.webp", "puffs": 20000, "price": 11200, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "dinnerlady-dual-50k", "name": "Dual Flavor 50000", "brand": "Dinner Lady", "type": "pod", "image": "assets/img/dinnerlady-dual-50k.webp", "puffs": 50000, "price": 17700, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "ebcreate-bcpro", "name": "BC Pro 40000", "brand": "EBCREATE", "type": "pod", "image": "assets/img/ebcreate-bcpro.webp", "puffs": 40000, "price": 14900, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "blacksheep-cybertank", "name": "Cyber Tank Pro 55000", "brand": "Black Sheep", "type": "pod", "image": "assets/img/blacksheep-cybertank.webp", "puffs": 55000, "price": 15800, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "elf-duke", "name": "Duke 35000", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-duke.webp", "puffs": 35000, "price": 13200, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 10}, {"name": "Grape", "color": "#7c3aed", "stock": 10}, {"name": "Peach Ice", "color": "#fb923c", "stock": 10}]},
+    {"id": "dinnerlady-galax", "name": "Galax 60000", "brand": "Dinner Lady", "type": "pod", "image": "assets/img/dinnerlady-galax.webp", "puffs": 60000, "price": 18200, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "oxbar-x15k", "name": "X15K", "brand": "Oxbar", "type": "pod", "image": "assets/img/oxbar-x15k.webp", "puffs": 15000, "price": 10500, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "elf-joinone-cart", "name": "Cartucho Joinone Ice", "brand": "Elf Bar", "type": "refil", "image": "assets/img/elf-joinone-cart.webp", "puffs": 25000, "price": 13400, "fromPrice": true, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 10}, {"name": "Grape", "color": "#7c3aed", "stock": 10}, {"name": "Peach Ice", "color": "#fb923c", "stock": 10}]},
+    {"id": "elf-joinone", "name": "Joinone 25000", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-joinone.webp", "puffs": 25000, "price": 14500, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 10}, {"name": "Grape", "color": "#7c3aed", "stock": 10}, {"name": "Peach Ice", "color": "#fb923c", "stock": 10}]},
+    {"id": "ignite-vfrozen", "name": "V Frozen", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-vfrozen.webp", "puffs": 20000, "price": 12980, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "ignite-v400-slim", "name": "V400 Ultra Slim", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v400-slim.webp", "puffs": 40000, "price": 15200, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "lifepod-eco3-cart", "name": "Cartucho Eco 3", "brand": "Life Pod", "type": "refil", "image": "assets/img/lifepod-eco3-cart.webp", "puffs": 20000, "price": 10800, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "dojo-spherex", "name": "Sphere X", "brand": "Dojo", "type": "pod", "image": "assets/img/dojo-spherex.webp", "puffs": 40000, "price": 11837, "fromPrice": true, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 10}, {"name": "Mint", "color": "#10b981", "stock": 10}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 10}]},
+    {"id": "ignite-shisha-40k", "name": "Shisha 40K", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-shisha-40k.webp", "puffs": 40000, "price": 14200, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "ignite-vmix-boost", "name": "V-Mix Boost Series 40K", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-vmix-boost.webp", "puffs": 40000, "price": 15090, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 10}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 10}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 10}, {"name": "Menthol", "color": "#10b981", "stock": 10}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 10}]},
+    {"id": "lifepod-bateria-eco3", "name": "Bateria com adaptador Eco 2 para Eco 3", "brand": "Life Pod", "type": "acessorio", "image": "assets/img/lifepod-bateria-eco3.webp", "price": 6590, "flavors": [{"name": "Padrão", "color": "#141414", "stock": 10}]},
+    {"id": "ignite-v150", "name": "V150", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v150.webp", "puffs": 15000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 0}, {"name": "Menthol", "color": "#10b981", "stock": 0}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 0}]},
+    {"id": "lifepod-eco2-carregador", "name": "Carregador do Pod Eco 2", "brand": "Life Pod", "type": "acessorio", "image": "assets/img/lifepod-eco2-carregador.webp", "flavors": [{"name": "Padrão", "color": "#141414", "stock": 0}]},
+    {"id": "lostmary-mo20000", "name": "MO20000 Pro", "brand": "Lost Mary", "type": "pod", "image": "assets/img/lostmary-mo20000.webp", "puffs": 20000, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Triple Berry Ice", "color": "#a21caf", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "blacksheep-dualtank-20k", "name": "Dual Tank 20000", "brand": "Black Sheep", "type": "pod", "image": "assets/img/blacksheep-dualtank-20k.webp", "puffs": 20000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mint", "color": "#10b981", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "elf-bc20000", "name": "BC20000", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-bc20000.webp", "puffs": 20000, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 0}, {"name": "Grape", "color": "#7c3aed", "stock": 0}, {"name": "Peach Ice", "color": "#fb923c", "stock": 0}]},
+    {"id": "elf-bc20000-touch", "name": "BC20000 Touch", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-bc20000-touch.webp", "puffs": 20000, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 0}, {"name": "Grape", "color": "#7c3aed", "stock": 0}, {"name": "Peach Ice", "color": "#fb923c", "stock": 0}]},
+    {"id": "lostmary-mixer", "name": "Mixer 30000", "brand": "Lost Mary", "type": "pod", "image": "assets/img/lostmary-mixer.webp", "puffs": 30000, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Triple Berry Ice", "color": "#a21caf", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "oxbar-g64k", "name": "SVOPP G64K", "brand": "Oxbar", "type": "pod", "image": "assets/img/oxbar-g64k.webp", "puffs": 64000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mint", "color": "#10b981", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "oxbar-g32k-cart", "name": "Cartucho SVOPP G32K", "brand": "Oxbar", "type": "refil", "image": "assets/img/oxbar-g32k-cart.webp", "puffs": 32000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mint", "color": "#10b981", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "elf-sweetking", "name": "Sweet King 40000", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-sweetking.webp", "puffs": 40000, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 0}, {"name": "Grape", "color": "#7c3aed", "stock": 0}, {"name": "Peach Ice", "color": "#fb923c", "stock": 0}]},
+    {"id": "lifepod-eco2", "name": "Eco 2 (completo)", "brand": "Life Pod", "type": "pod", "image": "assets/img/lifepod-eco2.webp", "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mint", "color": "#10b981", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "elf-bc10000-touch", "name": "BC10000 Touch", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-bc10000-touch.webp", "puffs": 14000, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 0}, {"name": "Grape", "color": "#7c3aed", "stock": 0}, {"name": "Peach Ice", "color": "#fb923c", "stock": 0}]},
+    {"id": "nikbar-icebaby", "name": "Ice Baby 40000", "brand": "Nikbar", "type": "pod", "image": "assets/img/nikbar-icebaby.webp", "puffs": 40000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mint", "color": "#10b981", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "sexaddict-s280", "name": "S280", "brand": "Sex Addict", "type": "pod", "image": "assets/img/sexaddict-s280.webp", "puffs": 28000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mint", "color": "#10b981", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "nikbar-triplechill", "name": "Triple Chill 40K", "brand": "Nikbar", "type": "pod", "image": "assets/img/nikbar-triplechill.webp", "puffs": 40000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mint", "color": "#10b981", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "ignite-v120", "name": "V120 Pro", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v120.webp", "puffs": 12000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 0}, {"name": "Menthol", "color": "#10b981", "stock": 0}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 0}]},
+    {"id": "ignite-vnano", "name": "V-Nano", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-vnano.webp", "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 0}, {"name": "Menthol", "color": "#10b981", "stock": 0}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 0}]},
+    {"id": "elf-bcpro-45k", "name": "BC Pro 45000", "brand": "Elf Bar", "type": "pod", "image": "assets/img/elf-bcpro-45k.webp", "puffs": 45000, "flavors": [{"name": "Blue Razz Ice", "color": "#2563eb", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Mango", "color": "#f97316", "stock": 0}, {"name": "Grape", "color": "#7c3aed", "stock": 0}, {"name": "Peach Ice", "color": "#fb923c", "stock": 0}]},
+    {"id": "ignite-v500", "name": "V500", "brand": "Ignite", "type": "pod", "image": "assets/img/ignite-v500.webp", "puffs": 50000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Kiwi", "color": "#ef4444", "stock": 0}, {"name": "Menthol", "color": "#10b981", "stock": 0}, {"name": "Blueberry Ice", "color": "#3b82f6", "stock": 0}]},
+    {"id": "lifepod-eco3-system", "name": "Pod System Eco 3", "brand": "Life Pod", "type": "pod", "image": "assets/img/lifepod-eco3-system.webp", "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mint", "color": "#10b981", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "inflave-alphapro", "name": "Alpha Pro 32000", "brand": "Inflave", "type": "pod", "image": "assets/img/inflave-alphapro.webp", "puffs": 32000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mint", "color": "#10b981", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]},
+    {"id": "inflave-onyx", "name": "Onyx Ultra 25000", "brand": "Inflave", "type": "pod", "image": "assets/img/inflave-onyx.webp", "puffs": 25000, "flavors": [{"name": "Grape Ice", "color": "#7c3aed", "stock": 0}, {"name": "Watermelon Ice", "color": "#f43f5e", "stock": 0}, {"name": "Strawberry Ice", "color": "#ef4444", "stock": 0}, {"name": "Mint", "color": "#10b981", "stock": 0}, {"name": "Mango Ice", "color": "#f59e0b", "stock": 0}]}
   ],
 
   faq: [

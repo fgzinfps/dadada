@@ -6,16 +6,18 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const brl = (c) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   const esc = (s) => String(s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
-  const fmtPuffs = (n) => (n >= 1000 ? `${n / 1000}k` : n) + " puffs";
+  const fmtPuffs = (n) => (n ? (n >= 1000 ? `${(n / 1000).toLocaleString("pt-BR")}k` : n) + " puffs" : "");
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
   };
 
-  const stockOf = (p) => p.flavors.reduce((a, f) => a + f.stock, 0);
+  const stockOf = (p) => (p.price ? p.flavors.reduce((a, f) => a + f.stock, 0) : 0);
   const pixPrice = (c) => Math.round(c * (1 - S.pixDiscount));
   const pctOff = (p) => (p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0);
-  const perK = (p) => p.price / ((p.puffs * (p.kit || 1)) / 1000);
+  const perK = (p) => (p.price && p.puffs ? p.price / (p.puffs / 1000) : Infinity);
+  const instOf = (c) => Math.min(S.maxInstallments, ((S.installmentRules || []).find(([min]) => c >= min) || [0, S.maxInstallments])[1]);
+  const instText = (c) => { const n = instOf(c); return n > 1 ? `${n}x ${brl(Math.ceil(c / n))} sem juros` : `${brl(c)} no cartão`; };
   const findP = (id) => S.products.find((p) => p.id === id);
 
   /* ---------- textos vindos da config ---------- */
@@ -42,8 +44,10 @@
   const toast = (msg) => { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2200); };
 
   /* ---------- arte do pod ---------- */
-  const tint = (p) => `--tint:color-mix(in srgb, ${p.colors[0]} 24%, #fbfaf6)`;
-  const podArt = (p) => `<div class="mini-pod ${p.kit ? "kit-2" : ""}" style="--c1:${p.colors[0]};--c2:${p.colors[1]}" data-puffs="${p.kit ? p.kit + "x " : ""}${p.puffs / 1000}K"></div>`;
+  const tint = (p) => (p.image ? "--tint:#fff" : `--tint:color-mix(in srgb, ${p.colors[0]} 24%, #fbfaf6)`);
+  const podArt = (p) => p.image
+    ? `<img src="${esc(p.image)}" alt="${esc(p.brand + " " + p.name)}" loading="lazy" width="480" height="480">`
+    : `<div class="mini-pod" style="--c1:${p.colors[0]};--c2:${p.colors[1]}" data-puffs="${p.puffs ? p.puffs / 1000 + "K" : ""}"></div>`;
 
   /* ---------- catálogo ---------- */
   const state = { cat: "all", q: "", sort: "featured", inStock: false };
@@ -55,10 +59,11 @@
 
   const inCat = (p) => {
     switch (state.cat) {
-      case "lt10k": return !p.kit && p.puffs < 10000;
-      case "10k": return !p.kit && p.puffs >= 10000 && p.puffs < 20000;
-      case "20k": return !p.kit && p.puffs >= 20000;
-      case "kit": return !!p.kit;
+      case "lt20k": return p.type === "pod" && p.puffs && p.puffs < 20000;
+      case "20k": return p.type === "pod" && p.puffs >= 20000 && p.puffs < 35000;
+      case "35k": return p.type === "pod" && p.puffs >= 35000;
+      case "refil": return p.type === "refil";
+      case "acessorio": return p.type === "acessorio";
       default: return true;
     }
   };
@@ -68,9 +73,9 @@
   function render() {
     let list = S.products.filter((p) => inCat(p) && matches(p) && (!state.inStock || stockOf(p) > 0));
     const sorters = {
-      "price-asc": (a, b) => a.price - b.price,
-      "price-desc": (a, b) => b.price - a.price,
-      "puffs-desc": (a, b) => b.puffs * (b.kit || 1) - a.puffs * (a.kit || 1),
+      "price-asc": (a, b) => (a.price || 1e9) - (b.price || 1e9),
+      "price-desc": (a, b) => (b.price || 0) - (a.price || 0),
+      "puffs-desc": (a, b) => (b.puffs || 0) - (a.puffs || 0),
       ppk: (a, b) => perK(a) - perK(b),
     };
     if (sorters[state.sort]) list = [...list].sort(sorters[state.sort]);
@@ -95,14 +100,14 @@
       <div class="card__body">
         <span class="brand">${esc(p.brand)}</span>
         <h3 class="card__name">${esc(p.name)}</h3>
-        <span class="card__meta">${p.kit ? `${p.kit} un. · ` : ""}${fmtPuffs(p.puffs)}${p.display ? " · tela" : ""} · ${brl(Math.round(perK(p)))} por 1k</span>
-        <div class="dots" title="${flavorsLeft} de ${p.flavors.length} sabores disponíveis">${p.flavors.map((f) => `<i class="${f.stock ? "" : "out"}" style="background:${f.color}" title="${esc(f.name)}${f.stock ? "" : " (esgotado)"}"></i>`).join("")}</div>
+        <span class="card__meta">${[fmtPuffs(p.puffs), p.type === "refil" ? "refil" : "", isFinite(perK(p)) ? `${brl(Math.round(perK(p)))} por 1k` : ""].filter(Boolean).join(" · ") || "&nbsp;"}</span>
+        ${p.type === "acessorio" ? "" : `<div class="dots" title="${flavorsLeft} de ${p.flavors.length} sabores disponíveis">${p.flavors.map((f) => `<i class="${f.stock ? "" : "out"}" style="background:${f.color}" title="${esc(f.name)}${f.stock ? "" : " (esgotado)"}"></i>`).join("")}</div>`}
         <div class="card__foot">
-          <div class="price ${p.oldPrice && !sold ? "price--sale" : ""}">
-            ${p.oldPrice ? `<span class="price__old">${brl(p.oldPrice)}</span>` : ""}
+          ${p.price ? `<div class="price ${p.oldPrice && !sold ? "price--sale" : ""}">
+            ${p.oldPrice ? `<span class="price__old">${brl(p.oldPrice)}</span>` : p.fromPrice ? `<span class="price__old price__from">a partir de</span>` : ""}
             <span class="price__now">${brl(pixPrice(p.price))} <small>Pix</small></span>
-            <span class="price__inst">${S.maxInstallments}x ${brl(Math.ceil(p.price / S.maxInstallments))} no cartão</span>
-          </div>
+            <span class="price__inst">ou ${instText(p.price)}</span>
+          </div>` : `<div class="price"><span class="price__inst">Sem estoque no momento</span></div>`}
           <button class="btn btn--line" data-open="${p.id}" ${sold ? "disabled" : ""}>${sold ? "Esgotado" : "Ver"}</button>
         </div>
       </div>
@@ -151,13 +156,16 @@
     $("#m-price").innerHTML = `
       ${p.oldPrice ? `<span class="price__old">de ${brl(p.oldPrice)}</span>` : ""}
       <span class="price__now">${brl(pixPrice(p.price))} <small>no Pix</small></span>
-      <span class="price__inst">${brl(p.price)} em até ${S.maxInstallments}x de ${brl(Math.ceil(p.price / S.maxInstallments))} sem juros</span>`;
+      <span class="price__inst">${brl(p.price)} no cartão${instOf(p.price) > 1 ? ` em até ${instOf(p.price)}x de ${brl(Math.ceil(p.price / instOf(p.price)))} sem juros` : ""}</span>`;
     $("#m-specs").innerHTML = [
-      ["Puffs", fmtPuffs(p.puffs) + (p.kit ? ` × ${p.kit}` : "")],
+      ["Marca", p.brand],
+      ["Puffs", fmtPuffs(p.puffs)],
+      ["Tipo", { pod: "Pod descartável", refil: "Refil / cartucho", acessorio: "Acessório" }[p.type]],
       ["Nicotina", p.nicotine],
       ["Bateria", p.battery],
-      ["Líquido", p.liquid],
-    ].map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("");
+    ].filter(([, v]) => v).map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("");
+    const single = p.flavors.length === 1 && p.flavors[0].name === "Padrão";
+    $("#m-flavors").hidden = single; $(".modal__body h4").hidden = single;
     renderFlavors();
     track("ViewContent", { content_ids: [p.id], content_name: p.name, content_type: "product", value: p.price / 100, currency: "BRL" });
     modal.hidden = false; document.body.classList.add("locked");
@@ -189,7 +197,7 @@
   };
   $("#m-add").onclick = () => {
     track("AddToCart", { content_ids: [cur.id], content_name: `${cur.name} - ${curFlavor.name}`, content_type: "product", value: (cur.price * curQty) / 100, currency: "BRL" });
-    addToCart(cur.id, curFlavor.name, curQty); closeModal(); toast(`${cur.name} · ${curFlavor.name} adicionado`); };
+    addToCart(cur.id, curFlavor.name, curQty); closeModal(); toast(`${cur.name}${curFlavor.name === "Padrão" ? "" : " · " + curFlavor.name} adicionado`); };
   function closeModal() { modal.hidden = true; document.body.classList.remove("locked"); lastFocus && lastFocus.focus(); }
   modal.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closeModal(); });
 
@@ -247,7 +255,7 @@
       ${t.pDisc ? `<dt>Desconto Pix</dt><dd class="disc">−${brl(t.pDisc)}</dd>` : ""}
       <dt>Frete</dt><dd>${t.ship ? brl(t.ship) : "Grátis"}</dd>
       <dt class="grand">Total</dt><dd class="grand">${brl(t.total)}</dd>
-      ${pay === "card" ? `<dt></dt><dd class="muted small">ou ${S.maxInstallments}x de ${brl(Math.ceil(t.total / S.maxInstallments))}</dd>` : ""}`;
+      ${pay === "card" ? `<dt></dt><dd class="small">${instText(t.total)}</dd>` : ""}`;
     $("#coupon").value = coupon || "";
   }
 
@@ -308,7 +316,7 @@
       t.pDisc ? `Desconto Pix: -${brl(t.pDisc)}` : null,
       `Frete: ${t.ship ? brl(t.ship) : "Grátis"}`,
       `*Total: ${brl(t.total)}*`,
-      `Pagamento: ${pay === "pix" ? "Pix" : `Cartão (até ${S.maxInstallments}x)`}`, "",
+      `Pagamento: ${pay === "pix" ? "Pix" : `Cartão (até ${instOf(t.total)}x)`}`, "",
       `CEP: ${[address.cep, address.logradouro, address.bairro, address.localidade && `${address.localidade}/${address.uf}`].filter(Boolean).join(", ")}`,
       "Declaro ter 18 anos ou mais.",
     ].filter((x) => x !== null).join("\n");
