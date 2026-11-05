@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CloudBox — Pods descartáveis</title>
-  <meta name="description" content="Pods descartáveis originais. Envio em 24h, Pix com desconto e frete grátis acima de R$ 250. Venda exclusiva para maiores de 18 anos.">
+  <meta name="description" content="Pods descartáveis com estoque por sabor. Despacho em 24h úteis, desconto no Pix. Venda exclusiva para maiores de 18 anos.">
   <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#0b0b12">
+  <meta name="theme-color" content="#f3f0e8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -17,80 +17,66 @@
   <!-- ===== Verificação de idade ===== -->
   <div class="age" id="age" role="dialog" aria-modal="true" aria-labelledby="age-title" hidden>
     <div class="age__card">
-      <div class="age__badge">18+</div>
+      <p class="age__kicker">Acesso restrito</p>
       <h2 id="age-title">Você tem 18 anos ou mais?</h2>
-      <p>Este site vende produtos com nicotina, que causa dependência. A venda é proibida para menores de 18 anos.</p>
+      <p>Aqui tem produto com nicotina. Nicotina vicia. Venda proibida para menores de 18 anos.</p>
       <div class="age__actions">
-        <button class="btn btn--primary" id="age-yes">Sim, tenho 18+</button>
-        <button class="btn btn--ghost" id="age-no">Não</button>
+        <button class="btn btn--dark" id="age-yes">Tenho 18 ou mais</button>
+        <button class="btn btn--line" id="age-no">Sair</button>
       </div>
     </div>
   </div>
 
   <div class="topbar">
-    <span>🚚 <b data-store="deliveryText"></b></span>
-    <span class="topbar__sep">•</span>
-    <span>Frete grátis acima de <b data-money="freeShippingFrom"></b></span>
-    <span class="topbar__sep">•</span>
-    <span>Cupom <b>BEMVINDO10</b> na 1ª compra</span>
+    <div class="wrap topbar__row">
+      <span data-store="deliveryText"></span>
+      <span>Frete grátis acima de <b data-money="freeShippingFrom"></b></span>
+      <span>1ª compra: cupom <b>BEMVINDO10</b></span>
+    </div>
   </div>
 
   <header class="header">
     <div class="wrap header__row">
-      <a href="#" class="logo" aria-label="Início">
-        <span class="logo__mark"></span><span data-store="name"></span>
-      </a>
+      <a href="#" class="logo" aria-label="Início" data-store="name"></a>
+      <nav class="nav" aria-label="Seções">
+        <a href="#catalogo">Pods</a>
+        <a href="#catalogo" data-cat-link="kit">Kits</a>
+        <a href="#faq">Ajuda</a>
+      </nav>
       <label class="search">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4a7 7 0 1 0 4.4 12.4l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 11 4Zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"/></svg>
-        <input type="search" id="search" placeholder="Buscar pod, marca ou sabor…" autocomplete="off">
+        <span class="sr-only">Buscar</span>
+        <input type="search" id="search" placeholder="Buscar marca ou sabor" autocomplete="off">
       </label>
       <button class="cart-btn" id="open-cart" aria-label="Abrir carrinho">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM5.2 4l.6 3H21l-2 8H7.4L4.3 2H1v2h2.6"/></svg>
-        <span class="cart-btn__count" id="cart-count">0</span>
+        Carrinho <span class="cart-btn__count" id="cart-count">0</span>
       </button>
     </div>
   </header>
 
   <main>
-    <!-- ===== Hero ===== -->
-    <section class="hero">
-      <div class="wrap hero__grid">
-        <div>
-          <span class="pill">Lotes lacrados · código de verificação</span>
-          <h1>Seu pod favorito,<br><span class="grad">na sua porta amanhã.</span></h1>
-          <p class="hero__sub">Sem enrolação: estoque real por sabor, preço com Pix na cara e pedido fechado em 1 minuto pelo WhatsApp.</p>
-          <div class="hero__cta">
-            <a href="#catalogo" class="btn btn--primary btn--lg">Ver pods</a>
-            <a href="#kits" class="btn btn--ghost btn--lg" data-cat-link="kit">Kits com desconto</a>
-          </div>
-          <ul class="hero__stats">
-            <li><b>24h</b><span>para despachar</span></li>
-            <li><b data-pix-pct></b><span>off no Pix</span></li>
-            <li><b data-store="maxInstallments-x"></b><span>sem juros</span></li>
-          </ul>
-        </div>
-        <div class="hero__art" aria-hidden="true">
-          <div class="pod pod--a"></div>
-          <div class="pod pod--b"></div>
-          <div class="pod pod--c"></div>
-          <div class="hero__glow"></div>
-        </div>
+    <!-- ===== Abertura ===== -->
+    <section class="intro wrap">
+      <div class="intro__text">
+        <h1>Descartáveis com estoque de verdade.</h1>
+        <p>O que aparece aqui está na prateleira, sabor por sabor. Escolheu, fechou o carrinho, a gente confirma no WhatsApp e despacha.</p>
+        <a href="#catalogo" class="btn btn--dark btn--lg">Ver o catálogo</a>
       </div>
+      <a class="feature" id="feature" href="#catalogo"></a>
     </section>
 
-    <!-- ===== Benefícios ===== -->
-    <section class="perks wrap">
-      <div class="perk"><span>✔</span><div><b>Originais</b><small>Verificáveis no site do fabricante</small></div></div>
-      <div class="perk"><span>⚡</span><div><b>Envio rápido</b><small>Despacho em até 24h úteis</small></div></div>
-      <div class="perk"><span>₱</span><div><b>Pix com desconto</b><small>Ou cartão em até 3x</small></div></div>
-      <div class="perk"><span>↺</span><div><b>Troca em 7 dias</b><small>Defeito de fábrica</small></div></div>
-    </section>
+    <ul class="facts wrap">
+      <li><b>Despacho em 24h</b> úteis após o pagamento</li>
+      <li><b data-pix-pct></b> de desconto no Pix</li>
+      <li><b data-store="maxInstallments-x"></b> sem juros no cartão</li>
+      <li><b>Troca em 7 dias</b> por defeito de fábrica</li>
+    </ul>
 
     <!-- ===== Catálogo ===== -->
     <section class="catalog wrap" id="catalogo">
       <div class="catalog__head">
-        <h2 id="kits">Catálogo</h2>
+        <h2>Catálogo <span class="catalog__count" id="count"></span></h2>
         <div class="catalog__tools">
+          <label class="toggle"><input type="checkbox" id="instock"> Só com estoque</label>
           <label class="select">
             <span class="sr-only">Ordenar</span>
             <select id="sort">
@@ -98,56 +84,39 @@
               <option value="price-asc">Menor preço</option>
               <option value="price-desc">Maior preço</option>
               <option value="puffs-desc">Mais puffs</option>
-              <option value="ppk">Melhor custo por 1k puffs</option>
+              <option value="ppk">Menor custo por 1k puffs</option>
             </select>
           </label>
-          <label class="toggle"><input type="checkbox" id="instock"> Só com estoque</label>
         </div>
       </div>
-      <div class="chips" id="chips" role="tablist"></div>
-      <p class="catalog__count" id="count"></p>
+      <div class="tabs" id="chips" role="tablist"></div>
       <div class="grid" id="grid"></div>
       <div class="empty" id="empty" hidden>
-        <p>Nada encontrado com esses filtros.</p>
-        <button class="btn btn--ghost" id="clear-filters">Limpar filtros</button>
+        <p>Nada com esses filtros.</p>
+        <button class="btn btn--line" id="clear-filters">Limpar filtros</button>
       </div>
-    </section>
-
-    <!-- ===== Como comprar ===== -->
-    <section class="steps wrap">
-      <h2>Como comprar</h2>
-      <ol>
-        <li><b>1</b><div><h3>Escolha</h3><p>Escolha o pod e o sabor. O estoque mostrado é por sabor.</p></div></li>
-        <li><b>2</b><div><h3>Feche o carrinho</h3><p>Informe o CEP e aplique o cupom. O total já sai com o desconto do Pix.</p></div></li>
-        <li><b>3</b><div><h3>Confirme no WhatsApp</h3><p>Seu pedido chega pronto pra nós. Confirmamos e despachamos.</p></div></li>
-      </ol>
     </section>
 
     <!-- ===== FAQ ===== -->
     <section class="faq wrap" id="faq">
-      <h2>Dúvidas frequentes</h2>
+      <h2>Perguntas</h2>
       <div id="faq-list"></div>
     </section>
   </main>
 
   <footer class="footer">
     <div class="wrap">
-      <div class="warning">
-        <b>ADVERTÊNCIA:</b> Este produto contém nicotina, substância que causa dependência química. Não recomendado para gestantes, lactantes, menores de 18 anos e pessoas com problemas cardíacos ou respiratórios.
-      </div>
+      <p class="warning"><b>Advertência:</b> este produto contém nicotina, substância que causa dependência química. Não recomendado para gestantes, lactantes, menores de 18 anos e pessoas com problemas cardíacos ou respiratórios.</p>
       <div class="footer__row">
-        <div>
-          <a href="#" class="logo"><span class="logo__mark"></span><span data-store="name"></span></a>
-          <p class="muted">Venda proibida para menores de 18 anos.</p>
-        </div>
+        <span class="logo" data-store="name"></span>
         <div class="footer__links">
           <a href="#catalogo">Catálogo</a>
-          <a href="#faq">Dúvidas</a>
+          <a href="#faq">Perguntas</a>
           <a id="footer-wa" target="_blank" rel="noopener">WhatsApp</a>
           <a id="footer-ig" target="_blank" rel="noopener" hidden>Instagram</a>
         </div>
       </div>
-      <p class="muted small">© <span id="year"></span> <span data-store="name"></span>. Imagens ilustrativas.</p>
+      <p class="small">© <span id="year"></span> <span data-store="name"></span> · Venda proibida para menores de 18 anos · Imagens ilustrativas</p>
     </div>
   </footer>
 
@@ -155,23 +124,23 @@
   <div class="modal" id="modal" hidden>
     <div class="modal__backdrop" data-close></div>
     <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="m-title">
-      <button class="icon-btn modal__close" data-close aria-label="Fechar">✕</button>
+      <button class="close" data-close aria-label="Fechar">Fechar</button>
       <div class="modal__art" id="m-art"></div>
       <div class="modal__body">
-        <span class="muted small" id="m-brand"></span>
+        <span class="brand" id="m-brand"></span>
         <h3 id="m-title"></h3>
         <div class="price" id="m-price"></div>
         <h4>Sabor</h4>
         <div class="flavors" id="m-flavors"></div>
         <p class="stock-note" id="m-stock"></p>
-        <div class="specs" id="m-specs"></div>
+        <dl class="specs" id="m-specs"></dl>
         <div class="modal__buy">
           <div class="qty">
             <button id="m-minus" aria-label="Diminuir">−</button>
             <span id="m-qty">1</span>
             <button id="m-plus" aria-label="Aumentar">+</button>
           </div>
-          <button class="btn btn--primary btn--grow" id="m-add">Adicionar</button>
+          <button class="btn btn--dark btn--grow" id="m-add">Adicionar</button>
         </div>
       </div>
     </div>
@@ -182,8 +151,8 @@
     <div class="drawer__backdrop" data-close-cart></div>
     <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="cart-title">
       <div class="drawer__head">
-        <h3 id="cart-title">Seu carrinho</h3>
-        <button class="icon-btn" data-close-cart aria-label="Fechar">✕</button>
+        <h3 id="cart-title">Carrinho</h3>
+        <button class="close" data-close-cart aria-label="Fechar">Fechar</button>
       </div>
       <div class="ship-bar">
         <p id="ship-msg"></p>
@@ -193,7 +162,7 @@
       <div class="drawer__foot" id="cart-foot">
         <div class="row-input">
           <input id="coupon" placeholder="Cupom" autocomplete="off">
-          <button class="btn btn--ghost" id="apply-coupon">Aplicar</button>
+          <button class="btn btn--line" id="apply-coupon">Aplicar</button>
         </div>
         <div class="row-input">
           <input id="cep" placeholder="CEP" inputmode="numeric" maxlength="9" autocomplete="postal-code">
@@ -204,8 +173,8 @@
           <label><input type="radio" name="pay" value="card"> Cartão</label>
         </div>
         <dl class="totals" id="totals"></dl>
-        <button class="btn btn--wa btn--lg btn--block" id="checkout">Finalizar no WhatsApp</button>
-        <p class="muted small center">Ao finalizar, você confirma ter 18 anos ou mais.</p>
+        <button class="btn btn--dark btn--lg btn--block" id="checkout">Enviar pedido no WhatsApp</button>
+        <p class="small center">Ao enviar, você declara ter 18 anos ou mais.</p>
       </div>
     </aside>
   </div>

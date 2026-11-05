@@ -41,14 +41,15 @@
   const toast = (msg) => { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2200); };
 
   /* ---------- arte do pod ---------- */
+  const tint = (p) => `--tint:color-mix(in srgb, ${p.colors[0]} 24%, #fbfaf6)`;
   const podArt = (p) => `<div class="mini-pod ${p.kit ? "kit-2" : ""}" style="--c1:${p.colors[0]};--c2:${p.colors[1]}" data-puffs="${p.kit ? p.kit + "x " : ""}${p.puffs / 1000}K"></div>`;
 
   /* ---------- catálogo ---------- */
   const state = { cat: "all", q: "", sort: "featured", inStock: false };
   const chips = $("#chips");
-  chips.innerHTML = S.categories.map((c) => `<button class="chip" role="tab" data-cat="${c.id}" aria-selected="${c.id === "all"}">${esc(c.label)}</button>`).join("");
+  chips.innerHTML = S.categories.map((c) => `<button class="tab" role="tab" data-cat="${c.id}" aria-selected="${c.id === "all"}">${esc(c.label)}</button>`).join("");
   chips.onclick = (e) => { const b = e.target.closest("[data-cat]"); if (b) setCat(b.dataset.cat); };
-  function setCat(id) { state.cat = id; $$(".chip").forEach((c) => c.setAttribute("aria-selected", c.dataset.cat === id)); render(); }
+  function setCat(id) { state.cat = id; $$(".tab").forEach((c) => c.setAttribute("aria-selected", c.dataset.cat === id)); render(); }
   $$("[data-cat-link]").forEach((a) => a.addEventListener("click", () => setCat(a.dataset.catLink)));
 
   const inCat = (p) => {
@@ -75,42 +76,57 @@
     // esgotados sempre por último
     list = [...list].sort((a, b) => (stockOf(a) > 0 ? 0 : 1) - (stockOf(b) > 0 ? 0 : 1));
 
-    $("#count").textContent = `${list.length} ${list.length === 1 ? "produto" : "produtos"}`;
+    $("#count").textContent = `${list.length} ${list.length === 1 ? "item" : "itens"}`;
     $("#empty").hidden = list.length > 0;
     $("#grid").innerHTML = list.map(card).join("");
   }
 
   function card(p) {
     const stock = stockOf(p), off = pctOff(p), sold = stock === 0;
-    const inst = Math.ceil(p.price / S.maxInstallments);
+    const flavorsLeft = p.flavors.filter((f) => f.stock > 0).length;
     return `
     <article class="card ${sold ? "soldout" : ""}">
-      <button class="card__art" data-open="${p.id}" style="--c2:${p.colors[1]}" aria-label="Ver ${esc(p.name)}">
+      <button class="card__art" data-open="${p.id}" style="${tint(p)}" aria-label="Ver ${esc(p.name)}">
         ${podArt(p)}
-        ${sold ? `<span class="card__badge">Esgotado</span>` : p.badge ? `<span class="card__badge">${esc(p.badge)}</span>` : ""}
+        ${sold ? `<span class="card__badge card__badge--out">Esgotado</span>` : p.badge ? `<span class="card__badge">${esc(p.badge)}</span>` : ""}
         ${off && !sold ? `<span class="card__off">-${off}%</span>` : ""}
       </button>
       <div class="card__body">
-        <span class="card__brand">${esc(p.brand)}</span>
+        <span class="brand">${esc(p.brand)}</span>
         <h3 class="card__name">${esc(p.name)}</h3>
-        <div class="card__meta">
-          <span class="tag">${fmtPuffs(p.puffs)}${p.kit ? " cada" : ""}</span>
-          <span class="tag">${brl(Math.round(perK(p)))}/1k</span>
-          ${p.display ? `<span class="tag">Tela</span>` : ""}
-        </div>
-        <div class="dots" title="${p.flavors.length} sabores">${p.flavors.map((f) => `<i class="${f.stock ? "" : "out"}" style="background:${f.color}" title="${esc(f.name)}"></i>`).join("")}</div>
+        <span class="card__meta">${p.kit ? `${p.kit} un. · ` : ""}${fmtPuffs(p.puffs)}${p.display ? " · tela" : ""} · ${brl(Math.round(perK(p)))} por 1k</span>
+        <div class="dots" title="${flavorsLeft} de ${p.flavors.length} sabores disponíveis">${p.flavors.map((f) => `<i class="${f.stock ? "" : "out"}" style="background:${f.color}" title="${esc(f.name)}${f.stock ? "" : " (esgotado)"}"></i>`).join("")}</div>
         <div class="card__foot">
-          <div class="price">
+          <div class="price ${p.oldPrice && !sold ? "price--sale" : ""}">
             ${p.oldPrice ? `<span class="price__old">${brl(p.oldPrice)}</span>` : ""}
-            <span class="price__now">${brl(pixPrice(p.price))}</span>
-            <span class="price__pix">no Pix</span>
-            <span class="price__inst">ou ${S.maxInstallments}x ${brl(inst)}</span>
+            <span class="price__now">${brl(pixPrice(p.price))} <small>Pix</small></span>
+            <span class="price__inst">${S.maxInstallments}x ${brl(Math.ceil(p.price / S.maxInstallments))} no cartão</span>
           </div>
-          <button class="btn btn--primary" data-open="${p.id}" ${sold ? "disabled" : ""}>${sold ? "Esgotado" : "Comprar"}</button>
+          <button class="btn btn--line" data-open="${p.id}" ${sold ? "disabled" : ""}>${sold ? "Esgotado" : "Ver"}</button>
         </div>
       </div>
     </article>`;
   }
+
+  /* destaque do topo: produto marcado como "Mais vendido" (ou o 1º com estoque) */
+  const feat = S.products.find((p) => p.badge === "Mais vendido" && stockOf(p) > 0) || S.products.find((p) => stockOf(p) > 0);
+  const featEl = $("#feature");
+  if (feat) {
+    featEl.innerHTML = `
+      <div class="feature__art" style="${tint(feat)}">${podArt(feat)}</div>
+      <div class="feature__info">
+        <span class="feature__kicker">Mais pedido da semana</span>
+        <span class="brand">${esc(feat.brand)}</span>
+        <h3 class="feature__name">${esc(feat.name)}</h3>
+        <span class="card__meta">${fmtPuffs(feat.puffs)} · ${feat.flavors.filter((f) => f.stock).length} sabores</span>
+        <div class="price ${feat.oldPrice ? "price--sale" : ""}">
+          ${feat.oldPrice ? `<span class="price__old">${brl(feat.oldPrice)}</span>` : ""}
+          <span class="price__now">${brl(pixPrice(feat.price))} <small>Pix</small></span>
+        </div>
+        <span class="feature__go">Escolher sabor</span>
+      </div>`;
+    featEl.addEventListener("click", (e) => { e.preventDefault(); openModal(feat.id); });
+  } else featEl.hidden = true;
 
   $("#grid").onclick = (e) => { const b = e.target.closest("[data-open]"); if (b && !b.disabled) openModal(b.dataset.open); };
   let qT;
@@ -127,22 +143,23 @@
     const p = findP(id); if (!p) return;
     cur = p; curQty = 1; lastFocus = document.activeElement;
     curFlavor = p.flavors.find((f) => f.stock > 0) || null;
-    const art = $("#m-art"); art.style.setProperty("--c2", p.colors[1]); art.innerHTML = podArt(p);
+    const art = $("#m-art"); art.setAttribute("style", tint(p)); art.innerHTML = podArt(p);
     $("#m-brand").textContent = p.brand;
     $("#m-title").textContent = p.name;
+    $("#m-price").className = "price" + (p.oldPrice ? " price--sale" : "");
     $("#m-price").innerHTML = `
-      ${p.oldPrice ? `<span class="price__old">${brl(p.oldPrice)}</span>` : ""}
-      <span class="price__now">${brl(pixPrice(p.price))} <small class="price__pix">no Pix</small></span>
+      ${p.oldPrice ? `<span class="price__old">de ${brl(p.oldPrice)}</span>` : ""}
+      <span class="price__now">${brl(pixPrice(p.price))} <small>no Pix</small></span>
       <span class="price__inst">${brl(p.price)} em até ${S.maxInstallments}x de ${brl(Math.ceil(p.price / S.maxInstallments))} sem juros</span>`;
     $("#m-specs").innerHTML = [
       ["Puffs", fmtPuffs(p.puffs) + (p.kit ? ` × ${p.kit}` : "")],
       ["Nicotina", p.nicotine],
       ["Bateria", p.battery],
       ["Líquido", p.liquid],
-    ].map(([k, v]) => `<div><small>${k}</small>${esc(v)}</div>`).join("");
+    ].map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("");
     renderFlavors();
     modal.hidden = false; document.body.classList.add("locked");
-    $(".modal__close").focus();
+    $(".modal__card .close").focus();
   }
   function renderFlavors() {
     $("#m-flavors").innerHTML = cur.flavors.map((f, i) => `
@@ -204,7 +221,7 @@
     const t = totals();
     const missing = S.freeShippingFrom - t.sub;
     $("#ship-msg").innerHTML = t.sub === 0 ? `Frete grátis acima de <b>${brl(S.freeShippingFrom)}</b>`
-      : missing > 0 ? `Faltam <b>${brl(missing)}</b> para o frete grátis` : `🎉 Você ganhou <b>frete grátis</b>`;
+      : missing > 0 ? `Faltam <b>${brl(missing)}</b> para o frete grátis` : `Frete grátis garantido`;
     $("#ship-fill").style.width = Math.min(100, (t.sub / S.freeShippingFrom) * 100) + "%";
 
     $("#cart-foot").hidden = cart.length === 0;
@@ -212,7 +229,7 @@
       ? `<div class="cart-empty"><p>Seu carrinho está vazio.</p><button class="btn btn--ghost" data-close-cart>Ver pods</button></div>`
       : cart.map((l, i) => { const p = findP(l.id); return `
         <div class="line">
-          <div class="line__art">${podArt(p)}</div>
+          <div class="line__art" style="${tint(p)}">${podArt(p)}</div>
           <div><b>${esc(p.name)}</b><small>${esc(l.flavor)}</small><br><small>${brl(p.price)} un.</small></div>
           <div class="line__right">
             <div class="qty qty--sm"><button data-dec="${i}" aria-label="Diminuir">−</button><span>${l.qty}</span><button data-inc="${i}" aria-label="Aumentar">+</button></div>
