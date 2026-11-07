@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>CloudBox — Pods descartáveis</title>
-  <meta name="description" content="Pods descartáveis Ignite, Elf Bar, Life Pod, Oxbar e mais. Envio em 24h, pagamento no Pix. Venda exclusiva para maiores de 18 anos.">
+  <title>CloudBox — Pods descartáveis no atacado</title>
+  <meta name="description" content="Pods descartáveis no atacado: Ignite, Elf Bar, Life Pod, Oxbar e mais. Pedido mínimo de 10 unidades, pagamento no Pix. Venda exclusiva para maiores de 18 anos.">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#f4f2ec">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,8 +48,8 @@
 
   <main>
     <section class="intro wrap">
-      <h1>Pods descartáveis originais.</h1>
-      <p>Ignite, Elf Bar, Life Pod, Oxbar e mais. <b>Pagamento no Pix</b>, envio em até 24h úteis e pedido fechado no WhatsApp.</p>
+      <h1>Pods descartáveis no atacado.</h1>
+      <p>Ignite, Elf Bar, Life Pod, Oxbar e mais, a partir de <b>R$ 25,90 a unidade</b>. Pedido mínimo de <b><span data-min-order></span> unidades</b>, misturando modelos e sabores. Pagamento no Pix e pedido fechado no WhatsApp.</p>
       <div class="brands" id="brands" aria-label="Filtrar por marca"></div>
     </section>
 
@@ -76,10 +76,10 @@
     </section>
 
     <ul class="facts wrap">
-      <li><b>Envio em 24h</b><span>úteis após o pagamento</span></li>
+      <li><b>Mínimo <span data-min-order></span> unidades</b><span>misture modelos e sabores</span></li>
       <li><b>Pagamento no Pix</b><span>rápido e seguro</span></li>
       <li><b>Frete grátis</b><span>acima de <span data-money="freeShippingFrom"></span></span></li>
-      <li><b>Troca em 7 dias</b><span>por defeito de fábrica</span></li>
+      <li><b>Envio em 24h</b><span>úteis após o pagamento</span></li>
     </ul>
 
     <section class="faq wrap" id="faq">
@@ -123,7 +123,7 @@
           <legend>Escolha o sabor</legend>
           <div id="m-flavors"></div>
         </fieldset>
-        <p class="ok-note"><span class="dot"></span> Disponível · <span data-store="deliveryText"></span></p>
+        <p class="ok-note"><span class="dot"></span> Disponível · atacado a partir de <span data-min-order></span> unidades no total</p>
       </div>
       <div class="modal__buy">
         <div class="qty">
@@ -150,7 +150,7 @@
       </div>
       <div class="drawer__items" id="cart-items"></div>
       <div class="drawer__foot" id="cart-foot">
-        <div class="row-input">
+        <div class="row-input" id="coupon-row">
           <input id="coupon" placeholder="Cupom de desconto" autocomplete="off" autocapitalize="characters">
           <button class="btn btn--line" id="apply-coupon">Aplicar</button>
         </div>

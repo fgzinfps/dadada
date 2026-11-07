@@ -30,7 +30,9 @@
   $$("[data-money]").forEach((el) => (el.textContent = brl(S[el.dataset.money])));
   $$("[data-pix-pct]").forEach((el) => (el.textContent = `${Math.round(S.pixDiscount * 100)}%`));
   $$("[data-pix-pct-off]").forEach((el) => (el.textContent = `-${Math.round(S.pixDiscount * 100)}%`));
-  $("#topbar-msg").textContent = `Frete grátis acima de ${brl(S.freeShippingFrom).replace(",00", "")} · ${S.deliveryText}`;
+  $("#topbar-msg").textContent = `Atacado · mínimo ${S.minOrder} un. · frete grátis acima de ${brl(S.freeShippingFrom).replace(",00", "")}`;
+  $$("[data-min-order]").forEach((el) => (el.textContent = S.minOrder));
+  if (!Object.keys(S.coupons || {}).length) $("#coupon-row").hidden = true;
   $("#year").textContent = new Date().getFullYear();
   $("#footer-wa").href = waLink(); $("#footer-wa-num").textContent = waPretty;
   $("#wa-float").href = waLink(`Olá! Vim pelo site da ${S.name}.`);
@@ -93,7 +95,7 @@
   const priceBlock = (p, lg) => p.price ? `
     <div class="price ${p.oldPrice ? "price--sale" : ""} ${lg ? "price--lg" : ""}">
       ${p.oldPrice ? `<span class="price__old">${brl(p.oldPrice)}</span>` : p.fromPrice ? `<span class="price__from">a partir de</span>` : ""}
-      <span class="price__now">${brl(pixPrice(p.price))}</span>
+      <span class="price__now">${brl(pixPrice(p.price))} <small>/un.</small></span>
       <span class="price__pix">${pixTag}</span>
     </div>` : `<div class="price price--ask ${lg ? "price--lg" : ""}"><span class="price__now">Preço no WhatsApp</span><span class="price__inst">Disponível · consulte o valor</span></div>`;
 
@@ -112,7 +114,7 @@
         <h3 class="card__name">${esc(p.name)}</h3>
         ${meta ? `<span class="card__meta">${meta}</span>` : ""}
         <div class="card__price">${priceBlock(p)}</div>
-        <button class="btn ${p.price ? "btn--dark" : "btn--line"}" data-open="${p.id}">${p.price ? "Comprar" : "Consultar"}</button>
+        <button class="btn ${p.price ? "btn--dark" : "btn--line"}" data-open="${p.id}">${p.price ? "Adicionar" : "Consultar"}</button>
       </div>
     </article>`;
   }
@@ -187,16 +189,21 @@
   function renderCart() {
     $("#cart-count").textContent = cart.reduce((a, l) => a + l.qty, 0);
     const t = totals(), missing = S.freeShippingFrom - t.sub;
-    $("#ship-msg").innerHTML = t.sub === 0 ? `Frete grátis acima de <b>${brl(S.freeShippingFrom)}</b>`
-      : missing > 0 ? `Faltam <b>${brl(missing)}</b> para o frete grátis` : `<b>Frete grátis</b> no seu pedido`;
-    $("#ship-fill").style.width = Math.min(100, (t.sub / S.freeShippingFrom) * 100) + "%";
+    const units = cart.reduce((a, l) => a + l.qty, 0), lack = Math.max(0, S.minOrder - units);
+    // Atacado: primeiro mostra o mínimo de unidades; depois, o progresso do frete grátis
+    $("#ship-msg").innerHTML = lack > 0
+      ? `Pedido mínimo: <b>${S.minOrder} unidades</b>${units ? ` · faltam <b>${lack}</b>` : ""} (pode misturar modelos)`
+      : missing > 0 ? `Mínimo atingido ✓ · faltam <b>${brl(missing)}</b> para o frete grátis` : `Mínimo atingido ✓ · <b>frete grátis</b>`;
+    $("#ship-fill").style.width = (lack > 0 ? Math.min(100, (units / S.minOrder) * 100) : Math.min(100, (t.sub / S.freeShippingFrom) * 100)) + "%";
+    $("#checkout").disabled = lack > 0;
+    $("#checkout").textContent = lack > 0 ? `Faltam ${lack} unidade${lack > 1 ? "s" : ""} para o mínimo` : "Finalizar pedido no WhatsApp";
     $("#cart-foot").hidden = cart.length === 0;
     $("#cart-items").innerHTML = cart.length === 0
       ? `<div class="cart-empty"><p>Seu carrinho está vazio.</p><button class="btn btn--line" data-close-cart>Ver produtos</button></div>`
       : cart.map((l, i) => { const p = findP(l.id); return `
         <div class="line">
           <div class="line__art">${img(p)}</div>
-          <div><b>${esc(p.brand)} ${esc(p.name)}</b>${isSingle(p) ? "" : `<small>${esc(l.flavor)}</small>`}<small>${brl(pixPrice(p.price))} un.</small></div>
+          <div><b>${esc(p.brand)} ${esc(p.name)}</b>${isSingle(p) ? "" : `<small>${esc(l.flavor)}</small>`}<small>${brl(pixPrice(p.price))}/un. · ${brl(pixPrice(p.price) * l.qty)}</small></div>
           <div class="line__right">
             <div class="qty qty--sm"><button data-dec="${i}" aria-label="Diminuir">−</button><span>${l.qty}</span><button data-inc="${i}" aria-label="Aumentar">+</button></div>
             <button class="line__rm" data-rm="${i}">remover</button>
@@ -250,11 +257,12 @@
 
   $("#checkout").onclick = () => {
     if (!cart.length) return;
+    if (cart.reduce((a, l) => a + l.qty, 0) < S.minOrder) { toast(`Pedido mínimo: ${S.minOrder} unidades`); return; }
     if (!address) { toast("Informe seu CEP para calcular o frete"); cepIn.focus(); return; }
     const t = totals();
     const lines = cart.map((l) => { const p = findP(l.id); return `• ${l.qty}x ${p.brand} ${p.name}${isSingle(p) ? "" : " — " + l.flavor} (${brl(p.price * l.qty)})`; });
     const msg = [
-      `Olá! Quero fazer este pedido na ${S.name}:`, "", ...lines, "",
+      `Olá! Quero fazer este pedido de ATACADO na ${S.name} (${cart.reduce((a, l) => a + l.qty, 0)} unidades):`, "", ...lines, "",
       `Subtotal: ${brl(t.sub)}`,
       t.cDisc ? `Cupom ${coupon}: -${brl(t.cDisc)}` : null,
       `Frete: ${t.ship ? brl(t.ship) : "Grátis"}`,
